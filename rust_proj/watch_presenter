@@ -1,0 +1,1 @@
+./tailwind -i ./templates/input_presenter.css -o ./assets/css/presenter.css --watch

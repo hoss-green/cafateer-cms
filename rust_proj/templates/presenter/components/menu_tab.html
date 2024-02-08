@@ -1,0 +1,15 @@
+{%- import "presenter/components/menu_item.html" as scope -%}
+{% macro tab(name, menu_items) %}
+<!-- tab -->
+<input type="radio" name="my_tabs_1" role="tab" class="tab" aria-label="{{ name }}" />
+<div role="tabpanel" class="tab-content w-full max-w-5xl">
+  <div class="w-full">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 w-full">
+        {% for item in menu_items %}
+          {% call scope::menu_item(item.title, item.description, item.price) %}
+        {% endfor %}
+    </div>
+  </div>
+</div>
+<!-- end tab -->
+{% endmacro %}

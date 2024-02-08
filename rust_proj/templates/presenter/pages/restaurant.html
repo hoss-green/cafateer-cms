@@ -1,0 +1,139 @@
+{%- import "presenter/components/menu_tab.html" as scope -%} {% extends "presenter/presenter_base.html" %} {%
+block title %}{{ title }}{% endblock %} {% block content %}
+<!-- Header -->
+<div
+  class="text-sm w-full bg-primary-content text-base-100 flex items-center flex-col md:flex-row md:justify-between md:px-4 font-light min-h-12 gap-4 py-4"
+>
+  <div>C.C. Street Market La Tejita</div>
+  <!-- social -->
+  <div class="flex gap-4">
+    <a class="text-lg" href="https://www.instagram.com/sunnycafetf"><i class="fa-brands fa-instagram"></i></a>
+    <a class="text-lg" href="mailto:latejita@sunny-cafe.es"><i class="fa-solid fa-envelope"></i></a>
+    <a class="text-lg" href="tel:+34 607 395 044"><i class="fa-solid fa-phone"></i></a>
+  </div>
+  <div>Open Wed-Sun: 8am - 4pm</div>
+</div>
+
+<!-- Hero -->
+<div class="w-full flex flex-col justify-center items-center py-12">
+  <h1 class="text-center text-[8rem] font-logo font-thin text-secondary">
+    Sunny Cafe
+  </h1>
+  <!--<p class="text-center font-label uppercase font-bold text-lg opacity-80">Fine Food, Fine Drinks &amp; Fine Service</p>-->
+</div>
+<div class="flex flex-col justify-center items-center">
+  <div class="flex gap-1 p-4 md:px-16 max-w-4xl">
+    <a href="#menu">Menu</a>
+    <p>|</p>
+    <a href="#find_us">Find Us</a>
+  </div>
+  <div class="flex gap-4 p-4 md:px-16 max-w-4xl">
+    <div>
+      <img class="rounded-sm" src="assets/images/sunny-3.jpeg" />
+    </div>
+    <div>
+      <img class="rounded-sm" src="assets/images/sunny-1.jpg" />
+    </div>
+  </div>
+</div>
+<div class="px-4 flex flex-col justify-center items-center">
+  <div class="pt-12 pb-4">
+    <h5
+      class="bg-primary-content text-base-100 font-label uppercase py-[0.1rem] px-2"
+    >
+      About Us
+    </h5>
+  </div>
+  <p class="font-light text-md max-w-lg">
+    Gluten free options, vegan options, our own grown produce and walking distance from "La Tejita" beach. Meticulously crafted, locally sourced dishes coupled with artisan espresso, wonderful teas, cocktails, smoothies, local wines, beers and spirits. Sunny Cafes's offering is simple: uncomplicated seasonal fare presented in a clean and wonderful space without terrace seating and excellent service. Join the morning rush or swing by later for a cheeky bite - you new local awaits.
+  </p>
+</div>
+
+<div id="menu" class="px-4 flex flex-col justify-center items-center w-full">
+  <div class="pt-12 pb-4">
+    <h5
+      class="bg-primary-content text-base-100 font-label uppercase py-[0.1rem] px-2"
+    >
+      Menu
+    </h5>
+  </div>
+  <div class="flex w-full justify-center">
+    <div class="px-4 flex justify-center items-center w-full max-w-4xl">
+      <div role="tablist" class="tabs w-full">
+        {% for tab in menu_tabs %} 
+        {% call scope::tab(tab.name, tab.menu_items.clone()) %} 
+        {% endfor %}
+        <!-- <input type="radio" name="my_tabs_1" role="tab" class="tab" aria-label="Toast" /> -->
+        <!-- <div role="tabpanel" class="tab-content w-full max-w-5xl"> -->
+        <!--     <div class="w-full"> -->
+        <!--       <div class="grid grid-cols-1 md:grid-cols-2 gap-3 w-full"> -->
+        <!--       </div> -->
+        <!--     </div> -->
+        <!--   </div> -->
+        <!---->
+        <!-- <input type="radio" name="my_tabs_1" role="tab" class="tab" aria-label="Bowls" /> -->
+        <!-- <div role="tabpanel" class="tab-content w-full max-w-5xl"> -->
+        <!--   <div class="w-full max-w-6xl"> -->
+        <!--   <p>empty</p> -->
+        <!--   </div> -->
+        <!-- </div> -->
+
+        <!-- <input type="radio" name="my_tabs_1" role="tab" class="tab" aria-label="Lunch" /> -->
+        <!-- <div role="tabpanel" class="tab-content w-full max-w-5xl"> -->
+        <!--   <p class="font-light text-md max-w-lg">  -->
+        <!--   3 From ambitious Melbourne locals Marc Bailey and Sarah Hocking comes Padre - An adventure in meticulously crafted, locally sourced dishes coupled with artisan espresso from award-winning barista Nicholas Hoppner. -->
+        <!--   <br/> -->
+        <!--   <br/> -->
+        <!--   Padre's offering is simple: uncomplicated seasonal fare presented in a light-filled, contemporary space. Join the morning rush or swing by later for a cheeky bite - you new local awaits. -->
+        <!--   </p> -->
+        <!-- </div> -->
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Find us -->
+<div id="find_us" class="w-full flex justify-center font-light">
+  <div class="w-full py-16 px-4 md:px-32 max-w-3xl">
+    <div class="bg-base-100 p-16">
+      <p>
+        <span class="font-bold">Open daily from 7am - 4pm</span>
+        <br />
+        Drop by for a coffee or bite to eat, for larger groups call ahead to
+        make a reservation.
+        <br />
+        <br />
+        C. Hernán Cortés, 2, Local 6, 38618 La Tejita, Santa Cruz de Tenerife
+        <br />
+        <br />
+        Phone: +34607395044
+        <br />
+        latejita@sunny-cafe.es
+      </p>
+    </div>
+    <div class="grid grid-cols-2 w-full gap-2 mt-2">
+      <a
+        target="_blank"
+        class="btn btn-primary btn-outline rounded-sm"
+        href="https://maps.app.goo.gl/yM4YSK5233hm4cZ19"
+        >Google Maps</a
+      >
+      <a
+        target="_blank"
+        class="btn btn-secondary btn-outline rounded-sm"
+        href="https://maps.apple.com/?address=Calle%20de%20Hern%C3%A1n%20Cort%C3%A9s,%202%20Local%206,%2038018%20Santa%20Cruz%20de%20Tenerife,%20Spain&auid=2095440094327282356&ll=28.033293,-16.563059&lsp=9902&q=Sunny%20Caf%C3%A9"
+        >Apple Maps</a
+      >
+    </div>
+  </div>
+</div>
+
+<!-- footer -->
+<div
+  class="text-sm w-full bg-primary-content text-base-100 flex items-center flex-col md:flex-row md:justify-between md:px-4 font-light min-h-32 gap-4 py-4"
+>
+  <div class="w-full flex flex-col justify-center items-center pt-8 pb-16">
+    <h1 class="text-center text-8xl font-logo font-thin">SC</h1>
+    <p class="text-center">Fine Food, Fine Drinks, Fine Service</p>
+  </div>
+</div>
+{% endblock %}

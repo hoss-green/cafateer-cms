@@ -1,0 +1,2 @@
+./tailwind -i ./templates/presenter_in.css -o ./assets/css/presenter.css
+./tailwind -i ./templates/manager_in.css -o ./assets/css/manager.css

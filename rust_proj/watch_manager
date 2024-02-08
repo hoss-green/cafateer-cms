@@ -1,0 +1,1 @@
+./tailwind -i ./templates/manager_in.css -o ./assets/css/manager.css --watch

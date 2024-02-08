@@ -1,0 +1,9 @@
+{% macro menu_item(title, description, price) %}
+<!-- item -->
+<div class="p-2 bg-base-100">
+  <span class="font-bold block text-lg">{{ title }}</span>
+  <p class="text-md font-light">{{ description }}</p>
+  <span class="font-bold">{{ price }}</span>
+</div>
+<!-- item end -->
+{% endmacro %}
