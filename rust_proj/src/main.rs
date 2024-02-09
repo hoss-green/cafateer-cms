@@ -2,7 +2,7 @@ use axum::{
     routing::{get, post},
     Router,
 };
-use cafeteer::manager::{get_details_home, get_manager_home};
+use cafeteer::{data::setup_db, manager::{get_details_home, get_manager_home}};
 use cafeteer::presenter::restaurant::get_restaurant;
 use cafeteer::{data::context::AppState, manager::post_details_home};
 use dotenv::dotenv;
@@ -24,6 +24,8 @@ async fn main() {
             }
         },
     };
+
+    setup_db(&state).await;
 
     let router = Router::new()
         .nest_service("/assets", tower_http::services::ServeDir::new("assets"))
