@@ -1,35 +1,54 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct BioItem {
+pub struct BioModel {
     pub id: uuid::Uuid,
     pub name: String,
-    pub address: String
+    pub address: String,
 }
 
-impl BioItem {
-    pub fn new() -> BioItem{
-        BioItem {
+impl BioModel {
+    pub fn new() -> BioModel {
+        BioModel {
             id: uuid::Uuid::new_v4(),
             name: "My El Cafe".to_string(),
-            address: "Nowhere".to_string() 
+            address: "Nowhere".to_string(),
         }
     }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct DetailsItem {
+pub struct DetailsModel {
     pub id: uuid::Uuid,
     pub lang: i32,
     pub blurb: Option<String>,
 }
 
-impl DetailsItem {
-    pub fn new() -> DetailsItem{
-        DetailsItem {
+impl DetailsModel {
+    pub fn new() -> DetailsModel {
+        DetailsModel {
             id: uuid::Uuid::new_v4(),
-            lang: 0,//  "en".to_string(),
+            lang: 0, //  "en".to_string(),
             blurb: None,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DetailLangModel {
+    pub id: uuid::Uuid,
+    pub lang: i32,
+    pub blurb: Option<String>,
+    pub code: String,
+}
+
+impl DetailLangModel {
+    pub fn new() -> DetailLangModel {
+        DetailLangModel {
+            id: uuid::Uuid::new_v4(),
+            lang: 0, //  "en".to_string(),
+            blurb: None,
+            code: "en".to_string(),
         }
     }
 }

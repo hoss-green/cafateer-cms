@@ -1056,20 +1056,12 @@ input[type="range"]::-ms-fill-lower {
   width: 100%;
 }
 
-.max-w-md {
-  max-width: 28rem;
+.max-w-2xl {
+  max-width: 42rem;
 }
 
 .max-w-sm {
   max-width: 24rem;
-}
-
-.max-w-lg {
-  max-width: 32rem;
-}
-
-.max-w-2xl {
-  max-width: 42rem;
 }
 
 .flex-1 {
