@@ -1,6 +1,6 @@
 mod home;
 mod details;
-mod menu;
+// mod menu;
 pub mod templates;
 
 pub use home::get_manager_home;

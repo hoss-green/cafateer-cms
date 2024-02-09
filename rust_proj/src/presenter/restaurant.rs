@@ -2,7 +2,7 @@ use askama::Template;
 use axum::{extract::State, response::Html};
 use http::StatusCode;
 
-use crate::{data::{fetcher, context::AppState}, data_models::MenuItem, view_models::{components::{MenuItemComponent, MenuTabComponent}, pages::RestaurantPage}};
+use crate::{data::{fetcher, context::AppState}, view_models::{components::{MenuItemComponent, MenuTabComponent}, pages::RestaurantPage}};
 
 pub async fn get_restaurant(State(app_state): State<AppState>) -> (StatusCode, Html<String>) {
 

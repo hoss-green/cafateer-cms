@@ -1,9 +1,9 @@
 use super::context::AppState;
 
-fn get_allergies(state:AppState) {
+pub fn get_allergies(state:AppState) {
 
 }
 
-fn get_menu_items(stata:AppState) {
+pub async fn get_languages(state:AppState) {
 
 }

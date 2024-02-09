@@ -1,11 +1,11 @@
-use super::templates::ManagerHomePage;
+use super::templates::StartPage;
 use crate::data::context::AppState;
 use askama::Template;
 use axum::{extract::State, response::Html};
 use http::StatusCode;
 
 pub async fn get_manager_home(State(app_state): State<AppState>) -> (StatusCode, Html<String>) {
-    let editor_home = ManagerHomePage {
+    let editor_home = StartPage {
         title: "Editor Home for SC",
     };
 

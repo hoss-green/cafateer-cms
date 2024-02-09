@@ -13,7 +13,6 @@ pub async fn get_menu_items(State(app_state): State<AppState>) -> (StatusCode, H
     let editor_home = DetailsPage {
         title: "Editor Home for SC",
         id: bio_details.id,
-        lang: bio_details.lang,
         name: bio_details.name,
         info: bio_details.info.unwrap_or("".to_string()),
     };

@@ -1,7 +1,7 @@
 use super::templates::DetailsPage;
 use crate::{
     data::{self, context::AppState},
-    data_models::BioItem,
+    data_models::DetailsItem,
 };
 use askama::Template;
 use axum::{extract::State, response::Html, Form};
@@ -14,8 +14,7 @@ pub async fn get_details_home(State(app_state): State<AppState>) -> (StatusCode,
         title: "Editor Home for SC",
         id: bio_details.id,
         lang: bio_details.lang,
-        name: bio_details.name,
-        info: bio_details.info.unwrap_or("".to_string()),
+        blurb: bio_details.blurb.unwrap_or("".to_string()),
     };
 
     let editor_home: String = editor_home.render().unwrap().to_string();
@@ -25,10 +24,10 @@ pub async fn get_details_home(State(app_state): State<AppState>) -> (StatusCode,
 
 pub async fn post_details_home(
     State(app_state): State<AppState>,
-    Form(bio_item): Form<BioItem>,
+    Form(details_item): Form<DetailsItem>,
 ) -> (StatusCode, Html<String>) {
     let mut info: String = "Details updated successfully".to_string();
-    let result = data::details::set_details(&app_state, bio_item).await;
+    let result = data::details::set_details(&app_state, details_item).await;
     if !result {
         info = "Failed to updated details".to_string();
     }
