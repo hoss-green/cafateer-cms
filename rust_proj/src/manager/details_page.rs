@@ -10,16 +10,19 @@ use http::StatusCode;
 use serde::{Deserialize, Serialize};
 
 pub async fn get_details_home(State(app_state): State<AppState>) -> (StatusCode, Html<String>) {
+    let language_list = data::references::get_languages(&app_state).await;
     let details_list = data::details::get_details_list(&app_state).await;
     let editor_home = DetailsPage {
         title: "Editor Home for SC",
+        languages: language_list,
         details: details_list
             .iter()
             .map(|item| DetailsViewModel {
                 id: item.id,
                 lang: item.lang,
                 blurb: item.blurb.clone().unwrap_or("".to_string()),
-                code: item.code.clone(),
+                lang_code: item.lang_code.clone(),
+                lang_name: item.lang_name.clone()
             })
             .collect(),
     };

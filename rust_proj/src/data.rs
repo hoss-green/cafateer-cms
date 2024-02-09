@@ -6,7 +6,7 @@ pub mod context;
 pub mod details;
 pub mod fetcher;
 pub mod menu_items;
-mod references;
+pub mod references;
 
 struct Counter {
     count: Option<i64>,

@@ -21,5 +21,6 @@ pub struct DetailsViewModel {
     pub id: uuid::Uuid,
     pub lang: i32,
     pub blurb: String,
-    pub code: String
+    pub lang_code: String,
+    pub lang_name: String
 }

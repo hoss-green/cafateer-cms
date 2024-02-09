@@ -39,7 +39,8 @@ pub struct DetailLangModel {
     pub id: uuid::Uuid,
     pub lang: i32,
     pub blurb: Option<String>,
-    pub code: String,
+    pub lang_code: String,
+    pub lang_name: String
 }
 
 impl DetailLangModel {
@@ -48,7 +49,8 @@ impl DetailLangModel {
             id: uuid::Uuid::new_v4(),
             lang: 0, //  "en".to_string(),
             blurb: None,
-            code: "en".to_string(),
+            lang_code: "en".to_string(),
+            lang_name: "English".to_string()
         }
     }
 }
