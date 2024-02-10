@@ -2,7 +2,7 @@ use axum::{
     routing::{get, post},
     Router,
 };
-use cafeteer::{data::setup_db, manager::{get_details_home, get_start_page}};
+use cafeteer::{data::setup_db, manager::{get_account_page, get_details_home, get_start_page}};
 use cafeteer::presenter::restaurant::get_restaurant;
 use cafeteer::{data::context::AppState, manager::post_details_home};
 use dotenv::dotenv;
@@ -37,7 +37,7 @@ async fn main() {
         )
         .route(
             "/manager/account",
-            get(get_details_home).post(post_details_home),
+            get(get_account_page)
         )
         .with_state(state);
     let listener = tokio::net::TcpListener::bind(&"127.0.0.1:4444")
@@ -46,24 +46,3 @@ async fn main() {
     let server = axum::serve(listener, router); //, make_service)
     server.await.unwrap();
 }
-
-// #[derive(Debug, Deserialize)]
-// #[allow(dead_code)]
-// struct Params {
-//     #[serde(default, deserialize_with = "empty_string_as_none")]
-//     word: Option<String>,
-// }
-
-// Serde deserialization decorator to map empty Strings to None,
-// fn empty_string_as_none<'de, D, T>(de: D) -> Result<Option<T>, D::Error>
-// where
-//     D: Deserializer<'de>,
-//     T: FromStr,
-//     T::Err: fmt::Display,
-// {
-//     let opt = Option::<String>::deserialize(de)?;
-//     match opt.as_deref() {
-//         None | Some("") => Ok(None),
-//         Some(s) => FromStr::from_str(s).map_err(de::Error::custom).map(Some),
-//     }
-// }

@@ -8,15 +8,23 @@ pub struct StartPage<'a> {
     pub title: &'a str,
 }
 
+
+#[derive(Template)]
+#[template(path = "manager/account_page.html")]
+pub struct AccountPage<'a> {
+    pub title: &'a str,
+    pub language: Language,
+    pub available_languages: Vec<Language>,
+    pub selected_languages: Vec<Language>
+}
+
+
 #[derive(Template)]
 #[template(path = "manager/details_page.html")]
 pub struct DetailsPage<'a> {
     pub title: &'a str,
     pub languages: Vec<Language>,
     pub details: Vec<DetailsViewModel>
-    // pub id: uuid::Uuid,
-    // pub lang: i32,
-    // pub blurb: String,
 }
 
 #[derive(Template)]

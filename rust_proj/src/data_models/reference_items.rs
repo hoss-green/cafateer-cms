@@ -18,3 +18,12 @@ pub struct Language {
     pub code: String,
     pub name: String,
 }
+
+impl Language {
+    pub fn get_from_int(languages: &Vec<Language>, id: i32) -> Language {
+        match languages.iter().find(|item| item.id == id) {
+            Some(lang) => lang.clone(),
+            None => panic!("Could not find language in array"),
+        }
+    }
+}
