@@ -1,17 +1,17 @@
 use super::context::AppState;
-use crate::data_models::AccountModel;
+use crate::data_models::{reference_items::Language, AccountModel};
 use sqlx::Postgres;
 
 pub async fn get_account_details(app_state: &AppState) -> AccountModel {
     let result = sqlx::query_as::<Postgres, AccountModel>(
-        r#"select id, languages as "languages!" from accounts"#,
+        r#"select id, languages from accounts"#,
     )
     .fetch_one(&app_state.database_pool)
     .await;
     match result {
         Ok(r) => r,
         Err(err) => {
-            println!("Cannot fetch menu items, err: {}", err);
+            println!("Cannot fetch account, err: {}", err);
             AccountModel::new()
         }
     }
@@ -25,15 +25,6 @@ pub async fn set_account_details(app_state: &AppState, account_model: AccountMod
     .execute(&app_state.database_pool)
     .await;
 
-    // let result = sqlx::query(
-    //     "insert into accounts(id, languages) VALUES ($1, $2) ON CONFLICT (id) DO UPDATE SET languages=$2 WHERE accounts.id=$1",
-    //     account_model.id,
-    //     // account_model.main_language,
-    //     account_model.languages,
-    // )
-    // .execute(&app_state.database_pool)
-    // .await;
-    //
     match result {
         Ok(_r) => {
             println!("Saved account succesful");
@@ -44,4 +35,9 @@ pub async fn set_account_details(app_state: &AppState, account_model: AccountMod
             false
         }
     }
+}
+
+pub async fn set_language(app_state: &AppState, language_id:i32, activated:bool)
+{
+    
 }

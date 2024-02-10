@@ -26,4 +26,8 @@ impl Language {
             None => panic!("Could not find language in array"),
         }
     }
+
+    pub fn vec_from_int_vec(all_langs: &Vec<Language>, chosen_langs: &Vec<i32>  ) -> Vec<Language> {
+       chosen_langs.iter().map(|language_id| Language::get_from_int(all_langs, *language_id)).collect() 
+    }
 }
