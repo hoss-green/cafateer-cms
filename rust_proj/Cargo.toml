@@ -19,6 +19,6 @@ tower = "0.4.13"
 tower-http = { version = "0.5.1", features = ["fs", "trace"] }
 askama = { version = "0.12.1", features = ["with-axum"] }
 once_cell = "1.19.0"
-sqlx = { version = "0.7.3", features = ["postgres", "runtime-tokio", "uuid"] }
+sqlx = { version = "0.7.3", features = ["postgres", "runtime-tokio", "uuid", "json"] }
 dotenv = "0.15.0"
 uuid = { version = "1.7.0", features = ["v4", "serde"] }
