@@ -2,6 +2,7 @@ mod account_page;
 mod start;
 mod details_page;
 pub mod templates;
+pub mod components;
 
 pub use start::get_start_page;
 pub use details_page::get_details_home;

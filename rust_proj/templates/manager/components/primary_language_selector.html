@@ -1,4 +1,7 @@
-{% macro show_picker(lang_items) %}
+{% macro show_picker(primary_language_id, user_selected_languages) %}
+
+    <div id="primary_lang_dropdown" class="flex justify-between">
+      <p>Primary Customer Language </p>
 <button
   id="dropdownDefaultButton"
   data-dropdown-toggle="dropdown_lang"
@@ -32,18 +35,20 @@
     class="py-2 text-sm text-gray-700 dark:text-gray-200"
     aria-labelledby="dropdownDefaultButton"
   >
-    <li>
-      {% for lang in lang_items %} 
-    <button
-        hx-post="/manager/account/primary_language/{{ lang.id }}"
-        class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white w-full"
-        >{{ lang.name }}
-        {%- if language.id == lang.id -%}
-        *****
-        {%- endif -%}
-    </button>
+    <li id="primary_lang_list">
+      {% for lang in user_selected_languages %} 
+        <button
+            hx-post="/manager/account/primary_language/{{ lang.id }}" hx-target="#primary_lang_list" hx-swap="outerHTML"
+            {%- if primary_language_id == lang.id -%}
+            class="block px-4 py-2 bg-primary-500 text-white w-full"
+            {% else %}
+            class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white w-full"
+            {%- endif -%}
+            >{{ lang.name }}
+        </button>
       {% endfor %}
     </li>
   </ul>
+</div>
 </div>
 {% endmacro %}

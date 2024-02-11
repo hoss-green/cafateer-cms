@@ -12,9 +12,9 @@ pub struct StartPage<'a> {
 #[template(path = "manager/account_page.html")]
 pub struct AccountPage<'a> {
     pub title: &'a str,
-    pub language: Language,
-    pub available_languages: Vec<Language>,
-    pub selected_languages: Vec<Language>,
+    pub primary_language: Language,
+    pub system_languages: Vec<Language>,
+    pub user_languages: Vec<Language>,
 }
 
 #[derive(Template)]
@@ -35,9 +35,11 @@ pub struct BioPage<'a> {
     pub info: String,
 }
 
-pub fn foo() -> String {
-   "OMG".to_string()
-}
+
+
+// pub fn foo() -> String {
+//    "OMG".to_string()
+// }
 
 pub fn is_selected(id:&i32, languages:&Vec<Language>) -> String {
    match languages.iter().any(|item| item.id == *id) {

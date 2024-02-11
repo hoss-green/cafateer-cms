@@ -17,11 +17,11 @@ pub async fn get_account_details(app_state: &AppState) -> AccountModel {
     }
 }
 
-pub async fn set_account_details(app_state: &AppState, account_model: AccountModel) -> bool {
+pub async fn set_account_details(app_state: &AppState, account_model: &AccountModel) -> bool {
     let result = sqlx::query(
         "insert into accounts(id, languages) VALUES ($1, $2) ON CONFLICT (id) DO UPDATE SET languages=$2 WHERE accounts.id=$1")
         .bind(account_model.id)
-        .bind(account_model.languages)
+        .bind(account_model.clone().languages)
     .execute(&app_state.database_pool)
     .await;
 
