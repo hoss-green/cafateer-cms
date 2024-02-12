@@ -1,15 +1,12 @@
-{%- import "manager/components/primary_language_selector.html" as primary_language_selector  -%}
-{%- import "manager/components/language_selection_dropdown.html" as language_selection_dropdown -%}
+{%- import "manager/macros/primary_language_selector.html" as primary_language_selector  -%}
+{%- import "manager/macros/language_selection_dropdown.html" as language_selection_dropdown -%}
 {% extends "manager/manager_base.html" %}
 {% block title %}{{ title }}{% endblock %}
 {% block content %}
 <div class="max-w-xl mx-auto">
-
   <form hx-post="/manager/details" hx-target="#detail_response_message">
   <div class="mb-5">
-    <!-- <input type="hidden" name="id" value=""/> -->
 </div>
-
   <div class="flex flex-col w-full justify-start gap-2">
         {% call primary_language_selector::show_picker(primary_language.id, user_languages.clone()) %} 
     <div class="flex justify-between">
@@ -17,7 +14,6 @@
         {% call language_selection_dropdown::show_picker(system_languages, user_languages) %} 
     </div>
   </div>
-  <!-- <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Save</button> -->
 </form>
 <div id="detail_response_message"></div>
 </div>

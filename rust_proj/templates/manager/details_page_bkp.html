@@ -1,0 +1,57 @@
+{% extends "manager/manager_base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="max-w-2xl mx-auto">
+  <div class="mx-auto w-full">
+    <!-- Start coding here -->
+    <div class="relative bg-white">
+      <div class="flex flex-col items-center justify-end space-y-3 md:flex-row md:space-y-0 md:space-x-4">
+        <div class="flex flex-col items-stretch justify-end flex-shrink-0 w-full space-y-2 md:w-auto md:flex-row md:space-y-0 md:items-center md:space-x-3">
+          <div class="flex items-center w-full space-x-3 md:w-auto">
+            <button id="actionsDropdownButton" data-dropdown-toggle="actionsDropdown" class="flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg md:w-auto focus:outline-none hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" type="button">
+              <svg class="-ml-1 mr-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path clip-rule="evenodd" fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+              </svg>
+             Language 
+            </button>
+            <div id="actionsDropdown" class="z-10 hidden bg-white divide-y divide-gray-100 rounded shadow w-44 dark:bg-gray-700 dark:divide-gray-600">
+              <ul class="py-1 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="actionsDropdownButton">
+                {% for lang in languages %}
+                <li>
+                  <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">{{lang.code}}</a>
+                </li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% for detail in details %}
+  <form hx-post="/manager/details" hx-target="#button{{detail.id}}{{detail.lang}}" hx-swap="innerHTML">
+  <div class="">
+    <input type="hidden" name="id" value="{{ detail.id }}"/>
+    <input type="hidden" name="lang" value="{{ detail.lang }}"/>
+    <label for="blurb" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your blurb {{ detail.lang_name.to_string() }}</label>
+    <textarea required id="textbox{{detail.id}}{{detail.lang}}" name="blurb" rows="4" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Write your introduction here...">{{ detail.blurb }}</textarea>
+    <div class="flex justify-end mt-2">
+      <button id="button{{detail.id}}{{detail.lang}}" type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Save</button>
+    </div>
+  </form>
+  <script>
+    let box_id{{detail.lang}} = "button{{detail.id}}{{detail.lang}}";
+    let box{{detail.lang}} = document.getElementById("textbox{{detail.id}}{{detail.lang}}");
+    box{{detail.lang}}.addEventListener('change', (event) => {handle_keypress("button{{detail.id}}{{detail.lang}}")});
+    box{{detail.lang}}.addEventListener('keypress', (event) => {handle_keypress("button{{detail.id}}{{detail.lang}}")});
+  </script>
+  {% endfor %}
+  <script>
+    function handle_keypress(button_id) {
+      let button = document.getElementById(button_id);
+      button.innerHTML = "Save*";
+    }
+  </script>
+</div>
+
+{% endblock %}

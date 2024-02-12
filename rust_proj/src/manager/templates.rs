@@ -1,6 +1,6 @@
 use askama::Template;
 
-use crate::{data_models::reference_items::Language, view_models::components::DetailsViewModel};
+use crate::data_models::reference_items::Language;
 
 #[derive(Template)]
 #[template(path = "manager/start_page.html")]
@@ -22,7 +22,7 @@ pub struct AccountPage<'a> {
 pub struct DetailsPage<'a> {
     pub title: &'a str,
     pub languages: Vec<Language>,
-    pub details: Vec<DetailsViewModel>,
+    // pub details: Vec<DetailsViewModel>,
 }
 
 #[derive(Template)]

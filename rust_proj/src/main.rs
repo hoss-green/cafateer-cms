@@ -2,11 +2,14 @@ use axum::{
     routing::{get, post},
     Router,
 };
-use cafeteer::{manager::post_primary_language, presenter::restaurant::get_restaurant};
 use cafeteer::{data::context::AppState, manager::post_details_home};
 use cafeteer::{
     data::{account::set_language, setup_db},
     manager::{get_account_page, get_details_home, get_start_page, post_language},
+};
+use cafeteer::{
+    manager::{get_details_data, post_primary_language},
+    presenter::restaurant::get_restaurant,
 };
 use dotenv::dotenv;
 use tower_http;
@@ -38,9 +41,13 @@ async fn main() {
             "/manager/details",
             get(get_details_home).post(post_details_home),
         )
+        .route("/manager/details/data/:id", get(get_details_data))
         .route("/manager/account", get(get_account_page))
         .route("/manager/account/languages", post(post_language))
-        .route("/manager/account/primary_language/:id", post(post_primary_language))
+        .route(
+            "/manager/account/primary_language/:id",
+            post(post_primary_language),
+        )
         .with_state(state);
     let listener = tokio::net::TcpListener::bind(&"127.0.0.1:4444")
         .await
