@@ -11,7 +11,7 @@
   <!-- Dropdown menu -->
   <div id="dropdown" class="z-10 hidden p-3 bg-white rounded-lg shadow w-72 dark:bg-gray-700">
     <!-- <h6 class="mb-2 text-sm font-medium text-gray-900 dark:text-white">Columns</h6> -->
-    <ul class="space-y-2 text-sm" aria-labelledby="dropdownDefault">
+    <ul id="checkbox_container" class="space-y-2 text-sm" aria-labelledby="dropdownDefault">
       {% for lang in all_available_languages.clone() %}
       <li>
         <label
@@ -20,9 +20,52 @@
             {{ crate::manager::templates::is_selected(lang.id, user_selected_languages) }}
             class="w-4 h-4 mr-2 bg-gray-100 border-gray-300 rounded text-primary-600 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500" />
           {{ lang.name }}
+          <!-- <input type="hidden" name="{{ lang.id }}" value="checkbox"/> -->
         </label>
       </li>
       {% endfor %}
     </ul>
   </div>
+  <script>
+    let checkboxes = document.getElementById("checkbox_container").getElementsByTagName("input");
+    let checkbox_array = Array.prototype.slice.call(checkboxes);
+   
+    function check_ticked() {
+        let count = checkbox_array.filter((checkbox) => checkbox.checked).length;
+        console.log(count);
+        if (count == 1) {
+          let last_box = checkbox_array.find((checkbox) => checkbox.checked); 
+          disable_checkbox(last_box);
+        } else {
+          checkbox_array.forEach((checkbox) => {
+            enable_checkbox(checkbox);
+          });
+        }
+    }
+
+    function notify_if_last(event) {
+        let count = checkbox_array.filter((checkbox) => checkbox.checked).length;
+        console.log(count);
+        if (count === 0) {
+          checkbox_array[0].checked = true;
+        };
+    }
+
+    function disable_checkbox(checkbox) {
+      checkbox.disabled = true;
+      checkbox.style.backgroundColor = "gray";
+    }
+
+    function enable_checkbox(checkbox) {
+      checkbox.disabled = false;
+      checkbox.style.backgroundColor = "";
+    }
+
+    checkbox_array.forEach((checkbox) => {
+//      checkbox.addEventListener('change', (event) => check_ticked());
+      checkbox.addEventListener('change', (event) => notify_if_last(event));
+    });
+
+   // check_ticked();    
+  </script />
 {% endmacro %}
