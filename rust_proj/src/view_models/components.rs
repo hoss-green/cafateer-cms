@@ -22,5 +22,16 @@ pub struct DetailsViewModel {
     pub lang: i32,
     pub blurb: String,
     pub lang_code: String,
-    pub lang_name: String
+    pub lang_name: String,
+}
+
+#[derive(Template, Clone, Serialize, Deserialize)]
+#[template(path = "presenter/components/menu_item.html")]
+pub struct MenuItemEditorComponent {
+    pub id: uuid::Uuid,
+    pub title: String,
+    pub description: String,
+    pub lang: i32,
+    pub price: f64,
+    pub category: String,
 }

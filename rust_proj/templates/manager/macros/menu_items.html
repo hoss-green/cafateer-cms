@@ -1,7 +1,6 @@
-{% extends "manager/manager_base.html" %}
-{% block title %}{{ title }}{% endblock %}
-{% block content %}
+{% macro editor_box(title, icon, url) %}
 <div class="max-w-sm mx-auto">
+
   <form hx-post="/manager/details" hx-target="#detail_response_message">
   <div class="mb-5">
     <input type="hidden" name="id" value="{{ id }}"/>
@@ -16,5 +15,32 @@
 </form>
 <div id="detail_response_message"></div>
 </div>
+{% endmacro %}
 
-{% endblock %}
+
+{% macro menu_item_button(id, title, category, language_id) %}
+<li class="mb-1">
+  <div class="w-full flex flex-col p-1 bg-gray-50 rounded-md">
+    <div class="w-full flex justify-between items-center">
+      <div class="flex flex-col items-start">
+      <button type="button" class="font-bold">{{ title }}</button>
+      <div>{{ category }}</div>
+      </div>
+      <div></div>
+    </div>
+    <div class="w-full flex justify-between items-center">
+      <div></div>
+         <button 
+            class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2.5 text-center inline-flex items-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800" 
+            data-drawer-target="drawer-right-example" 
+            data-drawer-show="drawer-right-example" 
+            data-drawer-placement="right" 
+            aria-controls="drawer-right-example"
+            hx-get="/manager/menu/item/{{id}}/{{language_id}}"
+            hx-target="#menu_item_edit_sidebar"
+            type="button">
+      EDIT</button>
+    </div>
+  </div>
+</li>
+{% endmacro %}

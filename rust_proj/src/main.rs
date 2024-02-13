@@ -2,9 +2,9 @@ use axum::{
     routing::{get, post},
     Router,
 };
-use cafeteer::{data::context::AppState, manager::post_details_home};
+use cafeteer::{data::context::AppState, manager::{get_menu_item, get_menu_page, post_details_home, set_menu_item}};
 use cafeteer::{
-    data::{account::set_language, setup_db},
+    data::setup_db,
     manager::{get_account_page, get_details_home, get_start_page, post_language},
 };
 use cafeteer::{
@@ -42,10 +42,13 @@ async fn main() {
             get(get_details_home).post(post_details_home),
         )
         .route("/manager/details/data/:id", get(get_details_data))
-        .route("/manager/account", get(get_account_page))
-        .route("/manager/account/languages", post(post_language))
+        .route("/manager/menu", get(get_menu_page))
+        .route("/manager/menu/item/:id/:lang", get(get_menu_item))
+        .route("/manager/menu/item/:id/:lang", post(set_menu_item))
+        .route("/manager/config", get(get_account_page))
+        .route("/manager/config/languages", post(post_language))
         .route(
-            "/manager/account/primary_language/:id",
+            "/manager/config/primary_language/:id",
             post(post_primary_language),
         )
         .with_state(state);

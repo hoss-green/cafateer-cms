@@ -2,6 +2,8 @@ use askama::Template;
 
 use crate::data_models::reference_items::Language;
 
+use super::macro_templates::MenuItemButton;
+
 #[derive(Template)]
 #[template(path = "manager/start_page.html")]
 pub struct StartPage<'a> {
@@ -22,7 +24,6 @@ pub struct AccountPage<'a> {
 pub struct DetailsPage<'a> {
     pub title: &'a str,
     pub languages: Vec<Language>,
-    // pub details: Vec<DetailsViewModel>,
 }
 
 #[derive(Template)]
@@ -35,15 +36,22 @@ pub struct BioPage<'a> {
     pub info: String,
 }
 
+#[derive(Template)]
+#[template(path = "manager/menu_page.html")]
+pub struct MenuPage<'a> {
+    pub title: &'a str,
+    pub menu_item_buttons:Vec<MenuItemButton>,
+}
+
 
 
 // pub fn foo() -> String {
 //    "OMG".to_string()
 // }
 
-pub fn is_selected(id:&i32, languages:&Vec<Language>) -> String {
-   match languages.iter().any(|item| item.id == *id) {
-    true => "checked".to_string(),
-    false => "".to_string(),
-}
+pub fn is_selected(id: &i32, languages: &Vec<Language>) -> String {
+    match languages.iter().any(|item| item.id == *id) {
+        true => "checked".to_string(),
+        false => "".to_string(),
+    }
 }

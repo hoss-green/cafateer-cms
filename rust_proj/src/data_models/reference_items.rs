@@ -5,11 +5,10 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Allergy {
     pub id: uuid::Uuid,
+    pub lang: i32,
+    pub title: String,
     pub icon: Option<String>,
-    pub en: Option<String>,
-    pub es: Option<String>,
-    pub de: Option<String>,
-    pub fr: Option<String>,
+    pub colour: Option<String>
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]

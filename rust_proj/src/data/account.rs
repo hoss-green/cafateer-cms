@@ -1,5 +1,5 @@
 use super::context::AppState;
-use crate::data_models::{reference_items::Language, AccountModel};
+use crate::data_models::AccountModel;
 use sqlx::Postgres;
 
 pub async fn get_account_details(app_state: &AppState) -> AccountModel {
@@ -37,7 +37,7 @@ pub async fn set_account_details(app_state: &AppState, account_model: &AccountMo
     }
 }
 
-pub async fn set_language(app_state: &AppState, language_id:i32, activated:bool)
-{
-    
-}
+// pub async fn set_language(app_state: &AppState, language_id:i32, activated:bool)
+// {
+//     
+// }

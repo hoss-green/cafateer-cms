@@ -27,9 +27,9 @@ pub struct DetailsModel {
 impl DetailsModel {
     pub fn new(id: uuid::Uuid, lang: i32, blurb: Option<String>) -> DetailsModel {
         DetailsModel {
-            id: uuid::Uuid::new_v4(),
-            lang: 0, //  "en".to_string(),
-            blurb: None,
+            id,
+            lang, //  "en".to_string(),
+            blurb,
         }
     }
     pub fn default() -> DetailsModel {

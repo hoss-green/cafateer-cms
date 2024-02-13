@@ -51,14 +51,15 @@
     <ul class="space-y-2">
       {% call nav_items::single_item("home", "fa-house", "/manager") %} 
       {% call nav_items::single_item("details", "fa-note", "/manager/details") %} 
-      {% call nav_items::single_item("menu", "fa-pie", "/manager/menu") %} 
-      {% call nav_items::single_item("config", "fa-sliders", "/manager/config") %} 
+      {% call nav_items::single_item("config", "fa-cog", "/manager/account") %} 
+      {% call nav_items::single_item("menu", "fa-pie", "/manager") %} 
+      {% call
+      nav_items::multi_item("menu_name", "fa-heart") %} {% call
+      nav_items::count_item("menu_name", "fa-heart", 39, "##") %}
     </ul>
     <ul
       class="pt-5 mt-5 space-y-2 border-t border-gray-200 dark:border-gray-700"
     >
-
-      {% call nav_items::single_item("settings", "fa-cogs", "#") %} 
       <li>
         <a
           href="#"

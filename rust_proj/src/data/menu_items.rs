@@ -1,11 +1,12 @@
 use crate::data_models::MenuItem;
 use super::context::AppState;
 
-pub async fn get_items_by_id(app_state: &AppState, id: uuid::Uuid) -> Vec<MenuItem> {
+pub async fn get_items_for_account(app_state: &AppState) -> Vec<MenuItem> {
+    let account = crate::data::account::get_account_details(app_state).await;
     let result = sqlx::query_as!(
         MenuItem,
-        "select id, lang, title, description, price, category from menu_items where id=$1",
-        id
+        "select id, lang, title, description, price, category, owner_id from menu_items where owner_id=$1",
+        account.id 
     )
     .fetch_all(&app_state.database_pool)
     .await;
@@ -19,10 +20,10 @@ pub async fn get_items_by_id(app_state: &AppState, id: uuid::Uuid) -> Vec<MenuIt
     }
 }
 
-pub async fn get_items_by_lang(app_state: &AppState, lang: String) -> Vec<MenuItem> {
+pub async fn get_items_by_lang(app_state: &AppState, lang: i32) -> Vec<MenuItem> {
     let result = sqlx::query_as!(
         MenuItem,
-        "select id, lang, title, description, price, category from menu_items where lang=$1",
+        "select id, lang, title, description, price, category, owner_id from menu_items where lang=$1",
         lang
     )
     .fetch_all(&app_state.database_pool)
@@ -37,10 +38,11 @@ pub async fn get_items_by_lang(app_state: &AppState, lang: String) -> Vec<MenuIt
     }
 }
 
-pub async fn get_item(app_state: &AppState, id:uuid::Uuid, lang: String) -> MenuItem {
+pub async fn get_item(app_state: &AppState, id:uuid::Uuid, lang: i32) -> MenuItem {
+    let account = crate::data::account::get_account_details(app_state).await;
     let result = sqlx::query_as!(
         MenuItem,
-        "select id, lang, title, description, price, category from menu_items where id=$1 and lang=$2",
+        "select id, lang, title, description, price, category, owner_id from menu_items where id=$1 and lang=$2",
         id,
         lang
     )
@@ -50,11 +52,11 @@ pub async fn get_item(app_state: &AppState, id:uuid::Uuid, lang: String) -> Menu
     match result {
         Ok(r) => match r {
             Some(item) => item,
-            None => MenuItem::new(),
+            None => MenuItem::new(account.id),
         },
         Err(err) => {
             println!("Cannot fetch menu items, err: {}", err);
-            MenuItem::new()
+            MenuItem::new(account.id)
         }
     }
 }

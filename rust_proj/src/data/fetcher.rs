@@ -5,7 +5,7 @@ use super::context::AppState;
 pub async fn get_menu_items(app_state: &AppState) -> Vec<MenuItem> {
     let result = sqlx::query_as!(
         MenuItem,
-        " select id, lang, title, description, price, category from menu_items"
+        " select id, lang, title, description, price, category, owner_id from menu_items"
     )
     .fetch_all(&app_state.database_pool)
     .await;

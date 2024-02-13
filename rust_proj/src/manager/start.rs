@@ -4,7 +4,7 @@ use askama::Template;
 use axum::{extract::State, response::Html};
 use http::StatusCode;
 
-pub async fn get_start_page(State(app_state): State<AppState>) -> (StatusCode, Html<String>) {
+pub async fn get_start_page(State(_app_state): State<AppState>) -> (StatusCode, Html<String>) {
     let editor_home = StartPage {
         title: "Editor Home for SC",
     };
