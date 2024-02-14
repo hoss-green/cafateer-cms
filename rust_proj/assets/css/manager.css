@@ -676,7 +676,7 @@ select:not([size]) {
 }
 
 [type='checkbox']:indeterminate {
-  background-image: url("data:image/svg+xml,%3csvg aria-hidden='true' xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 16 12'%3e %3cpath stroke='white' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M1 5.917 5.724 10.5 15 1.5'/%3e %3c/svg%3e");
+  background-image: url("data:image/svg+xml,%3csvg aria-hidden='true' xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 16 12'%3e %3cpath stroke='white' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M0.5 6h14'/%3e %3c/svg%3e");
   background-color: currentColor;
   border-color: transparent;
   background-position: center;
@@ -952,10 +952,6 @@ input[type="range"]::-ms-fill-lower {
   margin-left: -0.25rem;
 }
 
-.mb-1 {
-  margin-bottom: 0.25rem;
-}
-
 .mb-2 {
   margin-bottom: 0.5rem;
 }
@@ -1118,10 +1114,6 @@ input[type="range"]::-ms-fill-lower {
 
 .max-w-2xl {
   max-width: 42rem;
-}
-
-.max-w-sm {
-  max-width: 24rem;
 }
 
 .max-w-xl {

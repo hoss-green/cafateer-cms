@@ -5,7 +5,7 @@ use super::{
 use crate::{
     data::{self, categories, context::AppState},
     data_models::{reference_items::Language, DetailsModel},
-    manager::components::ComponentEditDetails,
+    manager::components::ComponentDetailEditor,
 };
 use askama::Template;
 use axum::{
@@ -73,7 +73,7 @@ pub async fn get_details_data(
         detail.lang_code = current_language.code;
         detail.lang_name = current_language.name;
     }
-    let component_edit_details = ComponentEditDetails {
+    let component_edit_details = ComponentDetailEditor {
         id: detail.id,
         lang: detail.lang,
         lang_name: detail.lang_name,

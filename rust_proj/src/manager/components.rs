@@ -2,13 +2,22 @@ use crate::data_models::reference_items::Language;
 use askama::Template;
 
 #[derive(Template, Debug, Clone)]
-#[template(path = "manager/components/component_edit_details.html")]
-pub struct ComponentEditDetails {
+#[template(path = "manager/components/detail_editor.html")]
+pub struct ComponentDetailEditor {
     pub id: uuid::Uuid,
     pub lang: i32,
     pub lang_name: String,
     pub blurb: String,
 }
+
+#[derive(Template, Debug, Clone)]
+#[template(path = "manager/components/category_editor.html")]
+pub struct ComponentCategoryEditor {
+    pub id: uuid::Uuid,
+    pub lang: i32,
+    pub name: String,
+}
+
 
 #[derive(Template, Debug, Clone)]
 #[template(path = "manager/components/primary_language_list.html")]
