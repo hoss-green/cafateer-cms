@@ -5,7 +5,7 @@ pub mod macro_templates;
 pub mod menu_page;
 mod start;
 pub mod templates;
-
+mod categories_page;
 pub use account_page::get_account_page;
 pub use account_page::post_language;
 pub use account_page::post_primary_language;
@@ -16,3 +16,4 @@ pub use menu_page::get_menu_page;
 pub use menu_page::get_menu_item;
 pub use menu_page::set_menu_item;
 pub use start::get_start_page;
+pub use categories_page::get_categories_page;

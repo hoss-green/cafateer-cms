@@ -1,6 +1,5 @@
+use crate::data_models::reference_items::Language;
 use askama::Template;
-
-use crate::data_models::{reference_items::Language, MenuItem};
 
 #[derive(Template, Debug, Clone)]
 #[template(path = "manager/components/component_edit_details.html")]

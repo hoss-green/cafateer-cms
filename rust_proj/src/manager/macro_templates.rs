@@ -17,3 +17,11 @@ pub struct MenuItemButton {
     pub category: String,
     pub user_languages: Vec<Language>,
 }
+
+#[derive(Template, Debug, Clone)]
+#[template(path = "manager/macros/language_selection_dropdown.html")]
+pub struct CategoryButton {
+    pub id: uuid::Uuid,
+    pub name: String,
+    pub user_languages: Vec<Language>,
+}

@@ -1,15 +1,11 @@
-{%- import "manager/macros/menu_items.html" as macro_menu_items  -%}
+{%- import "manager/macros/menu_item_edit_button.html" as menu_item_edit_button -%}
 {% extends "manager/manager_base.html" %}
 {% block title %}{{ title }}{% endblock %}
 {% block content %}
 <h5 class="text-2xl">Menu Editor</h5>
 {% for menu_item_button in menu_item_buttons %}
-  {% for language in menu_item_button.user_languages %}
+  <div class="flex flex-col gap-2">
+     {% call menu_item_edit_button::menu_item_button(menu_item_button.id, menu_item_button.title, menu_item_button.category, menu_item_button.user_languages) %}
   <div>
-    <ul>
-     {% call macro_menu_items::menu_item_button(menu_item_button.id, menu_item_button.title, menu_item_button.category, language.id) %}
-    </ul>
-  <div>
-  {% endfor %}
 {% endfor %}
 {% endblock %}

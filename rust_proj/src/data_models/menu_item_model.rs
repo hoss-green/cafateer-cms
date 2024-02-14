@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct MenuItem {
+pub struct MenuItemModel {
     pub id: uuid::Uuid,
     pub lang: i32,
     pub owner_id: uuid::Uuid,
@@ -12,9 +12,9 @@ pub struct MenuItem {
     pub category: Option<Uuid>,
 }
 
-impl MenuItem {
-    pub fn new(owner_id:uuid::Uuid) -> MenuItem {
-        MenuItem {
+impl MenuItemModel {
+    pub fn new(owner_id:uuid::Uuid) -> MenuItemModel {
+        MenuItemModel {
             id: uuid::Uuid::new_v4(),
             owner_id,
             lang: 0,

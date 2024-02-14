@@ -8,6 +8,7 @@ pub mod fetcher;
 pub mod menu_items;
 pub mod references;
 pub mod account;
+pub mod categories;
 
 struct Counter {
     count: Option<i64>,

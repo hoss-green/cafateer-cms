@@ -1,0 +1,73 @@
+use crate::data_models::CategoryModel;
+use super::context::AppState;
+
+pub async fn get_category(
+    app_state: &AppState,
+    (id, lang): (uuid::Uuid, i32),
+    owner_id: &uuid::Uuid,
+) -> CategoryModel {
+    let result = sqlx::query_as!(
+        CategoryModel,
+        "select id, lang, name, owner_id from menu_categories where owner_id = $1 and lang= $2",
+        id,
+        lang
+    )
+    .fetch_optional(&app_state.database_pool)
+    .await;
+    match result {
+        Ok(r) => match r {
+            Some(item) => item,
+            None => CategoryModel::new(*owner_id),
+        },
+        Err(err) => {
+            println!("Cannot fetch menu items, err: {}", err);
+            CategoryModel::new(*owner_id)
+        }
+    }
+}
+pub async fn get_category_list(
+    app_state: &AppState,
+    owner_id: &uuid::Uuid,
+) -> Vec<CategoryModel> {
+    let result = sqlx::query_as!(
+        CategoryModel,
+        "select id, lang, name, owner_id from menu_categories where owner_id = $1",
+        owner_id
+    )
+    .fetch_all(&app_state.database_pool)
+    .await;
+    match result {
+        Ok(r) => r,
+        Err(err) => {
+            println!("Cannot fetch menu items, err: {}", err);
+            vec![]
+        }
+    }
+}
+
+pub async fn set_category(
+    app_state: &AppState,
+    account_id: &uuid::Uuid,
+    details_item: CategoryModel,
+) -> bool {
+    let result = sqlx::query!(
+        "insert into menu_categories(owner_id, id, lang, name) VALUES ($1, $2, $3, $4) ON CONFLICT (id, lang) DO UPDATE SET name=$4 WHERE menu_categories.id=$2 and menu_categories.lang=$3",
+        &account_id,
+        details_item.id,
+        details_item.lang,
+        details_item.name,
+    )
+    .execute(&app_state.database_pool)
+    .await;
+
+    match result {
+        Ok(_r) => {
+            println!("Saved item succesfully");
+            true
+        }
+        Err(err) => {
+            println!("Cannot save item, fail, error: {}", err);
+            false
+        }
+    }
+}

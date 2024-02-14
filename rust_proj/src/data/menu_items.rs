@@ -1,10 +1,10 @@
-use crate::data_models::MenuItem;
+use crate::data_models::MenuItemModel;
 use super::context::AppState;
 
-pub async fn get_items_for_account(app_state: &AppState) -> Vec<MenuItem> {
+pub async fn get_items_for_account(app_state: &AppState) -> Vec<MenuItemModel> {
     let account = crate::data::account::get_account_details(app_state).await;
     let result = sqlx::query_as!(
-        MenuItem,
+        MenuItemModel,
         "select id, lang, title, description, price, category, owner_id from menu_items where owner_id=$1",
         account.id 
     )
@@ -20,9 +20,9 @@ pub async fn get_items_for_account(app_state: &AppState) -> Vec<MenuItem> {
     }
 }
 
-pub async fn get_items_by_lang(app_state: &AppState, lang: i32) -> Vec<MenuItem> {
+pub async fn get_items_by_lang(app_state: &AppState, lang: i32) -> Vec<MenuItemModel> {
     let result = sqlx::query_as!(
-        MenuItem,
+        MenuItemModel,
         "select id, lang, title, description, price, category, owner_id from menu_items where lang=$1",
         lang
     )
@@ -38,10 +38,10 @@ pub async fn get_items_by_lang(app_state: &AppState, lang: i32) -> Vec<MenuItem>
     }
 }
 
-pub async fn get_item(app_state: &AppState, id:uuid::Uuid, lang: i32) -> MenuItem {
+pub async fn get_item(app_state: &AppState, id:uuid::Uuid, lang: i32) -> MenuItemModel {
     let account = crate::data::account::get_account_details(app_state).await;
     let result = sqlx::query_as!(
-        MenuItem,
+        MenuItemModel,
         "select id, lang, title, description, price, category, owner_id from menu_items where id=$1 and lang=$2",
         id,
         lang
@@ -52,11 +52,11 @@ pub async fn get_item(app_state: &AppState, id:uuid::Uuid, lang: i32) -> MenuIte
     match result {
         Ok(r) => match r {
             Some(item) => item,
-            None => MenuItem::new(account.id),
+            None => MenuItemModel::new(account.id),
         },
         Err(err) => {
             println!("Cannot fetch menu items, err: {}", err);
-            MenuItem::new(account.id)
+            MenuItemModel::new(account.id)
         }
     }
 }

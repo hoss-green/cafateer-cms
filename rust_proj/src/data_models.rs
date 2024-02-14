@@ -1,9 +1,11 @@
 mod detail_items;
-mod menu_items;
+mod menu_item_model;
 pub mod reference_items;
 mod account_model;
+mod category_model;
 pub use detail_items::BioModel;
 pub use detail_items::DetailLangModel;
 pub use detail_items::DetailsModel;
-pub use menu_items::MenuItem;
+pub use menu_item_model::MenuItemModel;
 pub use account_model::AccountModel;
+pub use category_model::CategoryModel;

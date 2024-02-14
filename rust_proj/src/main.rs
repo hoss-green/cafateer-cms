@@ -2,7 +2,7 @@ use axum::{
     routing::{get, post},
     Router,
 };
-use cafeteer::{data::context::AppState, manager::{get_menu_item, get_menu_page, post_details_home, set_menu_item}};
+use cafeteer::{data::context::AppState, manager::{get_categories_page, get_menu_item, get_menu_page, post_details_home, set_menu_item}};
 use cafeteer::{
     data::setup_db,
     manager::{get_account_page, get_details_home, get_start_page, post_language},
@@ -43,6 +43,7 @@ async fn main() {
         )
         .route("/manager/details/data/:id", get(get_details_data))
         .route("/manager/menu", get(get_menu_page))
+        .route("/manager/menu/categories", get(get_categories_page))
         .route("/manager/menu/item/:id/:lang", get(get_menu_item))
         .route("/manager/menu/item/:id/:lang", post(set_menu_item))
         .route("/manager/config", get(get_account_page))

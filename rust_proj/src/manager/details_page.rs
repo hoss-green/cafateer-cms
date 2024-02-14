@@ -47,7 +47,6 @@ pub async fn get_details_data(
     };
 
     let component_editor: String = component_edit_details.render().unwrap().to_string();
-
     (StatusCode::OK, Html(component_editor))
 }
 
@@ -62,7 +61,6 @@ pub async fn get_details_home(State(app_state): State<AppState>) -> (StatusCode,
     };
 
     let editor_home: String = editor_home.render().unwrap().to_string();
-
     (StatusCode::OK, Html(editor_home))
 }
 
