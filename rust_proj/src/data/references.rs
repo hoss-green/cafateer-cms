@@ -1,6 +1,5 @@
-use crate::data_models::reference_items::{Allergy, Language};
-
 use super::context::AppState;
+use crate::data_models::reference_items::{Allergy, Language};
 
 pub async fn get_allergies(state: &AppState) -> Vec<Allergy> {
     let result = sqlx::query_as!(

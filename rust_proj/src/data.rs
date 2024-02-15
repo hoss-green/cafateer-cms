@@ -1,14 +1,12 @@
-use crate::data_models::reference_items::Language;
-
 use self::context::AppState;
-
+use crate::data_models::reference_items::Language;
+pub mod account;
+pub mod categories;
 pub mod context;
 pub mod details;
 pub mod fetcher;
 pub mod menu_items;
 pub mod references;
-pub mod account;
-pub mod categories;
 
 struct Counter {
     count: Option<i64>,
@@ -18,23 +16,23 @@ pub async fn setup_db(app_state: &AppState) {
     let setup_langs = vec![
         Language {
             id: 0,
-            code: "en".to_string(),
-            name: "English".to_string(),
+            code: "es".to_string(),
+            name: "Español".to_string(),
         },
         Language {
             id: 1,
-            code: "es".to_string(),
-            name: "Spanish".to_string(),
+            code: "en".to_string(),
+            name: "Inglés".to_string(),
         },
         Language {
             id: 2,
             code: "fr".to_string(),
-            name: "French".to_string(),
+            name: "Francais".to_string(),
         },
         Language {
             id: 3,
             code: "de".to_string(),
-            name: "German".to_string(),
+            name: "Alemán".to_string(),
         },
     ];
 

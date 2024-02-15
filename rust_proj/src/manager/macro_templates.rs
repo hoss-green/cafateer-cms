@@ -22,6 +22,6 @@ pub struct MenuItemButton {
 #[template(path = "manager/macros/language_selection_dropdown.html")]
 pub struct CategoryButton {
     pub id: uuid::Uuid,
-    pub name: String,
+    pub title: String,
     pub user_languages: Vec<Language>,
 }

@@ -15,9 +15,8 @@ pub struct ComponentDetailEditor {
 pub struct ComponentCategoryEditor {
     pub id: uuid::Uuid,
     pub lang: i32,
-    pub name: String,
+    pub title: String,
 }
-
 
 #[derive(Template, Debug, Clone)]
 #[template(path = "manager/components/primary_language_list.html")]

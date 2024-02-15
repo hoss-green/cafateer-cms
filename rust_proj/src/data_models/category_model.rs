@@ -5,7 +5,7 @@ pub struct CategoryModel {
     pub id: uuid::Uuid,
     pub lang: i32,
     pub owner_id: uuid::Uuid,
-    pub name: String,
+    pub title: Option<String>,
 }
 
 impl CategoryModel {
@@ -14,7 +14,7 @@ impl CategoryModel {
             id: uuid::Uuid::new_v4(),
             lang: 0,
             owner_id,
-            name: "new category".to_string()
+            title: Some("new category".to_string())
         }
     }
 }

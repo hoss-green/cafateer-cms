@@ -1,5 +1,5 @@
-use crate::data_models::CategoryModel;
 use super::context::AppState;
+use crate::data_models::CategoryModel;
 
 pub async fn get_category(
     app_state: &AppState,
@@ -8,9 +8,10 @@ pub async fn get_category(
 ) -> CategoryModel {
     let result = sqlx::query_as!(
         CategoryModel,
-        "select id, lang, name, owner_id from menu_categories where owner_id = $1 and lang= $2",
+        "select id, lang, title, owner_id from menu_categories where id = $1 and lang= $2 and owner_id = $3",
         id,
-        lang
+        lang,
+        owner_id
     )
     .fetch_optional(&app_state.database_pool)
     .await;
@@ -25,13 +26,11 @@ pub async fn get_category(
         }
     }
 }
-pub async fn get_category_list(
-    app_state: &AppState,
-    owner_id: &uuid::Uuid,
-) -> Vec<CategoryModel> {
+
+pub async fn get_category_list(app_state: &AppState, owner_id: &uuid::Uuid) -> Vec<CategoryModel> {
     let result = sqlx::query_as!(
         CategoryModel,
-        "select id, lang, name, owner_id from menu_categories where owner_id = $1",
+        "select id, lang, title, owner_id from menu_categories where owner_id = $1",
         owner_id
     )
     .fetch_all(&app_state.database_pool)
@@ -51,11 +50,11 @@ pub async fn set_category(
     details_item: CategoryModel,
 ) -> bool {
     let result = sqlx::query!(
-        "insert into menu_categories(owner_id, id, lang, name) VALUES ($1, $2, $3, $4) ON CONFLICT (id, lang) DO UPDATE SET name=$4 WHERE menu_categories.id=$2 and menu_categories.lang=$3",
+        "insert into menu_categories(owner_id, id, lang, title) VALUES ($1, $2, $3, $4) ON CONFLICT (id, lang) DO UPDATE SET title=$4 WHERE menu_categories.id=$2 and menu_categories.lang=$3",
         &account_id,
         details_item.id,
         details_item.lang,
-        details_item.name,
+        details_item.title,
     )
     .execute(&app_state.database_pool)
     .await;

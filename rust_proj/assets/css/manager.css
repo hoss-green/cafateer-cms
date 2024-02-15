@@ -903,6 +903,10 @@ input[type="range"]::-ms-fill-lower {
   position: relative;
 }
 
+.inset-0 {
+  inset: 0px;
+}
+
 .bottom-0 {
   bottom: 0px;
 }
@@ -941,6 +945,10 @@ input[type="range"]::-ms-fill-lower {
 
 .z-40 {
   z-index: 40;
+}
+
+.z-30 {
+  z-index: 30;
 }
 
 .mx-auto {
@@ -1338,6 +1346,10 @@ input[type="range"]::-ms-fill-lower {
   background-color: rgb(255 255 255 / var(--tw-bg-opacity));
 }
 
+.bg-gray-900\/50 {
+  background-color: rgb(17 24 39 / 0.5);
+}
+
 .p-1 {
   padding: 0.25rem;
 }
@@ -1723,6 +1735,10 @@ input[type="range"]::-ms-fill-lower {
 :is(.dark .dark\:bg-purple-600) {
   --tw-bg-opacity: 1;
   background-color: rgb(126 58 242 / var(--tw-bg-opacity));
+}
+
+:is(.dark .dark\:bg-gray-900\/80) {
+  background-color: rgb(17 24 39 / 0.8);
 }
 
 :is(.dark .dark\:text-gray-200) {

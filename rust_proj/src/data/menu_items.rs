@@ -60,3 +60,35 @@ pub async fn get_item(app_state: &AppState, id:uuid::Uuid, lang: i32) -> MenuIte
         }
     }
 }
+
+pub async fn set_item(
+    app_state: &AppState,
+    account_id: &uuid::Uuid,
+    details_item: MenuItemModel,
+) -> bool {
+    println!("hit");
+    let result = sqlx::query!(
+        "insert into menu_items(owner_id, id, lang, title, description, price, category) VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (id, lang) DO UPDATE SET title=$4, description=$5, price=$6, category=$7 WHERE menu_items.id=$2 and menu_items.lang=$3",
+        &account_id,
+        details_item.id,
+        details_item.lang,
+        details_item.title,
+        details_item.description,
+        details_item.price,
+        details_item.category
+    )
+    .execute(&app_state.database_pool)
+    .await;
+
+    println!("hit2");
+    match result {
+        Ok(_r) => {
+            println!("Saved item succesfully");
+            true
+        }
+        Err(err) => {
+            println!("Cannot save item, fail, error: {}", err);
+            false
+        }
+    }
+}

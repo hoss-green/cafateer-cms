@@ -5,7 +5,7 @@
 <h5 class="text-2xl">Category Editor</h5>
 {% for category_button in category_buttons %}
   <div class="flex flex-col gap-2">
-     {% call category_edit_button::render(category_button.id, category_button.name, category_button.user_languages) %}
+     {% call category_edit_button::render(category_button.id, category_button.title, category_button.user_languages) %}
   <div>
 {% endfor %}
 {% endblock %}

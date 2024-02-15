@@ -1,8 +1,6 @@
-use askama::Template;
-
-use crate::data_models::{reference_items::Language, CategoryModel};
-
 use super::macro_templates::{CategoryButton, MenuItemButton};
+use crate::data_models::reference_items::Language;
+use askama::Template;
 
 #[derive(Template)]
 #[template(path = "manager/start_page.html")]
@@ -30,7 +28,7 @@ pub struct DetailsPage<'a> {
 #[template(path = "manager/categories_page.html")]
 pub struct CategoriesPage<'a> {
     pub title: &'a str,
-    pub category_buttons:Vec<CategoryButton>,
+    pub category_buttons: Vec<CategoryButton>,
 }
 
 #[derive(Template)]
@@ -47,10 +45,8 @@ pub struct BioPage<'a> {
 #[template(path = "manager/menu_page.html")]
 pub struct MenuPage<'a> {
     pub title: &'a str,
-    pub menu_item_buttons:Vec<MenuItemButton>,
+    pub menu_item_buttons: Vec<MenuItemButton>,
 }
-
-
 
 // pub fn foo() -> String {
 //    "OMG".to_string()

@@ -78,6 +78,30 @@ pub async fn set_menu_item(
     (StatusCode::OK, Html(menu_editor))
 }
 
+pub async fn post_menu_item(
+    State(app_state): State<AppState>,
+    Form(menu_item_form): Form<MenuItemForm>,
+) -> (StatusCode, Html<String>) {
+    let account = data::account::get_account_details(&app_state).await;
+    let result = data::menu_items::set_item(
+        &app_state,
+        &account.id,
+        MenuItemModel {
+            id: menu_item_form.id,
+            lang: menu_item_form.lang,
+            owner_id: account.id,
+            title: menu_item_form.title,
+            description: menu_item_form.description, 
+            price: menu_item_form.price, 
+            category: menu_item_form.category,
+        },
+    )
+    .await;
+    if result {
+        return (StatusCode::OK, Html("Saved!".to_string()));
+    }
+    (StatusCode::OK, Html("Error".to_string()))
+}
 pub async fn post_details_home(
     State(_app_state): State<AppState>,
     Form(_menu_item): Form<MenuItemModel>,
@@ -87,6 +111,11 @@ pub async fn post_details_home(
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct DetailsForm {
-    blurb: String,
+pub struct MenuItemForm {
+    pub id: uuid::Uuid,
+    pub lang: i32,
+    pub title: String,
+    pub description: Option<String>,
+    pub price: Option<f64>,
+    pub category: Option<uuid::Uuid>,
 }
