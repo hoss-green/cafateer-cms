@@ -1,3 +1,5 @@
+// use serde::{Deserialize, Serialize};
+
 use super::context::AppState;
 use crate::data_models::CategoryModel;
 
@@ -8,7 +10,7 @@ pub async fn get_category(
 ) -> CategoryModel {
     let result = sqlx::query_as!(
         CategoryModel,
-        "select id, lang, title, owner_id from menu_categories where id = $1 and lang= $2 and owner_id = $3",
+        "select id, lang, title, owner_id, NULL as lang_name from menu_categories where id = $1 and lang = $2 and owner_id = $3",
         id,
         lang,
         owner_id
@@ -30,7 +32,7 @@ pub async fn get_category(
 pub async fn get_category_list(app_state: &AppState, owner_id: &uuid::Uuid) -> Vec<CategoryModel> {
     let result = sqlx::query_as!(
         CategoryModel,
-        "select id, lang, title, owner_id from menu_categories where owner_id = $1",
+        "select id, lang, title, owner_id, NULL as lang_name from menu_categories where owner_id = $1",
         owner_id
     )
     .fetch_all(&app_state.database_pool)
@@ -44,6 +46,37 @@ pub async fn get_category_list(app_state: &AppState, owner_id: &uuid::Uuid) -> V
     }
 }
 
+pub async fn get_category_list_by_lang(app_state: &AppState, owner_id: &uuid::Uuid, lang:i32) -> Vec<CategoryModel> {
+    let result = sqlx::query_as!(
+        CategoryModel,
+        "select m1.id, m1.lang, m1.owner_id, m2.title, rf.name as lang_name
+        from (
+            select distinct mm1.id, mm2.lang as lang, mm2.owner_id as owner_id from
+            menu_categories as mm1
+            left join (
+                select distinct lang, owner_id from
+                menu_categories
+            ) mm2
+        on mm1.owner_id = mm2.owner_id
+        ) m1
+        join ref_languages as rf on m1.lang = rf.id 
+        left join (
+            select id, lang, title, owner_id from menu_categories where lang=$1
+        ) m2
+        on m1.id = m2.id and m1.lang = m2.lang where m1.lang=$1 and m1.owner_id = $2",
+        lang,
+        owner_id
+    )
+    .fetch_all(&app_state.database_pool)
+    .await;
+    match result {
+        Ok(r) => r,
+        Err(err) => {
+            println!("Cannot fetch menu items, err: {}", err);
+            vec![]
+        }
+    }
+}
 pub async fn set_category(
     app_state: &AppState,
     account_id: &uuid::Uuid,

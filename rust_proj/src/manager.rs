@@ -15,6 +15,7 @@ pub use details_page::post_details_home;
 pub use menu_page::get_menu_page;
 pub use menu_page::get_menu_item;
 pub use menu_page::post_menu_item;
+pub use menu_page::get_menu_item_details;
 pub use start::get_start_page;
 pub use categories_page::get_categories_page;
 pub use categories_page::get_category_item;

@@ -1,0 +1,21 @@
+<form class="mb-6" id="detail_editor" hx-post="/manager/menu/item" hx-target="#post_message" hx-swap="innerHTML">
+  <input type="hidden" name="id" value="{{ id }}"></input>
+      <div class="mb-2">
+      <label for="categories" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Category</label>
+      <select id="categories" name="countries" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+        <option selected>Choose a Category</option>
+        {% for available_category in categories %}
+        {% if available_category.id == category %}
+        <option selected value="{{ available_category.id }}">{{ available_category.title.clone().unwrap_or(String::new()) }}</option>
+        {% endif %}
+        <option value="{{ available_category.id }}">{{ available_category.title.clone().unwrap_or(String::new()) }}</option>
+        {% endfor %}
+      </select>
+      </div>
+      <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+        <i class="fa-solid fa-floppy-disk"></i>
+        Save
+      </button>
+    <div id="post_message" class="flex justify-center w-full">
+    </div>
+</form>

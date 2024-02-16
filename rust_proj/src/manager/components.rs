@@ -1,4 +1,4 @@
-use crate::data_models::reference_items::Language;
+use crate::data_models::{reference_items::{Allergy, Language}, CategoryModel};
 use askama::Template;
 
 #[derive(Template, Debug, Clone)]
@@ -33,5 +33,14 @@ pub struct MenuItemEditor {
     pub description: String,
     pub lang: i32,
     pub price: f64,
-    pub category: String,
+}
+
+#[derive(Template, Debug, Clone)]
+#[template(path = "manager/components/menu_item_details_editor.html")]
+pub struct MenuItemDetailsEditor {
+    pub id: uuid::Uuid,
+    pub owner_id: uuid::Uuid,
+    pub allergies: Vec<Allergy>,
+    pub category: uuid::Uuid,
+    pub categories: Vec<CategoryModel>,
 }

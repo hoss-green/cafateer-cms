@@ -36,8 +36,6 @@ pub async fn post_language(
     body: String,
 ) -> (StatusCode, Html<String>) {
     let mut account_model = get_account_details(&app_state).await;
-    println!("{:#?}", body.clone());
-    // let message = format!("Details updated successfully with body: {}", body.clone());
     let options: Vec<String> = match body.contains("&") && body.len() > 0 {
         true => body.split("&")
         .map(|item| item.to_string())
@@ -45,7 +43,6 @@ pub async fn post_language(
         false => vec![body]
     };
 
-    println!("{:#?}", options.clone());
     let res: Vec<i32> = options
         .clone()
         .iter()

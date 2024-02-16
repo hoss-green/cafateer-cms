@@ -6,6 +6,7 @@ pub mod context;
 pub mod details;
 pub mod fetcher;
 pub mod menu_items;
+pub mod menu_item_details;
 pub mod references;
 
 struct Counter {

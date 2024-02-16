@@ -20,6 +20,7 @@ pub async fn get_categories_page(State(app_state): State<AppState>) -> (StatusCo
     let mut menu_items = data::categories::get_category_list(&app_state, &account.id).await;
     let mut menu_item_buttons: Vec<CategoryButton> = vec![];
     menu_items.sort_by(|a, b| (format!("{}{}", a.id, a.lang)).cmp(&format!("{}{}", b.id, b.lang)));
+
     for menu_item in menu_items.clone() {
         if menu_item_buttons.iter().any(|mi| mi.id == menu_item.id) {
             menu_item_buttons
@@ -74,6 +75,7 @@ pub async fn post_category_item(
             lang: details_item.lang,
             owner_id: account.id,
             title: details_item.title,
+            lang_name: None
         },
     )
     .await;
