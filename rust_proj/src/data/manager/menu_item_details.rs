@@ -1,7 +1,6 @@
 use sqlx::Postgres;
-
-use crate::data_models::MenuItemDetailsModel;
-use super::context::AppState;
+use crate::models::data::MenuItemDetailsModel;
+use crate::data::context::AppState;
 
 pub async fn get_menu_item_details(app_state: &AppState, id:uuid::Uuid) -> MenuItemDetailsModel {
     let result = sqlx::query_as::<Postgres, MenuItemDetailsModel>(

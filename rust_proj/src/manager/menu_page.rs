@@ -5,7 +5,7 @@ use super::{
 };
 use crate::{
     data::{self, context::AppState},
-    data_models::{reference_items::Language, MenuItemModel},
+    models::data::{reference_items::Language, MenuItemModel},
 };
 use askama::Template;
 use axum::{
@@ -18,7 +18,7 @@ use serde::{Deserialize, Serialize};
 
 pub async fn get_menu_page(State(app_state): State<AppState>) -> (StatusCode, Html<String>) {
     let languages = data::references::get_languages(&app_state).await;
-    let mut menu_items = data::menu_items::get_items_for_account(&app_state).await;
+    let mut menu_items = data::manager::menu_items::get_items_for_account(&app_state).await;
     let mut menu_item_buttons: Vec<MenuItemButton> = vec![];
     menu_items.sort_by(|a, b| (format!("{}{}", a.id, a.lang)).cmp(&format!("{}{}", b.id, b.lang)));
     for menu_item in menu_items.clone() {
@@ -52,8 +52,8 @@ pub async fn get_menu_item(
     State(app_state): State<AppState>,
     Path((id, lang)): Path<(uuid::Uuid, i32)>,
 ) -> (StatusCode, Html<String>) {
-    let account = data::account::get_account_details(&app_state).await;
-    let menu_item = data::menu_items::get_item_by_lang(&app_state, id, lang, account.id).await;
+    let account = data::manager::account::get_account_details(&app_state).await;
+    let menu_item = data::manager::menu_items::get_item_by_lang(&app_state, id, lang, account.id).await;
     let menu_item_editor = MenuItemEditor {
         id: menu_item.id,
         title: menu_item.title,
@@ -69,8 +69,8 @@ pub async fn post_menu_item(
     State(app_state): State<AppState>,
     Form(menu_item_form): Form<MenuItemForm>,
 ) -> (StatusCode, Html<String>) {
-    let account = data::account::get_account_details(&app_state).await;
-    let result = data::menu_items::set_item(
+    let account = data::manager::account::get_account_details(&app_state).await;
+    let result = data::manager::menu_items::set_item(
         &app_state,
         &account.id,
         MenuItemModel {
@@ -93,10 +93,10 @@ pub async fn get_menu_item_details(
     State(app_state): State<AppState>,
     Path(id): Path<uuid::Uuid>,
 ) -> (StatusCode, Html<String>) {
-    let account = data::account::get_account_details(&app_state).await;
-    let categories = data::categories::get_category_list_by_lang(&app_state, &account.id, 1).await;
+    let account = data::manager::account::get_account_details(&app_state).await;
+    let categories = data::manager::categories::get_category_list_by_lang(&app_state, &account.id, 1).await;
     let ref_allergies = data::references::get_allergies(&app_state).await;
-    let menu_item_details = data::menu_item_details::get_menu_item_details(&app_state, id).await;
+    let menu_item_details = data::manager::menu_item_details::get_menu_item_details(&app_state, id).await;
     let menu_item_editor = MenuItemDetailsEditor {
         id: menu_item_details.id,
         owner_id: account.id,

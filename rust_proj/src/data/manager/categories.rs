@@ -1,7 +1,5 @@
-// use serde::{Deserialize, Serialize};
-
-use super::context::AppState;
-use crate::data_models::CategoryModel;
+use crate::data::context::AppState;
+use crate::models::data::CategoryModel;
 
 pub async fn get_category(
     app_state: &AppState,

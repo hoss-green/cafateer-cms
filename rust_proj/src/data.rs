@@ -1,13 +1,9 @@
-use self::context::AppState;
-use crate::data_models::reference_items::Language;
-pub mod account;
-pub mod categories;
 pub mod context;
-pub mod details;
-pub mod fetcher;
-pub mod menu_items;
-pub mod menu_item_details;
+pub mod presenter;
+pub mod manager;
 pub mod references;
+use crate::data::context::AppState;
+use crate::models::data::reference_items::Language;
 
 struct Counter {
     count: Option<i64>,

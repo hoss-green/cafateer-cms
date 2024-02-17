@@ -1,4 +1,4 @@
-use crate::data_models::{reference_items::{Allergy, Language}, CategoryModel};
+use crate::models::data::{reference_items::{Allergy, Language}, CategoryModel};
 use askama::Template;
 
 #[derive(Template, Debug, Clone)]

@@ -21,4 +21,3 @@ pub struct LaunguageJsonModel {
     pub main_language: i32,
     pub languages: Vec::<i32> 
 }
-

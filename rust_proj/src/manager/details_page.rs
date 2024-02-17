@@ -1,7 +1,7 @@
 use super::templates::DetailsPage;
 use crate::{
     data::{self, context::AppState},
-    data_models::{reference_items::Language, DetailsModel},
+    models::data::{reference_items::Language, DetailsModel},
     manager::components::ComponentDetailEditor,
 };
 use askama::Template;
@@ -18,7 +18,7 @@ pub async fn get_details_data(
     Path(id): Path<i32>,
 ) -> (StatusCode, Html<String>) {
     println!("id {}", id);
-    let account = data::account::get_account_details(&app_state).await;
+    let account = data::manager::account::get_account_details(&app_state).await;
     if !account
         .languages
         .languages
@@ -31,7 +31,7 @@ pub async fn get_details_data(
         );
     }
 
-    let mut detail = data::details::get_detail(&app_state, &account.id, id).await;
+    let mut detail = data::manager::details::get_detail(&app_state, &account.id, id).await;
     if detail.lang_name.is_empty() {
         let all_langs = data::references::get_languages(&app_state).await;
         let current_language = Language::get_from_int(&all_langs, id);
@@ -51,7 +51,7 @@ pub async fn get_details_data(
 }
 
 pub async fn get_details_home(State(app_state): State<AppState>) -> (StatusCode, Html<String>) {
-    let account = data::account::get_account_details(&app_state).await;
+    let account = data::manager::account::get_account_details(&app_state).await;
     let all_langs = data::references::get_languages(&app_state).await;
     let language_list = Language::vec_from_int_vec(&all_langs, &account.languages.languages);
 
@@ -68,9 +68,9 @@ pub async fn post_details_home(
     State(app_state): State<AppState>,
     Form(details_item): Form<DetailsModel>,
 ) -> (StatusCode, Html<String>) {
-    let account = data::account::get_account_details(&app_state).await;
+    let account = data::manager::account::get_account_details(&app_state).await;
     let mut info: String = "Saved!".to_string();
-    let result = data::details::set_details(&app_state, &account.id, details_item).await;
+    let result = data::manager::details::set_details(&app_state, &account.id, details_item).await;
     if !result {
         info = "Error".to_string();
     }

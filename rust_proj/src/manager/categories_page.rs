@@ -3,7 +3,7 @@ use super::{
 };
 use crate::{
     data::{self, context::AppState},
-    data_models::{reference_items::Language, CategoryModel},
+    models::data::{reference_items::Language, CategoryModel},
 };
 use askama::Template;
 use axum::{
@@ -15,9 +15,9 @@ use http::StatusCode;
 use serde::{Deserialize, Serialize};
 
 pub async fn get_categories_page(State(app_state): State<AppState>) -> (StatusCode, Html<String>) {
-    let account = data::account::get_account_details(&app_state).await;
+    let account = data::manager::account::get_account_details(&app_state).await;
     let languages = data::references::get_languages(&app_state).await;
-    let mut menu_items = data::categories::get_category_list(&app_state, &account.id).await;
+    let mut menu_items = data::manager::categories::get_category_list(&app_state, &account.id).await;
     let mut menu_item_buttons: Vec<CategoryButton> = vec![];
     menu_items.sort_by(|a, b| (format!("{}{}", a.id, a.lang)).cmp(&format!("{}{}", b.id, b.lang)));
 
@@ -51,8 +51,8 @@ pub async fn get_category_item(
     State(app_state): State<AppState>,
     Path((id, lang)): Path<(uuid::Uuid, i32)>,
 ) -> (StatusCode, Html<String>) {
-    let account = data::account::get_account_details(&app_state).await;
-    let category = data::categories::get_category(&app_state, (id, lang), &account.id).await;
+    let account = data::manager::account::get_account_details(&app_state).await;
+    let category = data::manager::categories::get_category(&app_state, (id, lang), &account.id).await;
     let category_editor = ComponentCategoryEditor {
         id: category.id,
         title: category.title.unwrap_or("".to_string()),
@@ -66,8 +66,8 @@ pub async fn post_category_item(
     State(app_state): State<AppState>,
     Form(details_item): Form<CategoryForm>,
 ) -> (StatusCode, Html<String>) {
-    let account = data::account::get_account_details(&app_state).await;
-    let result = data::categories::set_category(
+    let account = data::manager::account::get_account_details(&app_state).await;
+    let result = data::manager::categories::set_category(
         &app_state,
         &account.id,
         CategoryModel {

@@ -1,11 +1,11 @@
 use super::templates::AccountPage;
 use crate::{
     data::{
-        account::{get_account_details, set_account_details},
+        manager::account::{get_account_details, set_account_details},
         context::AppState,
         references::get_languages,
     },
-    data_models::reference_items::Language,
+    models::data::reference_items::Language,
     manager::components::PrimaryLanguageList,
 };
 use askama::Template;

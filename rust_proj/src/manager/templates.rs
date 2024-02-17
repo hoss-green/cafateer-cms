@@ -1,5 +1,5 @@
 use super::macro_templates::{CategoryButton, MenuItemButton};
-use crate::data_models::reference_items::Language;
+use crate::models::data::reference_items::Language;
 use askama::Template;
 
 #[derive(Template)]

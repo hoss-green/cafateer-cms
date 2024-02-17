@@ -1,6 +1,6 @@
 use askama::Template;
 
-use crate::data_models::reference_items::Language;
+use crate::models::data::reference_items::Language;
 
 #[derive(Template, Debug, Clone)]
 #[template(path = "manager/macros/language_selection_dropdown.html")]

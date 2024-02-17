@@ -1,5 +1,4 @@
-use super::context::AppState;
-use crate::data_models::MenuItemModel;
+use crate::{data::context::AppState, models::data::MenuItemModel};
 
 pub async fn get_menu_items(app_state: &AppState) -> Vec<MenuItemModel> {
     let result = sqlx::query_as!(

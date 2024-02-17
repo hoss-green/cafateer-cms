@@ -1,5 +1,5 @@
 use askama::Template;
-use crate::view_models::components::MenuTabComponent;
+use crate::models::views::components::MenuTabComponent;
 
 #[derive(Template)]
 #[template(path="presenter/pages/restaurant.html")]
