@@ -1,7 +1,7 @@
 <li id="primary_lang_list">
   {% for lang in user_selected_languages %} 
     <button
-        hx-post="/manager/account/primary_language/{{ lang.id }}" hx-target="#primary_lang_list" hx-swap="outerHTML"
+        hx-post="/manager/config/primary_language/{{ lang.id }}" hx-target="#primary_lang_list" hx-swap="outerHTML"
         {%- if primary_language_id == lang.id -%}
         class="block px-4 py-2 bg-primary-500 text-white font-bold w-full">
         ** {{ lang.name }} **

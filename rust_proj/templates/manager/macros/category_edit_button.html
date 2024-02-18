@@ -1,5 +1,5 @@
 {%- import "manager/macros/category_dropdown_list.html" as category_dropdown_list -%} 
-{% macro render(id, title, languages) %}
+{% macro render(id, title, but_languages) %}
 <div class="w-full flex flex-col p-1 bg-gray-50 rounded-md">
   <div class="w-full flex justify-between items-center">
     <div class="flex flex-col items-start">
@@ -9,7 +9,7 @@
   </div>
   <div class="w-full flex justify-between items-center">
     <div></div>
-    {% call category_dropdown_list::render(id, languages.clone()) %}
+    {% call category_dropdown_list::render(id, but_languages.clone()) %}
   </div>
 </div>
 {% endmacro %}

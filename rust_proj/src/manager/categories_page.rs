@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use super::{
     components::ComponentCategoryEditor, macro_templates::CategoryButton, templates::CategoriesPage,
 };
@@ -16,31 +18,33 @@ use serde::{Deserialize, Serialize};
 
 pub async fn get_categories_page(State(app_state): State<AppState>) -> (StatusCode, Html<String>) {
     let account = data::manager::account::get_account_details(&app_state).await;
-    let languages = data::references::get_languages(&app_state).await;
-    let mut menu_items = data::manager::categories::get_category_list(&app_state, &account.id).await;
-    let mut menu_item_buttons: Vec<CategoryButton> = vec![];
-    menu_items.sort_by(|a, b| (format!("{}{}", a.id, a.lang)).cmp(&format!("{}{}", b.id, b.lang)));
+    let languages = Language::vec_from_int_vec(
+        &data::references::get_languages(&app_state).await,
+        &account.languages.languages,
+    );
+    let mut fetched_categories =
+        data::manager::categories::get_category_list(&app_state, &account.id).await;
+    fetched_categories
+        .sort_by(|a, b| (format!("{}{}", a.id, a.lang)).cmp(&format!("{}{}", b.id, b.lang)));
 
-    for menu_item in menu_items.clone() {
-        if menu_item_buttons.iter().any(|mi| mi.id == menu_item.id) {
-            menu_item_buttons
-                .iter_mut()
-                .filter(|mi| mi.id == menu_item.id)
-                .collect::<Vec<&mut CategoryButton>>()[0]
-                .user_languages
-                .push(Language::get_from_int(&languages, menu_item.lang));
-        } else {
-            menu_item_buttons.push(CategoryButton {
-                id: menu_item.id,
-                title: menu_item.clone().title.unwrap_or(String::new()),
-                user_languages: vec![Language::get_from_int(&languages, menu_item.lang)],
-            });
-        }
-    }
+    let mut unique_category_ids: HashMap<uuid::Uuid, bool> = HashMap::new();
+    fetched_categories.clone().into_iter().for_each(|cat| {
+        unique_category_ids.insert(cat.id, true);
+    });
 
+    println!("{:#?}", fetched_categories);
+    let category_item_buttons: Vec<CategoryButton> = unique_category_ids.iter().map(|unique_cat| {
+        let button_title = match fetched_categories.iter().find(|cat| cat.id == *unique_cat.0 && cat.lang == account.languages.main_language) {
+            Some(cat) => cat.clone().title.unwrap_or("No title".to_string()),
+            None => "No title".to_string()
+        };
+        CategoryButton { id: *unique_cat.0, title: button_title, user_languages: languages.clone() }
+    }).collect();
+
+    println!("{:#?}", category_item_buttons);
     let menu_editor = CategoriesPage {
         title: "Edit Menu",
-        category_buttons: menu_item_buttons,
+        category_buttons: category_item_buttons,
     };
 
     let menu_editor: String = menu_editor.render().unwrap().to_string();
@@ -52,7 +56,8 @@ pub async fn get_category_item(
     Path((id, lang)): Path<(uuid::Uuid, i32)>,
 ) -> (StatusCode, Html<String>) {
     let account = data::manager::account::get_account_details(&app_state).await;
-    let category = data::manager::categories::get_category(&app_state, (id, lang), &account.id).await;
+    let category =
+        data::manager::categories::get_category(&app_state, (id, lang), &account.id).await;
     let category_editor = ComponentCategoryEditor {
         id: category.id,
         title: category.title.unwrap_or("".to_string()),
@@ -75,7 +80,7 @@ pub async fn post_category_item(
             lang: details_item.lang,
             owner_id: account.id,
             title: details_item.title,
-            lang_name: None
+            lang_name: None,
         },
     )
     .await;
