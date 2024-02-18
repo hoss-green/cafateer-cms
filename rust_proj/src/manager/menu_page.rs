@@ -6,8 +6,8 @@ use super::{
     templates::MenuPage,
 };
 use crate::{
-    data::{self, context::AppState},
-    models::data::{reference_items::Language, CategoryModel, MenuItemModel},
+    data::{self, context::AppState, manager::categories},
+    models::data::{reference_items::Language, CategoryModel, MenuItemDetailsModel, MenuItemModel},
 };
 use askama::Template;
 use axum::{
@@ -19,29 +19,44 @@ use http::StatusCode;
 use serde::{Deserialize, Serialize};
 
 pub async fn get_menu_page(State(app_state): State<AppState>) -> (StatusCode, Html<String>) {
-    let languages = data::references::get_languages(&app_state).await;
+    let account = data::manager::account::get_account_details(&app_state).await;
+    // let categories = data::manager::categories::get_category_list(&app_state, &account.id).await;
+    let menu_item_details: Vec<MenuItemDetailsModel> =
+        data::manager::menu_item_details::get_menu_item_details(&app_state, &account.id).await;
+    let languages = Language::vec_from_int_vec(
+        &data::references::get_languages(&app_state).await,
+        &account.languages.languages,
+    );
     let mut menu_items = data::manager::menu_items::get_items_for_account(&app_state).await;
-    let mut menu_item_buttons: Vec<MenuItemButton> = vec![];
     menu_items.sort_by(|a, b| (format!("{}{}", a.id, a.lang)).cmp(&format!("{}{}", b.id, b.lang)));
+    let mut unique_menu_ids: HashMap<uuid::Uuid, bool> = HashMap::new();
+    menu_items.clone().into_iter().for_each(|mi| {
+        unique_menu_ids.insert(mi.id, true);
+    });
 
-    for menu_item in menu_items.clone() {
-
-        if menu_item_buttons.iter().any(|mi| mi.id == menu_item.id) {
-            menu_item_buttons
-                .iter_mut()
-                .filter(|mi| mi.id == menu_item.id)
-                .collect::<Vec<&mut MenuItemButton>>()[0]
-                .user_languages
-                .push(Language::get_from_int(&languages, menu_item.lang));
-        } else {
-            menu_item_buttons.push(MenuItemButton {
-                id: menu_item.id,
-                title: menu_item.clone().title,
-                category: uuid::Uuid::nil().to_string(), // menu_item.category.unwrap_or(uuid::Uuid::nil()).to_string(),
-                user_languages: vec![Language::get_from_int(&languages, menu_item.lang)],
-            });
-        }
-    }
+    let menu_item_buttons: Vec<MenuItemButton> = unique_menu_ids
+        .iter()
+        .map(|unique_mi| {
+            let button_title = match menu_items
+                .iter()
+                .find(|mi| mi.id == *unique_mi.0 && mi.lang == account.languages.main_language)
+            {
+                Some(cat) => cat.clone().title,
+                None => "No title".to_string(),
+            };
+            MenuItemButton {
+                id: *unique_mi.0,
+                title: button_title,
+                category: match menu_item_details.iter().find(|menu_item_desc| {
+                    menu_item_desc.id == *unique_mi.0
+                }) {
+                    Some(cat) => cat.id.clone().to_string(),
+                    None => "None".to_string(),
+                },
+                user_languages: languages.clone(),
+            }
+        })
+        .collect();
 
     let menu_editor = MenuPage {
         title: "Edit Menu",
@@ -135,9 +150,8 @@ pub async fn get_menu_item_details(
         categories.append(&mut fc);
     });
 
-    println!("{:#?}", categories);
     let menu_item_details =
-        data::manager::menu_item_details::get_menu_item_details(&app_state, id).await;
+        data::manager::menu_item_details::get_menu_item_detail(&app_state, &account.id, &id).await;
     let menu_item_editor = MenuItemDetailsEditor {
         id: menu_item_details.id,
         owner_id: account.id,

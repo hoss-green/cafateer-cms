@@ -30,14 +30,17 @@ impl MenuItemModel {
 #[derive(Debug, Clone, Serialize, Deserialize, FromRow)]
 pub struct MenuItemDetailsModel {
     pub id: uuid::Uuid,
+    pub owner_id: uuid::Uuid,
     pub allergies: Option<Vec<Uuid>>,
     pub category: Option<Uuid>,
+
 }
 
 impl MenuItemDetailsModel {
-    pub fn new() -> MenuItemDetailsModel {
+    pub fn new(owner_id:uuid::Uuid) -> MenuItemDetailsModel {
         MenuItemDetailsModel {
             id: uuid::Uuid::new_v4(),
+            owner_id,
             category: None,
             allergies: None,
         }

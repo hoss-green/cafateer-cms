@@ -33,15 +33,24 @@ pub async fn get_categories_page(State(app_state): State<AppState>) -> (StatusCo
     });
 
     println!("{:#?}", fetched_categories);
-    let category_item_buttons: Vec<CategoryButton> = unique_category_ids.iter().map(|unique_cat| {
-        let button_title = match fetched_categories.iter().find(|cat| cat.id == *unique_cat.0 && cat.lang == account.languages.main_language) {
-            Some(cat) => cat.clone().title.unwrap_or("No title".to_string()),
-            None => "No title".to_string()
-        };
-        CategoryButton { id: *unique_cat.0, title: button_title, user_languages: languages.clone() }
-    }).collect();
+    let category_item_buttons: Vec<CategoryButton> = unique_category_ids
+        .iter()
+        .map(|unique_cat| {
+            let button_title = match fetched_categories
+                .iter()
+                .find(|cat| cat.id == *unique_cat.0 && cat.lang == account.languages.main_language)
+            {
+                Some(cat) => cat.clone().title.unwrap_or("No title".to_string()),
+                None => "No title".to_string(),
+            };
+            CategoryButton {
+                id: *unique_cat.0,
+                title: button_title,
+                user_languages: languages.clone(),
+            }
+        })
+        .collect();
 
-    println!("{:#?}", category_item_buttons);
     let menu_editor = CategoriesPage {
         title: "Edit Menu",
         category_buttons: category_item_buttons,
