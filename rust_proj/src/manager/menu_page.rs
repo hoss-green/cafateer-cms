@@ -1,12 +1,10 @@
-use std::collections::HashMap;
-
 use super::{
     components::{MenuItemDetailsEditor, MenuItemEditor},
     macro_templates::MenuItemButton,
     templates::MenuPage,
 };
 use crate::{
-    data::{self, context::AppState, manager::categories},
+    data::{self, context::AppState},
     models::data::{reference_items::Language, CategoryModel, MenuItemDetailsModel, MenuItemModel},
 };
 use askama::Template;
@@ -17,10 +15,10 @@ use axum::{
 };
 use http::StatusCode;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 pub async fn get_menu_page(State(app_state): State<AppState>) -> (StatusCode, Html<String>) {
     let account = data::manager::account::get_account_details(&app_state).await;
-    // let categories = data::manager::categories::get_category_list(&app_state, &account.id).await;
     let menu_item_details: Vec<MenuItemDetailsModel> =
         data::manager::menu_item_details::get_menu_item_details(&app_state, &account.id).await;
     let languages = Language::vec_from_int_vec(
@@ -47,9 +45,10 @@ pub async fn get_menu_page(State(app_state): State<AppState>) -> (StatusCode, Ht
             MenuItemButton {
                 id: *unique_mi.0,
                 title: button_title,
-                category: match menu_item_details.iter().find(|menu_item_desc| {
-                    menu_item_desc.id == *unique_mi.0
-                }) {
+                category: match menu_item_details
+                    .iter()
+                    .find(|menu_item_desc| menu_item_desc.id == *unique_mi.0)
+                {
                     Some(cat) => cat.id.clone().to_string(),
                     None => "None".to_string(),
                 },

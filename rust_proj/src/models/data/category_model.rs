@@ -10,9 +10,9 @@ pub struct CategoryModel {
 }
 
 impl CategoryModel {
-    pub fn new(owner_id:uuid::Uuid) -> CategoryModel {
+    pub fn new(id:Option<uuid::Uuid>, owner_id:uuid::Uuid) -> CategoryModel {
         CategoryModel {
-            id: uuid::Uuid::new_v4(),
+            id: id.unwrap_or(uuid::Uuid::new_v4()),
             lang: 0,
             owner_id,
             title: Some("new category".to_string()),

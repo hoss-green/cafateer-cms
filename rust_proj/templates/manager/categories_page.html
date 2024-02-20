@@ -2,10 +2,25 @@
 {% extends "manager/manager_base.html" %}
 {% block title %}{{ title }}{% endblock %}
 {% block content %}
+<div class="pb-2 flex flex-col items-start">
 <h5 class="text-2xl">Category Editor</h5>
-{% for category_button in category_buttons %}
+<!-- <button type="submit" class="btn">New</button> -->
+<div class="flex gap-2">
+<button 
+     type="button" 
+  hx-post="/manager/menu/categories" 
+  hx-target="#category_container"
+  hx-swap="beforeend"
+  class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
+  New
+</button>
+</div>
+</div>
+<div id="category_container">
   <div class="flex flex-col gap-2">
-     {% call category_edit_button::render(category_button.id, category_button.title, category_button.user_languages) %}
+    {% for category_button in category_buttons %}
+      {% call category_edit_button::render(category_button.id, category_button.title, category_button.user_languages) %}
+    {% endfor %}
   <div>
-{% endfor %}
+  </div>
 {% endblock %}

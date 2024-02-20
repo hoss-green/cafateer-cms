@@ -1,11 +1,11 @@
 use axum::{
-    routing::{get, post},
+    routing::{delete, get, post, put},
     Router,
 };
 use cafeteer::{
     data::context::AppState,
     manager::{
-        get_categories_page, get_category_item, get_menu_item, get_menu_item_details, get_menu_page, post_category_item, post_details_home, post_menu_item
+        create_category_item, delete_category_item, get_categories_page, get_category_item, get_menu_item, get_menu_item_details, get_menu_page, update_category_item, post_details_home, post_menu_item
     },
 };
 use cafeteer::{
@@ -50,7 +50,9 @@ async fn main() {
         .route("/manager/menu", get(get_menu_page))
         .route("/manager/menu/categories", get(get_categories_page))
         .route("/manager/menu/categories/:id/:lang", get(get_category_item))
-        .route("/manager/menu/categories", post(post_category_item))
+        .route("/manager/menu/categories", put(update_category_item))
+        .route("/manager/menu/categories", post(create_category_item))
+        .route("/manager/menu/categories/:id", delete(delete_category_item))
         .route("/manager/menu/item/:id/:lang", get(get_menu_item))
         .route("/manager/menu/item/details/:id", get(get_menu_item_details))
         .route("/manager/menu/item", post(post_menu_item))

@@ -18,11 +18,11 @@ pub async fn get_category(
     match result {
         Ok(r) => match r {
             Some(item) => item,
-            None => CategoryModel::new(*owner_id),
+            None => CategoryModel::new(Some(id), *owner_id),
         },
         Err(err) => {
             println!("Cannot fetch menu items, err: {}", err);
-            CategoryModel::new(*owner_id)
+            CategoryModel::new(Some(id), *owner_id)
         }
     }
 }
@@ -44,7 +44,11 @@ pub async fn get_category_list(app_state: &AppState, owner_id: &uuid::Uuid) -> V
     }
 }
 
-pub async fn get_category_list_by_lang(app_state: &AppState, owner_id: &uuid::Uuid, lang:i32) -> Vec<CategoryModel> {
+pub async fn get_category_list_by_lang(
+    app_state: &AppState,
+    owner_id: &uuid::Uuid,
+    lang: i32,
+) -> Vec<CategoryModel> {
     let result = sqlx::query_as!(
         CategoryModel,
         "select m1.id, m1.lang, m1.owner_id, m2.title, rf.name as lang_name
@@ -94,6 +98,34 @@ pub async fn set_category(
         Ok(_r) => {
             println!("Saved item succesfully");
             true
+        }
+        Err(err) => {
+            println!("Cannot save item, fail, error: {}", err);
+            false
+        }
+    }
+}
+
+pub async fn delete_category(
+    app_state: &AppState,
+    account_id: &uuid::Uuid,
+    category_id: &uuid::Uuid,
+) -> bool {
+    let result = sqlx::query!(
+        "delete from menu_categories where owner_id=$1 and id=$2",
+        &account_id,
+        &category_id,
+    )
+    .execute(&app_state.database_pool)
+    .await;
+
+    match result {
+        Ok(r) => {
+            if r.rows_affected() > 0 {
+                println!("Deleted category succesfully {:?}", r);
+                return true;
+            }
+            false
         }
         Err(err) => {
             println!("Cannot save item, fail, error: {}", err);

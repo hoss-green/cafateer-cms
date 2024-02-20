@@ -19,4 +19,6 @@ pub use menu_page::get_menu_item_details;
 pub use start::get_start_page;
 pub use categories_page::get_categories_page;
 pub use categories_page::get_category_item;
-pub use categories_page::post_category_item;
+pub use categories_page::update_category_item;
+pub use categories_page::create_category_item;
+pub use categories_page::delete_category_item;
