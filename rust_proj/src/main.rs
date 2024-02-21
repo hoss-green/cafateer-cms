@@ -10,7 +10,7 @@ use cafeteer::{
         pages::{get_account_page, get_categories_page, get_home_page, get_menu_page},
         post_details_home, update_category_item,
     },
-    presenter::menu::get_menu,
+    presenter::{menu::get_menu, restaurant::get_restaurant_with_lang},
 };
 use cafeteer::{
     data::setup_db,
@@ -45,6 +45,7 @@ async fn main() {
     let router = Router::new()
         .nest_service("/assets", tower_http::services::ServeDir::new("assets"))
         .route("/", get(get_restaurant))
+        .route("/:lang", get(get_restaurant_with_lang))
         .route("/menu", get(get_menu))
         .route("/manager", get(get_home_page))
         .route(
@@ -61,7 +62,7 @@ async fn main() {
         .route("/manager/menu/item/:id/:lang", get(get_menu_item))
         .route("/manager/menu/item", post(create_menu_item))
         .route("/manager/menu/item", put(update_menu_item))
-        .route("/manager/menu/item/:id", post(delete_menu_item))
+        .route("/manager/menu/item/:id", delete(delete_menu_item))
         .route("/manager/menu/item/details/:id", get(get_menu_item_details))
         .route("/manager/config", get(get_account_page))
         .route("/manager/config/languages", post(post_language))

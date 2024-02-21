@@ -1,13 +1,24 @@
 use askama::Template;
-use axum::{extract::State, response::Html};
+use axum::{
+    extract::{Path, State},
+    response::Html,
+};
 use http::StatusCode;
 
-use crate::{data::context::AppState, models::views::{components::{MenuItemComponent, MenuTabComponent}, pages::MenuPage}};
+use crate::{
+    data::context::AppState,
+    models::views::{
+        components::{MenuItemComponent, MenuTabComponent},
+        pages::MenuPage,
+    },
+};
 
-
-pub async fn get_menu(State(app_state): State<AppState>) -> (StatusCode, Html<String>) {
+pub async fn get_menu(
+    State(app_state): State<AppState>,
+    _lang: Path<i32>,
+) -> (StatusCode, Html<String>) {
     let mut menu_items_lunch: Vec<MenuItemComponent> = vec![];
-    let menu_items = crate::data::presenter::fetcher::get_menu_items(&app_state).await;
+    let menu_items = crate::data::presenter::fetcher::get_menu_items(&app_state, 0).await;
 
     let menu_items_breakfast = menu_items
         .iter()

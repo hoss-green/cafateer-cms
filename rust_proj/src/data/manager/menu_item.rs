@@ -1,6 +1,6 @@
 use crate::{data::context::AppState, models::data::MenuItemModel};
 
-pub async fn get_item_by_lang(app_state: &AppState, id:uuid::Uuid, lang: i32, owner_id:uuid::Uuid) -> MenuItemModel {
+pub async fn get(app_state: &AppState, id:uuid::Uuid, lang: i32, owner_id:uuid::Uuid) -> MenuItemModel {
     let account = crate::data::manager::account::get_account_details(app_state).await;
     let result = sqlx::query_as!(
         MenuItemModel,
@@ -26,7 +26,7 @@ pub async fn get_item_by_lang(app_state: &AppState, id:uuid::Uuid, lang: i32, ow
             MenuItemModel::new(account.id) } }
 }
 
-pub async fn set_item(
+pub async fn set(
     app_state: &AppState,
     account_id: &uuid::Uuid,
     details_item: MenuItemModel,
@@ -57,7 +57,7 @@ pub async fn set_item(
     }
 }
 
-pub async fn delete(app_state: &AppState, id:uuid::Uuid, owner_id:uuid::Uuid) -> bool {
+pub async fn delete(app_state: &AppState, owner_id:&uuid::Uuid, id:&uuid::Uuid) -> bool {
     let result = sqlx::query!(
         "delete from menu_items where id=$1 and owner_id=$2",
         &id,

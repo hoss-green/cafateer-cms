@@ -1,9 +1,10 @@
 use crate::{data::context::AppState, models::data::MenuItemModel};
 
-pub async fn get_menu_items(app_state: &AppState) -> Vec<MenuItemModel> {
+pub async fn get_menu_items(app_state: &AppState, lang: i32) -> Vec<MenuItemModel> {
     let result = sqlx::query_as!(
         MenuItemModel,
-        " select id, lang, title, description, price, owner_id from menu_items"
+        "select id, lang, title, description, price, owner_id from menu_items where lang=$1",
+        lang
     )
     .fetch_all(&app_state.database_pool)
     .await;

@@ -2,10 +2,24 @@
 {% extends "manager/manager_base.html" %}
 {% block title %}{{ title }}{% endblock %}
 {% block content %}
+<div class="pb-2 flex flex-col items-start">
 <h5 class="text-2xl">Menu Editor</h5>
-{% for menu_item_button in menu_item_buttons %}
+<div class="flex gap-2">
+<button 
+     type="button" 
+  hx-post="/manager/menu/item" 
+  hx-target="#menu_item_container"
+  hx-swap="beforeend"
+  class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
+  New
+</button>
+</div>
+</div>
+<div id="menu_item_container">
   <div class="flex flex-col gap-2">
-     {% call menu_item_edit_button::menu_item_button(menu_item_button.id, menu_item_button.title, menu_item_button.category, menu_item_button.user_languages) %}
+    {% for menu_item_button in menu_item_buttons %}
+      {% call menu_item_edit_button::menu_item_button(menu_item_button.id, menu_item_button.title, menu_item_button.category, menu_item_button.user_languages) %}
+    {% endfor %}
   <div>
-{% endfor %}
+<div>
 {% endblock %}

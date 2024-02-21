@@ -10,6 +10,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 pub async fn get_menu_page(State(app_state): State<AppState>) -> (StatusCode, Html<String>) {
+
     let account = data::manager::account::get_account_details(&app_state).await;
     let menu_item_details: Vec<MenuItemDetailsModel> =
         data::manager::menu_item_details::get_menu_item_details(&app_state, &account.id).await;

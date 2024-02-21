@@ -1,5 +1,8 @@
 use askama::Template;
-use axum::{extract::State, response::Html};
+use axum::{
+    extract::{Path, State},
+    response::Html,
+};
 use http::StatusCode;
 
 use crate::{
@@ -11,8 +14,15 @@ use crate::{
 };
 
 pub async fn get_restaurant(State(app_state): State<AppState>) -> (StatusCode, Html<String>) {
+    get_restaurant_with_lang(State(app_state), Path(0)).await
+}
+
+pub async fn get_restaurant_with_lang(
+    State(app_state): State<AppState>,
+    Path(lang): Path<i32>,
+) -> (StatusCode, Html<String>) {
     let mut menu_items_lunch: Vec<MenuItemComponent> = vec![];
-    let menu_items = crate::data::presenter::fetcher::get_menu_items(&app_state).await;
+    let menu_items = crate::data::presenter::fetcher::get_menu_items(&app_state, lang).await;
 
     let menu_items_breakfast = menu_items
         .iter()

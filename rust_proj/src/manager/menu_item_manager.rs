@@ -60,15 +60,16 @@ pub async fn update_menu_item(
 
 pub async fn create_menu_item(State(app_state): State<AppState>) -> (StatusCode, Html<String>) {
     let account = data::manager::account::get_account_details(&app_state).await;
-    let result = data::manager::category::set(
+    let result = data::manager::menu_item::set(
         &app_state,
         &account.id,
-        CategoryModel {
+        MenuItemModel {
             id: uuid::Uuid::new_v4(),
             lang: account.languages.main_language,
             owner_id: account.id,
-            title: Some("new category".to_string()),
-            lang_name: None,
+            title: "new menu_item".to_string(),
+            description: None,
+            price: None 
         },
     )
     .await;
@@ -83,7 +84,7 @@ pub async fn delete_menu_item(
     Path(id): Path<uuid::Uuid>,
 ) -> (StatusCode, Html<String>) {
     let account = data::manager::account::get_account_details(&app_state).await;
-    let result = data::manager::category::delete(&app_state, &account.id, &id).await;
+    let result = data::manager::menu_item::delete(&app_state, &account.id, &id).await;
     if result {
         return (StatusCode::OK, Html(String::new()));
     }
