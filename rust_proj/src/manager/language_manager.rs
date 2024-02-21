@@ -1,12 +1,11 @@
-use super::templates::AccountPage;
 use crate::{
     data::{
-        manager::account::{get_account_details, set_account_details},
         context::AppState,
+        manager::account::{get_account_details, set_account_details},
         references::get_languages,
     },
-    models::data::reference_items::Language,
     manager::components::PrimaryLanguageList,
+    models::data::reference_items::Language,
 };
 use askama::Template;
 use axum::{
@@ -16,31 +15,17 @@ use axum::{
 use http::StatusCode;
 use std::str::FromStr;
 
-pub async fn get_account_page(State(app_state): State<AppState>) -> (StatusCode, Html<String>) {
-    let languages = get_languages(&app_state).await;
-    let response = get_account_details(&app_state).await;
-    let editor_home = AccountPage {
-        primary_language: Language::get_from_int(&languages, response.languages.main_language),
-        user_languages: Language::vec_from_int_vec(&languages, &response.languages.languages),
-        system_languages: languages,
-        title: "Editor Home for SC",
-    };
-
-    let editor_home: String = editor_home.render().unwrap().to_string();
-
-    (StatusCode::OK, Html(editor_home))
-}
-
 pub async fn post_language(
     State(app_state): State<AppState>,
     body: String,
 ) -> (StatusCode, Html<String>) {
     let mut account_model = get_account_details(&app_state).await;
     let options: Vec<String> = match body.contains("&") && body.len() > 0 {
-        true => body.split("&")
-        .map(|item| item.to_string())
-        .collect::<Vec<String>>(),
-        false => vec![body]
+        true => body
+            .split("&")
+            .map(|item| item.to_string())
+            .collect::<Vec<String>>(),
+        false => vec![body],
     };
 
     let res: Vec<i32> = options

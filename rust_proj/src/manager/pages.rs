@@ -1,0 +1,10 @@
+mod account_page;
+mod categories_page;
+mod menu_page;
+mod details_page;
+mod home_page;
+pub use account_page::get_account_page;
+pub use categories_page::get_categories_page;
+pub use menu_page::get_menu_page;
+pub use details_page::get_details_home;
+pub use home_page::get_home_page;

@@ -2,12 +2,17 @@ use askama::Template;
 use axum::{extract::State, response::Html};
 use http::StatusCode;
 
-use crate::{data::{ context::AppState}, models::views::{components::{MenuItemComponent, MenuTabComponent}, pages::RestaurantPage}};
+use crate::{
+    data::context::AppState,
+    models::views::{
+        components::{MenuItemComponent, MenuTabComponent},
+        pages::RestaurantPage,
+    },
+};
 
 pub async fn get_restaurant(State(app_state): State<AppState>) -> (StatusCode, Html<String>) {
-
     let mut menu_items_lunch: Vec<MenuItemComponent> = vec![];
-    let menu_items = crate::data::presenter::fetcher::get_menu_items(&app_state).await; 
+    let menu_items = crate::data::presenter::fetcher::get_menu_items(&app_state).await;
 
     let menu_items_breakfast = menu_items
         .iter()

@@ -48,10 +48,6 @@ pub struct MenuPage<'a> {
     pub menu_item_buttons: Vec<MenuItemButton>,
 }
 
-// pub fn foo() -> String {
-//    "OMG".to_string()
-// }
-
 pub fn is_selected(id: &i32, languages: &Vec<Language>) -> String {
     match languages.iter().any(|item| item.id == *id) {
         true => "checked".to_string(),

@@ -1,42 +1,5 @@
 use crate::{data::context::AppState, models::data::MenuItemModel};
 
-pub async fn get_items_for_account(app_state: &AppState) -> Vec<MenuItemModel> {
-    let account = crate::data::manager::account::get_account_details(app_state).await;
-    let result = sqlx::query_as!(
-        MenuItemModel,
-        "select id, lang, title, description, price,  owner_id from menu_items where owner_id=$1",
-        account.id 
-    )
-    .fetch_all(&app_state.database_pool)
-    .await;
-
-    match result {
-        Ok(r) => r,
-        Err(err) => {
-            println!("Cannot fetch menu items, err: {}", err);
-            vec![]
-        }
-    }
-}
-
-pub async fn get_items_by_lang(app_state: &AppState, lang: i32) -> Vec<MenuItemModel> {
-    let result = sqlx::query_as!(
-        MenuItemModel,
-        "select id, lang, title, description, price, owner_id from menu_items where lang=$1",
-        lang
-    )
-    .fetch_all(&app_state.database_pool)
-    .await;
-
-    match result {
-        Ok(r) => r,
-        Err(err) => {
-            println!("Cannot fetch menu items, err: {}", err);
-            vec![]
-        }
-    }
-}
-
 pub async fn get_item_by_lang(app_state: &AppState, id:uuid::Uuid, lang: i32, owner_id:uuid::Uuid) -> MenuItemModel {
     let account = crate::data::manager::account::get_account_details(app_state).await;
     let result = sqlx::query_as!(
@@ -60,9 +23,7 @@ pub async fn get_item_by_lang(app_state: &AppState, id:uuid::Uuid, lang: i32, ow
         },
         Err(err) => {
             println!("Cannot fetch menu item, err: {}", err);
-            MenuItemModel::new(account.id)
-        }
-    }
+            MenuItemModel::new(account.id) } }
 }
 
 pub async fn set_item(
@@ -96,5 +57,27 @@ pub async fn set_item(
     }
 }
 
+pub async fn delete(app_state: &AppState, id:uuid::Uuid, owner_id:uuid::Uuid) -> bool {
+    let result = sqlx::query!(
+        "delete from menu_items where id=$1 and owner_id=$2",
+        &id,
+        &owner_id,
+    )
+    .execute(&app_state.database_pool)
+    .await;
 
+    match result {
+        Ok(r) => {
+            if r.rows_affected() > 0 {
+                println!("Deleted menu_item succesfully {:?}", r);
+                return true;
+            }
+            false
+        }
+        Err(err) => {
+            println!("Cannot delete menu item, fail, error: {}", err);
+            false
+        }
+    }
+}
 
