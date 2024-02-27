@@ -13,7 +13,7 @@ pub struct MenuItemComponent {
     pub title: String,
     pub description: String,
     pub price: f64,
-    pub category: String,
+    pub category: uuid::Uuid,
 }
 
 #[derive(Clone, Serialize, Deserialize)]

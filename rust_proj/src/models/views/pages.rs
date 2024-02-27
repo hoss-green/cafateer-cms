@@ -1,16 +1,21 @@
 use askama::Template;
-use crate::models::views::components::MenuTabComponent;
+use crate::models::{data::CategoryModel, views::components::MenuTabComponent};
 
 #[derive(Template)]
 #[template(path="presenter/pages/restaurant.html")]
 pub struct RestaurantPage<'a> {
     pub title: &'a str,
-    pub menu_tabs: Vec<MenuTabComponent<'a>>
+    pub blurb: &'a str,
+    pub menu_page: MenuPage<'a>,
+    // pub menu_tabs: Vec<MenuTabComponent<'a>>
+
+
 }
 
 #[derive(Template)]
 #[template(path="presenter/pages/menu_page.html")]
 pub struct MenuPage<'a> {
     pub title: &'a str,
+    pub categories: Vec<CategoryModel>,
     pub menu_tabs: Vec<MenuTabComponent<'a>>
 }

@@ -7,9 +7,9 @@ block title %}{{ title }}{% endblock %} {% block content %}
   <div>C.C. Street Market La Tejita</div>
   <!-- social -->
   <div class="flex gap-4">
-    <a class="text-lg" href="https://www.instagram.com/sunnycafetf"><i class="fa-brands fa-instagram"></i></a>
-    <a class="text-lg" href="mailto:latejita@sunny-cafe.es"><i class="fa-solid fa-envelope"></i></a>
-    <a class="text-lg" href="tel:+34 607 395 044"><i class="fa-solid fa-phone"></i></a>
+    <a class="text-lg" href="https://www.instagram.com/sunnycafetf"><i class="fa-brands fa-instagram text-3xl md:text-xl"></i></a>
+    <a class="text-lg" href="mailto:latejita@sunny-cafe.es"><i class="fa-solid fa-envelope text-3xl md:text-xl"></i></a>
+    <a class="text-lg" href="tel:+34 607 395 044"><i class="fa-solid fa-phone text-3xl md:text-xl"></i></a>
   </div>
   <div>Open Wed-Sun: 8am - 4pm</div>
 </div>
@@ -44,8 +44,8 @@ block title %}{{ title }}{% endblock %} {% block content %}
       About Us
     </h5>
   </div>
-  <p class="font-light text-md max-w-lg">
-    Gluten free options, vegan options, our own grown produce and walking distance from "La Tejita" beach. Meticulously crafted, locally sourced dishes coupled with artisan espresso, wonderful teas, cocktails, smoothies, local wines, beers and spirits. Sunny Cafes's offering is simple: uncomplicated seasonal fare presented in a clean and wonderful space without terrace seating and excellent service. Join the morning rush or swing by later for a cheeky bite - you new local awaits.
+  <p class="font-light text-md max-w-lg text-center">
+    {{ blurb }}
   </p>
 </div>
 
@@ -60,33 +60,10 @@ block title %}{{ title }}{% endblock %} {% block content %}
   <div class="flex w-full justify-center">
     <div class="px-4 flex justify-center items-center w-full max-w-4xl">
       <div role="tablist" class="tabs w-full">
-        {% for tab in menu_tabs %} 
+        <div style="grid-column-start: 1;grid-column-end: span 9999;"></div>
+        {% for tab in menu_page.menu_tabs %} 
         {% call scope::tab(tab.name, tab.menu_items.clone()) %} 
         {% endfor %}
-        <!-- <input type="radio" name="my_tabs_1" role="tab" class="tab" aria-label="Toast" /> -->
-        <!-- <div role="tabpanel" class="tab-content w-full max-w-5xl"> -->
-        <!--     <div class="w-full"> -->
-        <!--       <div class="grid grid-cols-1 md:grid-cols-2 gap-3 w-full"> -->
-        <!--       </div> -->
-        <!--     </div> -->
-        <!--   </div> -->
-        <!---->
-        <!-- <input type="radio" name="my_tabs_1" role="tab" class="tab" aria-label="Bowls" /> -->
-        <!-- <div role="tabpanel" class="tab-content w-full max-w-5xl"> -->
-        <!--   <div class="w-full max-w-6xl"> -->
-        <!--   <p>empty</p> -->
-        <!--   </div> -->
-        <!-- </div> -->
-
-        <!-- <input type="radio" name="my_tabs_1" role="tab" class="tab" aria-label="Lunch" /> -->
-        <!-- <div role="tabpanel" class="tab-content w-full max-w-5xl"> -->
-        <!--   <p class="font-light text-md max-w-lg">  -->
-        <!--   3 From ambitious Melbourne locals Marc Bailey and Sarah Hocking comes Padre - An adventure in meticulously crafted, locally sourced dishes coupled with artisan espresso from award-winning barista Nicholas Hoppner. -->
-        <!--   <br/> -->
-        <!--   <br/> -->
-        <!--   Padre's offering is simple: uncomplicated seasonal fare presented in a light-filled, contemporary space. Join the morning rush or swing by later for a cheeky bite - you new local awaits. -->
-        <!--   </p> -->
-        <!-- </div> -->
       </div>
     </div>
   </div>

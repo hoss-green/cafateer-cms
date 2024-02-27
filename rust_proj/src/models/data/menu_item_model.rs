@@ -10,7 +10,6 @@ pub struct MenuItemModel {
     pub title: String,
     pub description: Option<String>,
     pub price: Option<f64>,
-    // pub category: Option<Uuid>,
 }
 
 impl MenuItemModel {
@@ -22,7 +21,6 @@ impl MenuItemModel {
             title: "Item Name".to_string(),
             description: None,
             price: None,
-            // category: None,
         }
     }
 }

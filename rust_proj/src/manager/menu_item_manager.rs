@@ -3,7 +3,7 @@ use super::
 ;
 use crate::{
     data::{self, context::AppState},
-    models::data::{CategoryModel, MenuItemModel},
+    models::data::MenuItemModel,
 };
 use askama::Template;
 use axum::{

@@ -15,10 +15,11 @@ use crate::{
 
 pub async fn get_menu(
     State(app_state): State<AppState>,
-    _lang: Path<i32>,
+    lang: Path<i32>,
 ) -> (StatusCode, Html<String>) {
     let mut menu_items_lunch: Vec<MenuItemComponent> = vec![];
-    let menu_items = crate::data::presenter::fetcher::get_menu_items(&app_state, 0).await;
+    let categories = crate::data::presenter::fetcher::get_categories(&app_state, *lang).await;
+    let menu_items = crate::data::presenter::fetcher::get_menu_items(&app_state, *lang).await;
 
     let menu_items_breakfast = menu_items
         .iter()
@@ -31,18 +32,19 @@ pub async fn get_menu(
                 title: menu_item.title.clone(),
                 description: desc,
                 price: menu_item.price.unwrap_or(0.0),
-                category: String::new(),
+                category: uuid::Uuid::new_v4()
+                // String::new(),
             }
             .clone()
         })
         .collect();
 
-    menu_items_lunch.push(MenuItemComponent {
-        title: "CCCC is the title".to_string(),
-        description: "description 3".to_string(), //.to_string(),
-        price: 15.50,
-        category: "Lunch".to_string(), //.to_string(),
-    });
+    // menu_items_lunch.push(MenuItemComponent {
+    //     title: "CCCC is the title".to_string(),
+    //     description: "description 3".to_string(), //.to_string(),
+    //     price: 15.50,
+    //     category: "Lunch".to_string(), //.to_string(),
+    // });
 
     let menu_tab_breakfast: MenuTabComponent = MenuTabComponent {
         name: "Breakfast", //.to_string(),
@@ -57,6 +59,7 @@ pub async fn get_menu(
     let menu_tabs: Vec<MenuTabComponent> = vec![menu_tab_breakfast, menu_tab_lunch];
     let menu_page = MenuPage {
         title: "Sunny Cafe",
+        categories,
         menu_tabs,
     };
 
