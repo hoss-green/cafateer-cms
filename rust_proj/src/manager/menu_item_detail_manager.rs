@@ -1,12 +1,12 @@
 use super::components::MenuItemDetailsEditor;
 use crate::{
     data::{self, context::AppState},
-    models::data::{reference_items::Language, CategoryModel},
+    models::data::{reference_items::{Allergy, Language}, CategoryModel, MenuItemDetailsModel},
 };
 use askama::Template;
 use axum::{
     extract::{Path, State},
-    response::Html,
+    response::Html, Form,
 };
 use http::StatusCode;
 use serde::{Deserialize, Serialize};
@@ -66,12 +66,34 @@ pub async fn get_menu_item_details(
     (StatusCode::OK, Html(menu_editor))
 }
 
+pub async fn update_menu_item_details(
+    State(app_state): State<AppState>,
+    Form(menu_item_form): Form<MenuItemDetailsForm>,
+) -> (StatusCode, Html<String>) {
+    let account = data::manager::account::get_account_details(&app_state).await;
+    let result = data::manager::menu_item_details::set(
+        &app_state,
+        &account.id,
+        &MenuItemDetailsModel {
+            id: menu_item_form.id,
+            owner_id: account.id,
+            category: menu_item_form.category,
+            allergies: match menu_item_form.allergies {
+                Some(ags) => Some(sqlx::types::Json(ags)),
+                None => None,
+            } 
+        },
+    )
+    .await;
+    if result {
+        return (StatusCode::OK, Html("Saved!".to_string()));
+    }
+    (StatusCode::OK, Html("Error".to_string()))
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct MenuItemForm {
+pub struct MenuItemDetailsForm {
     pub id: uuid::Uuid,
-    pub lang: i32,
-    pub title: String,
-    pub description: Option<String>,
-    pub price: Option<f64>,
     pub category: Option<uuid::Uuid>,
+    pub allergies: Option<Vec<uuid::Uuid>>
 }

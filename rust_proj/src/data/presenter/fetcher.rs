@@ -1,4 +1,12 @@
-use crate::{data::context::AppState, models::data::{CategoryModel, DetailsModel, MenuItemModel}};
+use sqlx::Postgres;
+
+use crate::{
+    data::context::AppState,
+    models::{
+        data::{CategoryModel, DetailsModel, MenuItemModel},
+        views::menu_item_view_model::MenuItemViewModel,
+    },
+};
 
 pub async fn get_details(app_state: &AppState, lang: i32) -> DetailsModel {
     let result = sqlx::query_as!(
@@ -36,12 +44,28 @@ pub async fn get_categories(app_state: &AppState, lang: i32) -> Vec<CategoryMode
     }
 }
 
-pub async fn get_menu_items(app_state: &AppState, lang: i32) -> Vec<MenuItemModel> {
-    let result = sqlx::query_as!(
-        MenuItemModel,
-        "select id, lang, title, description, price, owner_id from menu_items where lang=$1",
-        lang
-    )
+// pub async fn get_menu_items(app_state: &AppState, lang: i32) -> Vec<MenuItemModel> {
+//     let result = sqlx::query_as!(
+//         MenuItemModel,
+//         "select id, lang, title, description, price, owner_id from menu_items where lang=$1",
+//         lang
+//     )
+//     .fetch_all(&app_state.database_pool)
+//     .await;
+//
+//     match result {
+//         Ok(r) => r,
+//         Err(err) => {
+//             println!("Cannot fetch menu items, err: {}", err);
+//             vec![]
+//         }
+//     }
+// }
+
+pub async fn get_menu_items(app_state: &AppState, lang: i32) -> Vec<MenuItemViewModel> {
+    let result = sqlx::query_as::<Postgres, MenuItemViewModel>(
+        "select mi.id, title, description, price, mi.lang, mi.owner_id, d.category, d.allergies from menu_items as mi join menu_item_details d on mi.id = d.id and mi.owner_id = d.owner_id where mi.lang = $1")
+        .bind(lang)
     .fetch_all(&app_state.database_pool)
     .await;
 

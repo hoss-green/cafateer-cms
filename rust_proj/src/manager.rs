@@ -17,6 +17,7 @@ pub use detail_manager::post_details_home;
 pub use language_manager::post_language;
 pub use language_manager::post_primary_language;
 pub use menu_item_detail_manager::get_menu_item_details;
+pub use menu_item_detail_manager::update_menu_item_details;
 pub use menu_item_manager::create_menu_item;
 pub use menu_item_manager::delete_menu_item;
 pub use menu_item_manager::get_menu_item;

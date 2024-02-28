@@ -62,7 +62,7 @@ block title %}{{ title }}{% endblock %} {% block content %}
       <div role="tablist" class="tabs w-full">
         <div style="grid-column-start: 1;grid-column-end: span 9999;"></div>
         {% for tab in menu_page.menu_tabs %} 
-        {% call scope::tab(tab.name, tab.menu_items.clone()) %} 
+          {% call scope::tab(tab.name, tab.menu_items.clone()) %} 
         {% endfor %}
       </div>
     </div>

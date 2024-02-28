@@ -70,7 +70,6 @@ pub async fn set_item(
     account_id: &uuid::Uuid,
     details_item: MenuItemModel,
 ) -> bool {
-    println!("hit");
     let result = sqlx::query!(
         "insert into menu_items(owner_id, id, lang, title, description, price) VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT (id, lang) DO UPDATE SET title=$4, description=$5, price=$6 WHERE menu_items.id=$2 and menu_items.lang=$3",
         &account_id,
@@ -83,7 +82,6 @@ pub async fn set_item(
     .execute(&app_state.database_pool)
     .await;
 
-    println!("hit2");
     match result {
         Ok(_r) => {
             println!("Saved item succesfully");

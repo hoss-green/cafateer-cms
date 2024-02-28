@@ -1,8 +1,12 @@
-use sqlx::Postgres;
-use crate::models::data::MenuItemDetailsModel;
 use crate::data::context::AppState;
+use crate::models::data::MenuItemDetailsModel;
+use sqlx::Postgres;
 
-pub async fn get_menu_item_detail(app_state: &AppState, owner_id:&uuid::Uuid, id:&uuid::Uuid) -> MenuItemDetailsModel {
+pub async fn get_menu_item_detail(
+    app_state: &AppState,
+    owner_id: &uuid::Uuid,
+    id: &uuid::Uuid,
+) -> MenuItemDetailsModel {
     let result = sqlx::query_as::<Postgres, MenuItemDetailsModel>(
         r#"select id, category, allergies, owner_id from menu_item_details"#,
     )
@@ -18,7 +22,10 @@ pub async fn get_menu_item_detail(app_state: &AppState, owner_id:&uuid::Uuid, id
     }
 }
 
-pub async fn get_menu_item_details(app_state: &AppState, id:&uuid::Uuid) -> Vec<MenuItemDetailsModel> {
+pub async fn get_menu_item_details(
+    app_state: &AppState,
+    id: &uuid::Uuid,
+) -> Vec<MenuItemDetailsModel> {
     let result = sqlx::query_as::<Postgres, MenuItemDetailsModel>(
         r#"select id, category, allergies, owner_id from menu_item_details"#,
     )
@@ -31,6 +38,36 @@ pub async fn get_menu_item_details(app_state: &AppState, id:&uuid::Uuid) -> Vec<
             println!("Cannot fetch menu_item_detail, err: {}", err);
             // MenuItemDetailsModel::new()
             vec![]
+        }
+    }
+}
+
+pub async fn set(
+    app_state: &AppState,
+    account_id: &uuid::Uuid,
+    menu_item_details_model: &MenuItemDetailsModel,
+) -> bool {
+    let result = sqlx::query(
+        "insert into menu_item_details(id, owner_id, category, allergies)
+            VALUES ($1, $2, $3, $4) 
+            ON CONFLICT (id) DO UPDATE SET category=$3, allergies=$4 
+            WHERE menu_item_details.id=$1 AND menu_item_details.owner_id=$2",
+    )
+    .bind(menu_item_details_model.id)
+    .bind(account_id)
+    .bind(menu_item_details_model.category)
+    .bind(menu_item_details_model.clone().allergies)
+    .execute(&app_state.database_pool)
+    .await;
+
+    match result {
+        Ok(_r) => {
+            println!("Saved details succesful");
+            true
+        }
+        Err(err) => {
+            println!("Cannot save menu item details fail, error: {}", err);
+            false
         }
     }
 }

@@ -29,7 +29,7 @@ impl MenuItemModel {
 pub struct MenuItemDetailsModel {
     pub id: uuid::Uuid,
     pub owner_id: uuid::Uuid,
-    pub allergies: Option<Vec<Uuid>>,
+    pub allergies: Option<sqlx::types::Json<Vec<Uuid>>>,
     pub category: Option<Uuid>,
 
 }

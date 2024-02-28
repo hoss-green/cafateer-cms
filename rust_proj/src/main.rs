@@ -8,7 +8,7 @@ use cafeteer::{
         create_category_item, delete_category_item, get_category_item, get_menu_item_details,
         menu_item_manager::*,
         pages::{get_account_page, get_categories_page, get_home_page, get_menu_page},
-        post_details_home, update_category_item,
+        post_details_home, update_category_item, update_menu_item_details,
     },
     presenter::{menu::get_menu, restaurant::get_restaurant_with_lang},
 };
@@ -64,6 +64,7 @@ async fn main() {
         .route("/manager/menu/item", put(update_menu_item))
         .route("/manager/menu/item/:id", delete(delete_menu_item))
         .route("/manager/menu/item/details/:id", get(get_menu_item_details))
+        .route("/manager/menu/item/details", put(update_menu_item_details))
         .route("/manager/config", get(get_account_page))
         .route("/manager/config/languages", post(post_language))
         .route(

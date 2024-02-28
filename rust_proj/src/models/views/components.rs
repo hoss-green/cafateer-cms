@@ -1,13 +1,14 @@
 use askama::Template;
 use serde::{Deserialize, Serialize};
-#[derive(Template, Clone, Serialize, Deserialize)]
+#[derive(Debug, Template, Clone, Serialize, Deserialize)]
 #[template(path = "presenter/components/menu_tab.html", ext = "html")]
-pub struct MenuTabComponent<'a> {
-    pub name: &'a str,
+pub struct MenuTabComponent {
+    pub category: uuid::Uuid,
+    pub name: String,
     pub menu_items: Vec<MenuItemComponent>,
 }
 
-#[derive(Template, Clone, Serialize, Deserialize)]
+#[derive(Debug, Template, Clone, Serialize, Deserialize)]
 #[template(path = "presenter/components/menu_item.html")]
 pub struct MenuItemComponent {
     pub title: String,

@@ -1,12 +1,11 @@
-<form class="mb-6" id="detail_editor" hx-post="/manager/menu/item" hx-target="#post_message" hx-swap="innerHTML">
+<form class="mb-6" id="detail_editor" hx-put="/manager/menu/item/details" hx-target="#post_message" hx-swap="innerHTML">
   <input type="hidden" name="id" value="{{ id }}"></input>
       <div class="mb-2">
       <label for="categories" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Category</label>
-      <select id="categories" name="countries" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+      <select id="categories" name="category" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
         <option selected>Choose a Category</option>
         {% for available_category in categories %}
-        {% if available_category.id == category %}
-        <!-- <option selected value="{{ available_category.id }}">{{ available_category.title.clone().unwrap_or(String::new()) }}</option> -->
+          {% if available_category.id == category %}
         {% endif %}
         <option value="{{ available_category.id }}">{{ available_category.title.clone().unwrap_or(String::new()) }}</option>
         {% endfor %}

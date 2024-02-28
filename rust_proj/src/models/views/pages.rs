@@ -7,9 +7,6 @@ pub struct RestaurantPage<'a> {
     pub title: &'a str,
     pub blurb: &'a str,
     pub menu_page: MenuPage<'a>,
-    // pub menu_tabs: Vec<MenuTabComponent<'a>>
-
-
 }
 
 #[derive(Template)]
@@ -17,5 +14,5 @@ pub struct RestaurantPage<'a> {
 pub struct MenuPage<'a> {
     pub title: &'a str,
     pub categories: Vec<CategoryModel>,
-    pub menu_tabs: Vec<MenuTabComponent<'a>>
+    pub menu_tabs: Vec<MenuTabComponent>
 }
