@@ -48,13 +48,14 @@ pub async fn set(
     menu_item_details_model: &MenuItemDetailsModel,
 ) -> bool {
     let result = sqlx::query(
-        "insert into menu_item_details(id, owner_id, category, allergies)
-            VALUES ($1, $2, $3, $4) 
-            ON CONFLICT (id) DO UPDATE SET category=$3, allergies=$4 
+        "insert into menu_item_details(id, owner_id, price, category, allergies)
+            VALUES ($1, $2, $3, $4, $5) 
+            ON CONFLICT (id) DO UPDATE SET price=$3, category=$4, allergies=$5 
             WHERE menu_item_details.id=$1 AND menu_item_details.owner_id=$2",
     )
     .bind(menu_item_details_model.id)
     .bind(account_id)
+    .bind(menu_item_details_model.price)
     .bind(menu_item_details_model.category)
     .bind(menu_item_details_model.clone().allergies)
     .execute(&app_state.database_pool)

@@ -2,7 +2,7 @@ use askama::Template;
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 
-#[derive(FromRow, Template, Clone, Serialize, Deserialize)]
+#[derive(Debug, FromRow, Template, Clone, Serialize, Deserialize)]
 #[template(path = "presenter/components/menu_item.html")]
 pub struct MenuItemViewModel {
     pub id: uuid::Uuid,

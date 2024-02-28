@@ -72,7 +72,9 @@ pub async fn update_menu_item_details(
     State(app_state): State<AppState>,
     Form(menu_item_form): Form<MenuItemDetailsForm>,
 ) -> (StatusCode, Html<String>) {
+    println!("{:#?}", menu_item_form.clone());
     let account = data::manager::account::get_account_details(&app_state).await;
+
     let result = data::manager::menu_item_details::set(
         &app_state,
         &account.id,
