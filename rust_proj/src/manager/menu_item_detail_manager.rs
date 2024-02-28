@@ -1,12 +1,13 @@
 use super::components::MenuItemDetailsEditor;
 use crate::{
     data::{self, context::AppState},
-    models::data::{reference_items::{Allergy, Language}, CategoryModel, MenuItemDetailsModel},
+    models::data::{reference_items::Language, CategoryModel, MenuItemDetailsModel},
 };
 use askama::Template;
 use axum::{
     extract::{Path, State},
-    response::Html, Form,
+    response::Html,
+    Form,
 };
 use http::StatusCode;
 use serde::{Deserialize, Serialize};
@@ -60,6 +61,7 @@ pub async fn get_menu_item_details(
         owner_id: account.id,
         allergies: ref_allergies,
         category: menu_item_details.category.unwrap_or(uuid::Uuid::nil()),
+        price: menu_item_details.price.unwrap_or(0.0),
         categories,
     };
     let menu_editor: String = menu_item_editor.render().unwrap().to_string();
@@ -81,7 +83,8 @@ pub async fn update_menu_item_details(
             allergies: match menu_item_form.allergies {
                 Some(ags) => Some(sqlx::types::Json(ags)),
                 None => None,
-            } 
+            },
+            price: menu_item_form.price,
         },
     )
     .await;
@@ -95,5 +98,6 @@ pub async fn update_menu_item_details(
 pub struct MenuItemDetailsForm {
     pub id: uuid::Uuid,
     pub category: Option<uuid::Uuid>,
-    pub allergies: Option<Vec<uuid::Uuid>>
+    pub allergies: Option<Vec<uuid::Uuid>>,
+    pub price: Option<f64>,
 }

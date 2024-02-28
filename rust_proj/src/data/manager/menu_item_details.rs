@@ -8,7 +8,7 @@ pub async fn get_menu_item_detail(
     id: &uuid::Uuid,
 ) -> MenuItemDetailsModel {
     let result = sqlx::query_as::<Postgres, MenuItemDetailsModel>(
-        r#"select id, category, allergies, owner_id from menu_item_details"#,
+        r#"select id, price, category, allergies, owner_id from menu_item_details"#,
     )
     .bind(id)
     .fetch_one(&app_state.database_pool)
@@ -27,7 +27,7 @@ pub async fn get_menu_item_details(
     id: &uuid::Uuid,
 ) -> Vec<MenuItemDetailsModel> {
     let result = sqlx::query_as::<Postgres, MenuItemDetailsModel>(
-        r#"select id, category, allergies, owner_id from menu_item_details"#,
+        r#"select id, price, category, allergies, owner_id from menu_item_details"#,
     )
     .bind(id)
     .fetch_all(&app_state.database_pool)

@@ -1,10 +1,15 @@
 use crate::{data::context::AppState, models::data::MenuItemModel};
 
-pub async fn get(app_state: &AppState, id:uuid::Uuid, lang: i32, owner_id:uuid::Uuid) -> MenuItemModel {
+pub async fn get(
+    app_state: &AppState,
+    id: uuid::Uuid,
+    lang: i32,
+    owner_id: uuid::Uuid,
+) -> MenuItemModel {
     let account = crate::data::manager::account::get_account_details(app_state).await;
     let result = sqlx::query_as!(
         MenuItemModel,
-        "select id, lang, title, description, price, owner_id from menu_items where id=$1 and lang=$2 and owner_id=$3",
+        "select id, lang, title, description, owner_id from menu_items where id=$1 and lang=$2 and owner_id=$3",
         id,
         lang,
         owner_id
@@ -15,15 +20,16 @@ pub async fn get(app_state: &AppState, id:uuid::Uuid, lang: i32, owner_id:uuid::
     match result {
         Ok(r) => match r {
             Some(item) => item,
-            None => 
-            {
-            println!("Cannot find menu item");
-                MenuItemModel::new(account.id)
+            None => {
+                println!("Cannot find menu item");
+                MenuItemModel::new(uuid::Uuid::new_v4(), account.id, lang)
             }
         },
         Err(err) => {
             println!("Cannot fetch menu item, err: {}", err);
-            MenuItemModel::new(account.id) } }
+            MenuItemModel::new(uuid::Uuid::new_v4(), account.id, lang)
+        }
+    }
 }
 
 pub async fn set(
@@ -33,13 +39,14 @@ pub async fn set(
 ) -> bool {
     println!("hit");
     let result = sqlx::query!(
-        "insert into menu_items(owner_id, id, lang, title, description, price) VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT (id, lang) DO UPDATE SET title=$4, description=$5, price=$6 WHERE menu_items.id=$2 and menu_items.lang=$3",
+        "insert into menu_items(owner_id, id, lang, title, description) 
+            VALUES ($1, $2, $3, $4, $5) ON CONFLICT (id, lang) DO UPDATE SET title=$4, description=$5
+            WHERE menu_items.id=$2 and menu_items.lang=$3",
         &account_id,
         details_item.id,
         details_item.lang,
         details_item.title,
         details_item.description,
-        details_item.price,
     )
     .execute(&app_state.database_pool)
     .await;
@@ -57,7 +64,7 @@ pub async fn set(
     }
 }
 
-pub async fn delete(app_state: &AppState, owner_id:&uuid::Uuid, id:&uuid::Uuid) -> bool {
+pub async fn delete(app_state: &AppState, owner_id: &uuid::Uuid, id: &uuid::Uuid) -> bool {
     let result = sqlx::query!(
         "delete from menu_items where id=$1 and owner_id=$2",
         &id,
@@ -80,4 +87,3 @@ pub async fn delete(app_state: &AppState, owner_id:&uuid::Uuid, id:&uuid::Uuid) 
         }
     }
 }
-

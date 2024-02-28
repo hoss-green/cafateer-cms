@@ -1,5 +1,4 @@
-use super::
-    components::MenuItemEditor
+use super:: components::MenuItemEditor
 ;
 use crate::{
     data::{self, context::AppState},
@@ -19,6 +18,7 @@ pub async fn get_menu_item(
     State(app_state): State<AppState>,
     Path((id, lang)): Path<(uuid::Uuid, i32)>,
 ) -> (StatusCode, Html<String>) {
+    println!("{:#?}", (id, lang));
     let account = data::manager::account::get_account_details(&app_state).await;
     let menu_item =
         data::manager::menu_items::get_item_by_lang(&app_state, id, lang, account.id).await;
@@ -27,7 +27,6 @@ pub async fn get_menu_item(
         title: menu_item.title,
         description: menu_item.description.unwrap_or(String::new()),
         lang: menu_item.lang,
-        price: menu_item.price.unwrap_or(0.0),
     };
     let menu_editor: String = menu_item_editor.render().unwrap().to_string();
     (StatusCode::OK, Html(menu_editor))
@@ -37,8 +36,9 @@ pub async fn update_menu_item(
     State(app_state): State<AppState>,
     Form(menu_item_form): Form<MenuItemForm>,
 ) -> (StatusCode, Html<String>) {
+    println!("{:#?}", menu_item_form.clone());
     let account = data::manager::account::get_account_details(&app_state).await;
-    let result = data::manager::menu_items::set_item(
+    let result = data::manager::menu_item::set(
         &app_state,
         &account.id,
         MenuItemModel {
@@ -47,7 +47,6 @@ pub async fn update_menu_item(
             owner_id: account.id,
             title: menu_item_form.title,
             description: menu_item_form.description,
-            price: menu_item_form.price,
         },
     )
     .await;
@@ -69,7 +68,6 @@ pub async fn create_menu_item(State(app_state): State<AppState>) -> (StatusCode,
             owner_id: account.id,
             title: "new menu_item".to_string(),
             description: None,
-            price: None 
         },
     )
     .await;
@@ -96,6 +94,5 @@ pub struct MenuItemForm {
     pub lang: i32,
     pub title: String,
     pub description: Option<String>,
-    pub price: Option<f64>,
     pub category: Option<uuid::Uuid>,
 }

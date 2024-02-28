@@ -3,7 +3,7 @@ use sqlx::Postgres;
 use crate::{
     data::context::AppState,
     models::{
-        data::{CategoryModel, DetailsModel, MenuItemModel},
+        data::{CategoryModel, DetailsModel},
         views::menu_item_view_model::MenuItemViewModel,
     },
 };

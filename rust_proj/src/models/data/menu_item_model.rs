@@ -9,18 +9,16 @@ pub struct MenuItemModel {
     pub owner_id: uuid::Uuid,
     pub title: String,
     pub description: Option<String>,
-    pub price: Option<f64>,
 }
 
 impl MenuItemModel {
-    pub fn new(owner_id: uuid::Uuid) -> MenuItemModel {
+    pub fn new(id: uuid::Uuid, owner_id: uuid::Uuid, lang:i32) -> MenuItemModel {
         MenuItemModel {
-            id: uuid::Uuid::new_v4(),
+            id, 
             owner_id,
-            lang: 0,
+            lang, //: lang.unwrap_or(0),
             title: "Item Name".to_string(),
             description: None,
-            price: None,
         }
     }
 }
@@ -31,7 +29,7 @@ pub struct MenuItemDetailsModel {
     pub owner_id: uuid::Uuid,
     pub allergies: Option<sqlx::types::Json<Vec<Uuid>>>,
     pub category: Option<Uuid>,
-
+    pub price: Option<f64>,
 }
 
 impl MenuItemDetailsModel {
@@ -41,6 +39,7 @@ impl MenuItemDetailsModel {
             owner_id,
             category: None,
             allergies: None,
+            price: None,
         }
     }
 }

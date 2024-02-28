@@ -6,11 +6,9 @@ use crate::{
 use askama::Template;
 use axum::{extract::State, response::Html};
 use http::StatusCode;
-use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 pub async fn get_menu_page(State(app_state): State<AppState>) -> (StatusCode, Html<String>) {
-
     let account = data::manager::account::get_account_details(&app_state).await;
     let menu_item_details: Vec<MenuItemDetailsModel> =
         data::manager::menu_item_details::get_menu_item_details(&app_state, &account.id).await;
@@ -19,8 +17,8 @@ pub async fn get_menu_page(State(app_state): State<AppState>) -> (StatusCode, Ht
         &account.languages.languages,
     );
     let mut menu_items = data::manager::menu_items::get_items_for_account(&app_state).await;
-    menu_items.sort_by(|a, b| (format!("{}{}", a.id, a.lang)).cmp(&format!("{}{}", b.id, b.lang)));
     let mut unique_menu_ids: HashMap<uuid::Uuid, bool> = HashMap::new();
+    menu_items.sort_by(|a, b| (format!("{}{}", a.id, a.lang)).cmp(&format!("{}{}", b.id, b.lang)));
     menu_items.clone().into_iter().for_each(|mi| {
         unique_menu_ids.insert(mi.id, true);
     });
@@ -57,14 +55,4 @@ pub async fn get_menu_page(State(app_state): State<AppState>) -> (StatusCode, Ht
 
     let menu_editor: String = menu_editor.render().unwrap().to_string();
     (StatusCode::OK, Html(menu_editor))
-}
-
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct MenuItemForm {
-    pub id: uuid::Uuid,
-    pub lang: i32,
-    pub title: String,
-    pub description: Option<String>,
-    pub price: Option<f64>,
-    pub category: Option<uuid::Uuid>,
 }

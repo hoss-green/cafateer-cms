@@ -7,10 +7,7 @@ use http::StatusCode;
 
 use crate::{
     data::context::AppState,
-    models::views::{
-        components::{MenuItemComponent, MenuTabComponent},
-        pages::MenuPage,
-    },
+    models::views::{components::MenuTabComponent, pages::MenuPage},
 };
 
 pub async fn get_menu(
@@ -38,7 +35,7 @@ pub async fn get_menu(
     //         .clone()
     //     })
     //     .collect();
-     
+
     // menu_items_lunch.push(MenuItemComponent {
     //     title: "CCCC is the title".to_string(),
     //     description: "description 3".to_string(), //.to_string(),

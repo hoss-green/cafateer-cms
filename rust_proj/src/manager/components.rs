@@ -32,7 +32,6 @@ pub struct MenuItemEditor {
     pub title: String,
     pub description: String,
     pub lang: i32,
-    pub price: f64,
 }
 
 #[derive(Template, Debug, Clone)]
@@ -43,4 +42,5 @@ pub struct MenuItemDetailsEditor {
     pub allergies: Vec<Allergy>,
     pub category: uuid::Uuid,
     pub categories: Vec<CategoryModel>,
+    pub price: f64,
 }
