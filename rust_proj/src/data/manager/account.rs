@@ -1,13 +1,10 @@
 use crate::data::context::AppState;
 use crate::models::data::AccountModel;
-use sqlx::Postgres;
 
-pub async fn get_account_details(app_state: &AppState) -> AccountModel {
-    let result = sqlx::query_as::<Postgres, AccountModel>(
-        r#"select id, languages from accounts"#,
-    )
-    .fetch_one(&app_state.database_pool)
-    .await;
+pub async fn get(app_state: &AppState) -> AccountModel {
+    let result = sqlx::query_as!(AccountModel, r#"select id, primary_language from accounts"#,)
+        .fetch_one(&app_state.database_pool)
+        .await;
     match result {
         Ok(r) => r,
         Err(err) => {
@@ -17,11 +14,11 @@ pub async fn get_account_details(app_state: &AppState) -> AccountModel {
     }
 }
 
-pub async fn set_account_details(app_state: &AppState, account_model: &AccountModel) -> bool {
-    let result = sqlx::query(
-        "insert into accounts(id, languages) VALUES ($1, $2) ON CONFLICT (id) DO UPDATE SET languages=$2 WHERE accounts.id=$1")
-        .bind(account_model.id)
-        .bind(account_model.clone().languages)
+pub async fn set(app_state: &AppState, account_model: &AccountModel) -> bool {
+    let result = sqlx::query!(
+        "insert into accounts(id, primary_language) VALUES ($1, $2) ON CONFLICT (id) DO UPDATE SET primary_language=$2 WHERE accounts.id=$1", 
+        account_model.id,
+        account_model.primary_language)
     .execute(&app_state.database_pool)
     .await;
 

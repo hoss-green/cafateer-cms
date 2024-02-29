@@ -6,7 +6,7 @@ pub async fn get(
     lang: i32,
     owner_id: uuid::Uuid,
 ) -> MenuItemModel {
-    let account = crate::data::manager::account::get_account_details(app_state).await;
+    let account = crate::data::manager::account::get(app_state).await;
     let result = sqlx::query_as!(
         MenuItemModel,
         "select id, lang, title, description, owner_id from menu_items where id=$1 and lang=$2 and owner_id=$3",

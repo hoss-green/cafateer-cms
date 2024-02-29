@@ -2,22 +2,23 @@
   <button id="dropdownDefault" data-dropdown-toggle="dropdown"
     class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2.5 text-center inline-flex items-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
     type="button">
-    Filter by categories
+    Select
       <i class="ml-2 fa-solid fa-caret-down"></i>
   </button>
   <!-- Dropdown menu -->
   <div id="dropdown" class="z-10 hidden p-3 bg-white rounded-lg shadow w-72 dark:bg-gray-700">
-    <!-- <h6 class="mb-2 text-sm font-medium text-gray-900 dark:text-white">Columns</h6> -->
     <ul id="checkbox_container" class="space-y-2 text-sm" aria-labelledby="dropdownDefault">
       {% for lang in all_available_languages.clone() %}
       <li>
         <label
           class="flex items-center text-sm font-medium text-gray-900 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-md px-1.5 py-1 w-full">
-          <input hx-post="/manager/config/languages" name="{{ lang.id }}" type="checkbox" hx-target="#primary_lang_list" hx-swap="outerHTML" 
+        <form hx-post="/manager/config/languages">
+          <input  name="{{ lang.id }}" type="checkbox" hx-post="/manager/config/languages" hx-target="#primary_lang_list" hx-swap="outerHTML" 
             {{ crate::manager::templates::is_selected(lang.id, user_selected_languages) }}
             class="w-4 h-4 mr-2 bg-gray-100 border-gray-300 rounded text-primary-600 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500" />
           {{ lang.name }}
-          <!-- <input type="hidden" name="{{ lang.id }}" value="checkbox"/> -->
+          <input type="hidden" name="id" value="{{lang.id}}"/>
+        </form>
         </label>
       </li>
       {% endfor %}

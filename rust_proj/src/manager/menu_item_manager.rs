@@ -1,7 +1,7 @@
 use super:: components::MenuItemEditor
 ;
 use crate::{
-    data::{self, context::AppState},
+    data::{self, context::AppState, manager::account_languages},
     models::data::MenuItemModel,
 };
 use askama::Template;
@@ -19,7 +19,7 @@ pub async fn get_menu_item(
     Path((id, lang)): Path<(uuid::Uuid, i32)>,
 ) -> (StatusCode, Html<String>) {
     println!("{:#?}", (id, lang));
-    let account = data::manager::account::get_account_details(&app_state).await;
+    let account = data::manager::account::get(&app_state).await;
     let menu_item =
         data::manager::menu_items::get_item_by_lang(&app_state, id, lang, account.id).await;
     let menu_item_editor = MenuItemEditor {
@@ -37,7 +37,7 @@ pub async fn update_menu_item(
     Form(menu_item_form): Form<MenuItemForm>,
 ) -> (StatusCode, Html<String>) {
     println!("{:#?}", menu_item_form.clone());
-    let account = data::manager::account::get_account_details(&app_state).await;
+    let account = data::manager::account::get(&app_state).await;
     let result = data::manager::menu_item::set(
         &app_state,
         &account.id,
@@ -58,13 +58,13 @@ pub async fn update_menu_item(
 
 
 pub async fn create_menu_item(State(app_state): State<AppState>) -> (StatusCode, Html<String>) {
-    let account = data::manager::account::get_account_details(&app_state).await;
+    let account = data::manager::account::get(&app_state).await;
     let result = data::manager::menu_item::set(
         &app_state,
         &account.id,
         MenuItemModel {
             id: uuid::Uuid::new_v4(),
-            lang: account.languages.main_language,
+            lang: account.primary_language,
             owner_id: account.id,
             title: "new menu_item".to_string(),
             description: None,
@@ -81,7 +81,7 @@ pub async fn delete_menu_item(
     State(app_state): State<AppState>,
     Path(id): Path<uuid::Uuid>,
 ) -> (StatusCode, Html<String>) {
-    let account = data::manager::account::get_account_details(&app_state).await;
+    let account = data::manager::account::get(&app_state).await;
     let result = data::manager::menu_item::delete(&app_state, &account.id, &id).await;
     if result {
         return (StatusCode::OK, Html(String::new()));

@@ -1,11 +1,7 @@
 use crate::{
-    data::{
-        context::AppState,
-        manager::account::{get_account_details, set_account_details},
-        references::get_languages,
-    },
+    data::{context::AppState, manager::account_languages, references::get_languages},
     manager::components::PrimaryLanguageList,
-    models::data::reference_items::Language,
+    models::data::{reference_items::Language, AccountLanguagesModel},
 };
 use askama::Template;
 use axum::{
@@ -13,42 +9,75 @@ use axum::{
     response::Html,
 };
 use http::StatusCode;
-use std::str::FromStr;
 
 pub async fn post_language(
     State(app_state): State<AppState>,
     body: String,
 ) -> (StatusCode, Html<String>) {
-    let mut account_model = get_account_details(&app_state).await;
-    let options: Vec<String> = match body.contains("&") && body.len() > 0 {
-        true => body
-            .split("&")
-            .map(|item| item.to_string())
-            .collect::<Vec<String>>(),
-        false => vec![body],
+    println!("{:#?}", body);
+    let mut account = crate::data::manager::account::get(&app_state).await;
+    let lang_setting = match body.contains("&") {
+        true => match body.split("&").last() {
+            Some(body) => match body.split("=").last() {
+                Some(id) => (id.to_string().parse::<i32>().unwrap(), true),
+                None => return (StatusCode::OK, Html("error".to_string())),
+            },
+            None => return (StatusCode::OK, Html("error".to_string())),
+        },
+        false => match body.split("=").last() {
+            Some(id) => (id.to_string().parse::<i32>().unwrap(), false),
+            None => todo!(),
+        },
     };
 
-    let res: Vec<i32> = options
-        .clone()
-        .iter()
-        .map(|item| FromStr::from_str(item.split("=").next().unwrap()).unwrap_or(0))
-        .collect();
+    match lang_setting.1 {
+        true => {
+            crate::data::manager::account_languages::add(
+                &app_state,
+                &AccountLanguagesModel {
+                    id: uuid::Uuid::new_v4(),
+                    owner_id: account.id,
+                    language: lang_setting.0,
+                },
+            )
+            .await
+        }
+        false => {
+            crate::data::manager::account_languages::delete(&app_state, account.id, lang_setting.0)
+                .await
+        }
+    };
 
-    if res
-        .clone()
-        .iter()
-        .any(|&item| item == account_model.languages.main_language)
-    {
-    } else {
-        account_model.languages.main_language = res[0];
+    let account_languages =
+        crate::data::manager::account_languages::get_all(&app_state, account.id)
+            .await
+            .iter()
+            .map(|al| al.language)
+            .collect::<Vec<i32>>();
+    let account_languages = match account_languages.len() {
+        0 => {
+            let am = AccountLanguagesModel {
+                    id: uuid::Uuid::new_v4(),
+                    owner_id: account.id,
+                    language: 0,
+                };
+            crate::data::manager::account_languages::add(
+                &app_state,
+                &am
+            )
+            .await;
+            vec![0]
+        }
+        _ => account_languages,
+    };
+    if !account_languages.iter().any(|&al| al == account.primary_language) {
+        account.primary_language = *account_languages.iter().last().unwrap_or(&0);
+        crate::data::manager::account::set(&app_state, &account).await;
     }
-
-    account_model.languages.languages = res.clone();
-    set_account_details(&app_state, &account_model).await;
     let languages = get_languages(&app_state).await;
     let primary_dropdown = PrimaryLanguageList {
-        primary_language_id: account_model.languages.main_language,
-        user_selected_languages: Language::vec_from_int_vec(&languages, &res),
+        primary_language_id: account.primary_language,
+        user_selected_languages: Language::vec_from_int_vec(&languages, &account_languages),
     };
     let page: String = primary_dropdown.render().unwrap().to_string();
     (StatusCode::OK, Html(page))
@@ -59,15 +88,18 @@ pub async fn post_primary_language(
     Path(id): Path<i32>,
 ) -> (StatusCode, Html<String>) {
     let languages = get_languages(&app_state).await;
-    let mut account_model = get_account_details(&app_state).await;
-    account_model.languages.main_language = id;
-    set_account_details(&app_state, &account_model).await;
+    let mut account = crate::data::manager::account::get(&app_state).await;
+    let account_languages =
+        crate::data::manager::account_languages::get_all(&app_state, account.id)
+            .await
+            .iter()
+            .map(|al| al.language)
+            .collect::<Vec<i32>>();
+    account.primary_language = id;
+    crate::data::manager::account::set(&app_state, &account).await;
     let primary_dropdown = PrimaryLanguageList {
-        primary_language_id: account_model.languages.main_language,
-        user_selected_languages: Language::vec_from_int_vec(
-            &languages,
-            &account_model.languages.languages,
-        ),
+        primary_language_id: account.primary_language,
+        user_selected_languages: Language::vec_from_int_vec(&languages, &account_languages),
     };
     let page: String = primary_dropdown.render().unwrap().to_string();
     (StatusCode::OK, Html(page))

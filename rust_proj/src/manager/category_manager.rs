@@ -17,7 +17,7 @@ pub async fn get_category_item(
     Path((id, lang)): Path<(uuid::Uuid, i32)>,
 ) -> (StatusCode, Html<String>) {
     println!("{:#?}", lang);
-    let account = data::manager::account::get_account_details(&app_state).await;
+    let account = data::manager::account::get(&app_state).await;
     let category = data::manager::category::get(&app_state, (id, lang), &account.id).await;
     let category_editor = ComponentCategoryEditor {
         id: category.id,
@@ -29,13 +29,13 @@ pub async fn get_category_item(
 }
 
 pub async fn create_category_item(State(app_state): State<AppState>) -> (StatusCode, Html<String>) {
-    let account = data::manager::account::get_account_details(&app_state).await;
+    let account = data::manager::account::get(&app_state).await;
     let result = data::manager::category::set(
         &app_state,
         &account.id,
         CategoryModel {
             id: uuid::Uuid::new_v4(),
-            lang: account.languages.main_language,
+            lang: account.primary_language,
             owner_id: account.id,
             title: Some("new category".to_string()),
             lang_name: None,
@@ -52,7 +52,7 @@ pub async fn delete_category_item(
     State(app_state): State<AppState>,
     Path(id): Path<uuid::Uuid>,
 ) -> (StatusCode, Html<String>) {
-    let account = data::manager::account::get_account_details(&app_state).await;
+    let account = data::manager::account::get(&app_state).await;
     let result = data::manager::category::delete(&app_state, &account.id, &id).await;
     if result {
         return (StatusCode::OK, Html(String::new()));
@@ -64,7 +64,7 @@ pub async fn update_category_item(
     State(app_state): State<AppState>,
     Form(details_item): Form<CategoryForm>,
 ) -> (StatusCode, Html<String>) {
-    let account = data::manager::account::get_account_details(&app_state).await;
+    let account = data::manager::account::get(&app_state).await;
     let result = data::manager::category::set(
         &app_state,
         &account.id,

@@ -17,10 +17,11 @@ pub async fn get_menu_item_details(
     State(app_state): State<AppState>,
     Path(id): Path<uuid::Uuid>,
 ) -> (StatusCode, Html<String>) {
-    let account = data::manager::account::get_account_details(&app_state).await;
+    let account = data::manager::account::get(&app_state).await;
+    let account_languages = data::manager::account_languages::get_all(&app_state, account.id).await;
     let languages = Language::vec_from_int_vec(
         &data::references::get_languages(&app_state).await,
-        &account.languages.languages,
+        &account_languages.iter().map(|al| al.language).collect::<Vec<i32>>()
     );
     let fetched_categories =
         data::manager::categories::get_category_list(&app_state, &account.id).await;
@@ -49,7 +50,7 @@ pub async fn get_menu_item_details(
                     }),
                 }
             })
-            .filter(|cm| cm.lang == account.languages.main_language) // account.languages.main_language)
+            .filter(|cm| cm.lang == account.primary_language) // account.languages.main_language)
             .collect::<Vec<CategoryModel>>();
         categories.append(&mut fc);
     });
@@ -73,7 +74,7 @@ pub async fn update_menu_item_details(
     Form(menu_item_form): Form<MenuItemDetailsForm>,
 ) -> (StatusCode, Html<String>) {
     println!("{:#?}", menu_item_form.clone());
-    let account = data::manager::account::get_account_details(&app_state).await;
+    let account = data::manager::account::get(&app_state).await;
 
     let result = data::manager::menu_item_details::set(
         &app_state,

@@ -9,10 +9,12 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 pub async fn get_categories_page(State(app_state): State<AppState>) -> (StatusCode, Html<String>) {
-    let account = data::manager::account::get_account_details(&app_state).await;
+    let account = data::manager::account::get(&app_state).await;
+    let account_languages = crate::data::manager::account_languages::get_all(&app_state, account.id).await;
+    let languages = account_languages.iter().map(|ac_lang_model| ac_lang_model.language).collect::<Vec<i32>>();
     let languages = Language::vec_from_int_vec(
         &data::references::get_languages(&app_state).await,
-        &account.languages.languages,
+        &languages,
     );
     let mut fetched_categories =
         data::manager::categories::get_category_list(&app_state, &account.id).await;
@@ -30,7 +32,7 @@ pub async fn get_categories_page(State(app_state): State<AppState>) -> (StatusCo
         .map(|unique_cat| {
             let button_title = match fetched_categories
                 .iter()
-                .find(|cat| cat.id == *unique_cat.0 && cat.lang == account.languages.main_language)
+                .find(|cat| cat.id == *unique_cat.0 && cat.lang == account.primary_language)
             {
                 Some(cat) => cat.clone().title.unwrap_or("No title".to_string()),
                 None => "No title".to_string(),

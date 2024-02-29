@@ -1,7 +1,6 @@
 // use super::templates::AccountPage;
 use crate::{
-    data::{context::AppState, manager::account::get_account_details, references::get_languages},
-    manager::templates::AccountPage,
+    data::context::AppState, manager::templates::AccountPage,
     models::data::reference_items::Language,
 };
 use askama::Template;
@@ -9,11 +8,17 @@ use axum::{extract::State, response::Html};
 use http::StatusCode;
 
 pub async fn get_account_page(State(app_state): State<AppState>) -> (StatusCode, Html<String>) {
-    let languages = get_languages(&app_state).await;
-    let response = get_account_details(&app_state).await;
+    let languages = crate::data::references::get_languages(&app_state).await;
+    let account = crate::data::manager::account::get(&app_state).await;
+    let account_languages =
+        crate::data::manager::account_languages::get_all(&app_state, account.id).await;
+    let account_languages = account_languages
+        .iter()
+        .map(|ac_lang_model| ac_lang_model.language)
+        .collect::<Vec<i32>>();
     let editor_home = AccountPage {
-        primary_language: Language::get_from_int(&languages, response.languages.main_language),
-        user_languages: Language::vec_from_int_vec(&languages, &response.languages.languages),
+        primary_language: Language::get_from_int(&languages, account.primary_language),
+        user_languages: Language::vec_from_int_vec(&languages, &account_languages),
         system_languages: languages,
         title: "Editor Home for SC",
     };
