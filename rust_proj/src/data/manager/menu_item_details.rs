@@ -8,7 +8,7 @@ pub async fn get_menu_item_detail(
     id: &uuid::Uuid,
 ) -> MenuItemDetailsModel {
     let result = sqlx::query_as::<Postgres, MenuItemDetailsModel>(
-        r#"select id, price, category, allergies, owner_id from menu_item_details"#,
+        r#"select id, price, category, allergies, owner_id from menu_item_details where id = $1"#,
     )
     .bind(id)
     .fetch_one(&app_state.database_pool)
@@ -17,19 +17,19 @@ pub async fn get_menu_item_detail(
         Ok(r) => r,
         Err(err) => {
             println!("Cannot fetch menu_item_detail, err: {}", err);
-            MenuItemDetailsModel::new(*owner_id)
+            MenuItemDetailsModel::new(*id, *owner_id)
         }
     }
 }
 
 pub async fn get_menu_item_details(
     app_state: &AppState,
-    id: &uuid::Uuid,
+    owner_id: &uuid::Uuid,
 ) -> Vec<MenuItemDetailsModel> {
     let result = sqlx::query_as::<Postgres, MenuItemDetailsModel>(
-        r#"select id, price, category, allergies, owner_id from menu_item_details"#,
+        r#"select id, price, category, allergies, owner_id from menu_item_details where owner_id = $1"#,
     )
-    .bind(id)
+    .bind(owner_id)
     .fetch_all(&app_state.database_pool)
     .await;
     match result {

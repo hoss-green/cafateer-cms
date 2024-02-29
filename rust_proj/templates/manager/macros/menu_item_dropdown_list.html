@@ -22,10 +22,10 @@
       {% for lang in available_languages %}
       <button
         class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white w-full"
-        data-drawer-target="drawer-right-example"
-        data-drawer-show="drawer-right-example"
+        data-drawer-target="right-edit-drawer"
+        data-drawer-show="right-edit-drawer"
         data-drawer-placement="right"
-        aria-controls="drawer-right-example"
+        aria-controls="right-edit-drawer"
         hx-get="/manager/menu/item/{{menu_id}}/{{lang.id}}"
         hx-target="#sidebar_editor"
         type="button"

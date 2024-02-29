@@ -33,9 +33,9 @@ pub struct MenuItemDetailsModel {
 }
 
 impl MenuItemDetailsModel {
-    pub fn new(owner_id:uuid::Uuid) -> MenuItemDetailsModel {
+    pub fn new(id:uuid::Uuid, owner_id:uuid::Uuid) -> MenuItemDetailsModel {
         MenuItemDetailsModel {
-            id: uuid::Uuid::new_v4(),
+            id,//: uuid::Uuid::new_v4(),
             owner_id,
             category: None,
             allergies: None,

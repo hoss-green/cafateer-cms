@@ -1,6 +1,7 @@
 {%- import "manager/macros/menu_item_dropdown_list.html" as
-menu_item_dropdown_list -%} {% macro menu_item_button(id, title, category,
-languages) %}
+menu_item_dropdown_list -%}
+<!-- -->
+{% macro menu_item_button(id, title, category, languages) %}
 <div
   id="menu_button{{id}}"
   class="w-full flex flex-col p-1 bg-gray-50 rounded-md"
@@ -24,10 +25,10 @@ languages) %}
     </button>
     <button
       class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-      data-drawer-target="drawer-right-example"
-      data-drawer-show="drawer-right-example"
+      data-drawer-target="right-edit-drawer"
+      data-drawer-show="right-edit-drawer"
       data-drawer-placement="right"
-      aria-controls="drawer-right-example"
+      aria-controls="right-edit-drawer"
       hx-get="/manager/menu/item/details/{{ id }}"
       hx-target="#sidebar_editor"
       type="button"
