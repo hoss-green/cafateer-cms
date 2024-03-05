@@ -1,8 +1,8 @@
-use crate::{data::context::AppState, models::data::AccountLanguagesModel};
+use crate::{data::context::AppState, models::data::ProfileLanguagesModel};
 
-pub async fn get_all(app_state: &AppState, owner_id: uuid::Uuid) -> Vec<AccountLanguagesModel> {
+pub async fn get_all(app_state: &AppState, owner_id: uuid::Uuid) -> Vec<ProfileLanguagesModel> {
     let result = sqlx::query_as!(
-        AccountLanguagesModel,
+        ProfileLanguagesModel,
         r#"select id, language, owner_id from account_languages where owner_id=$1"#,
         owner_id
     )
@@ -36,7 +36,7 @@ pub async fn delete(app_state: &AppState, owner_id: uuid::Uuid, lang_id: i32) ->
     }
 }
 
-pub async fn add(app_state: &AppState, account_languages_model: &AccountLanguagesModel) -> bool {
+pub async fn add(app_state: &AppState, account_languages_model: &ProfileLanguagesModel) -> bool {
     let result = sqlx::query!(
         "insert into account_languages(owner_id, id, language)  VALUES ($1, $2, $3)",
         &account_languages_model.owner_id,
@@ -79,12 +79,11 @@ pub async fn add(app_state: &AppState, account_languages_model: &AccountLanguage
 
 pub async fn set_account_details(
     app_state: &AppState,
-    account_languages_model: &AccountLanguagesModel,
+    profile_languages_model: &ProfileLanguagesModel,
 ) -> bool {
     let result = sqlx::query!(
-        // "insert into accounts(id, languages) VALUES ($1, $2) ON CONFLICT (id) DO UPDATE SET languages=$2 WHERE accounts.id=$1", account_model.id)
-        "insert into accounts(id) VALUES ($1)",
-        account_languages_model.id
+        "insert into profiles(id) VALUES ($1)",
+        profile_languages_model.id
     )
     .execute(&app_state.database_pool)
     .await;

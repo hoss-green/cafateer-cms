@@ -25,7 +25,7 @@ pub async fn get_restaurant_with_lang(
     let categories = crate::data::presenter::fetcher::get_categories(&app_state, lang).await;
     let mut menu_items = crate::data::presenter::fetcher::get_menu_item_vms(&app_state, lang).await;
 
-    println!("{:#?}", menu_items.clone());
+    // println!("{:#?}", menu_items.clone());
     
     let mut menu_tabs: Vec<MenuTabComponent> = vec![];
     menu_items.iter_mut().for_each(|mi| {
@@ -66,7 +66,7 @@ pub async fn get_restaurant_with_lang(
         };
     });
 
-    println!("{:#?}", menu_tabs.clone());
+    // println!("{:#?}", menu_tabs.clone());
     
     let title = "Sunny Cafe";
     let restaurant_page = RestaurantPage {

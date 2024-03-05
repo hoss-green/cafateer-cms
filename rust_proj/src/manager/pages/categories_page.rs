@@ -9,8 +9,8 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 pub async fn get_categories_page(State(app_state): State<AppState>) -> (StatusCode, Html<String>) {
-    let account = data::manager::account::get(&app_state).await;
-    let account_languages = crate::data::manager::account_languages::get_all(&app_state, account.id).await;
+    let account = data::manager::profile::get(&app_state).await;
+    let account_languages = crate::data::manager::profile_languages::get_all(&app_state, account.id).await;
     let languages = account_languages.iter().map(|ac_lang_model| ac_lang_model.language).collect::<Vec<i32>>();
     let languages = Language::vec_from_int_vec(
         &data::references::get_languages(&app_state).await,

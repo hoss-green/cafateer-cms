@@ -1,7 +1,7 @@
 use crate::{data::context::AppState, models::data::MenuItemModel};
 
 pub async fn get_items_for_account(app_state: &AppState) -> Vec<MenuItemModel> {
-    let account = crate::data::manager::account::get(app_state).await;
+    let account = crate::data::manager::profile::get(app_state).await;
     let result = sqlx::query_as!(
         MenuItemModel,
         "select id, lang, title, description, owner_id from menu_items where owner_id=$1",
@@ -38,7 +38,7 @@ pub async fn get_items_by_lang(app_state: &AppState, lang: i32) -> Vec<MenuItemM
 }
 
 pub async fn get_item_by_lang(app_state: &AppState, id:uuid::Uuid, lang: i32, owner_id:uuid::Uuid) -> MenuItemModel {
-    let account = crate::data::manager::account::get(app_state).await;
+    let account = crate::data::manager::profile::get(app_state).await;
     let result = sqlx::query_as!(
         MenuItemModel,
         "select id, lang, title, description, owner_id from menu_items where id=$1 and lang=$2 and owner_id=$3",

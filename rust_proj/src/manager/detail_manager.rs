@@ -1,6 +1,6 @@
 use super::templates::DetailsPage;
 use crate::{
-    data::{self, context::AppState, manager::account_languages}, manager::components::ComponentDetailEditor, models::data::{reference_items::Language, DetailsModel}
+    data::{self, context::AppState}, manager::components::ComponentDetailEditor, models::data::{reference_items::Language, DetailsModel}
 };
 use askama::Template;
 use axum::{
@@ -16,8 +16,8 @@ pub async fn get_details_data(
     Path(id): Path<i32>,
 ) -> (StatusCode, Html<String>) {
     println!("id {}", id);
-    let account = data::manager::account::get(&app_state).await;
-    let account_languages = data::manager::account_languages::get_all(&app_state, account.id).await;
+    let account = data::manager::profile::get(&app_state).await;
+    let account_languages = data::manager::profile_languages::get_all(&app_state, account.id).await;
     if !account_languages.iter().map(|al| al.language).collect::<Vec<i32>>()
         .iter()
         .any(|&lang_id| lang_id == id)
@@ -48,8 +48,8 @@ pub async fn get_details_data(
 }
 
 pub async fn get_details_home(State(app_state): State<AppState>) -> (StatusCode, Html<String>) {
-    let account = data::manager::account::get(&app_state).await;
-    let account_languages = data::manager::account_languages::get_all(&app_state, account.id).await;
+    let account = data::manager::profile::get(&app_state).await;
+    let account_languages = data::manager::profile_languages::get_all(&app_state, account.id).await;
     let all_langs = data::references::get_languages(&app_state).await;
     let language_list = Language::vec_from_int_vec(&all_langs, &account_languages.iter().map(|ml| ml.language).collect::<Vec<i32>>());
 
@@ -66,7 +66,7 @@ pub async fn post_details_home(
     State(app_state): State<AppState>,
     Form(details_item): Form<DetailsModel>,
 ) -> (StatusCode, Html<String>) {
-    let account = data::manager::account::get(&app_state).await;
+    let account = data::manager::profile::get(&app_state).await;
     let mut info: String = "Saved!".to_string();
     let result = data::manager::details::set_details(&app_state, &account.id, details_item).await;
     if !result {

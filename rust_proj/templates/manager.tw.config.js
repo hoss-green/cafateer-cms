@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ["./templates/manager/**/*.html"],
+  content: ["./templates/manager/**/*.html", "./templates/session/**/*.html"],
   theme: {
     fontFamily: {
       sans: ["Inconsolata", "sans-serif"],

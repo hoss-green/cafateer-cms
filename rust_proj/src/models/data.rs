@@ -1,11 +1,11 @@
-mod account_model;
+mod profile_model;
 mod category_model;
 mod detail_items;
 mod menu_item_model;
 pub mod reference_items;
-mod account_languages_model;
-pub use account_model::AccountModel;
-pub use account_languages_model::AccountLanguagesModel;
+mod profile_languages_model;
+pub use profile_model::ProfileModel;
+pub use profile_languages_model::ProfileLanguagesModel;
 pub use category_model::CategoryModel;
 pub use detail_items::BioModel;
 pub use detail_items::DetailLangModel;

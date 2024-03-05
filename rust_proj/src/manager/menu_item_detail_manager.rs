@@ -17,8 +17,8 @@ pub async fn get_menu_item_details(
     State(app_state): State<AppState>,
     Path(id): Path<uuid::Uuid>,
 ) -> (StatusCode, Html<String>) {
-    let account = data::manager::account::get(&app_state).await;
-    let account_languages = data::manager::account_languages::get_all(&app_state, account.id).await;
+    let account = data::manager::profile::get(&app_state).await;
+    let account_languages = data::manager::profile_languages::get_all(&app_state, account.id).await;
     let languages = Language::vec_from_int_vec(
         &data::references::get_languages(&app_state).await,
         &account_languages.iter().map(|al| al.language).collect::<Vec<i32>>()
@@ -73,8 +73,7 @@ pub async fn update_menu_item_details(
     State(app_state): State<AppState>,
     Form(menu_item_form): Form<MenuItemDetailsForm>,
 ) -> (StatusCode, Html<String>) {
-    println!("{:#?}", menu_item_form.clone());
-    let account = data::manager::account::get(&app_state).await;
+    let account = data::manager::profile::get(&app_state).await;
 
     let result = data::manager::menu_item_details::set(
         &app_state,

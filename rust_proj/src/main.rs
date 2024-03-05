@@ -1,8 +1,10 @@
 use axum::{
+    middleware,
     routing::{delete, get, post, put},
     Router,
 };
 use cafeteer::{
+    auth_middleware,
     data::context::AppState,
     manager::{
         create_category_item, delete_category_item, get_category_item, get_menu_item_details,
@@ -11,6 +13,7 @@ use cafeteer::{
         post_details_home, update_category_item, update_menu_item_details,
     },
     presenter::{menu::get_menu, restaurant::get_restaurant_with_lang},
+    session,
 };
 use cafeteer::{
     data::setup_db,
@@ -21,7 +24,6 @@ use cafeteer::{
     presenter::restaurant::get_restaurant,
 };
 use dotenv::dotenv;
-use tower_http;
 
 #[tokio::main]
 async fn main() {
@@ -39,7 +41,6 @@ async fn main() {
             }
         },
     };
-
     setup_db(&state).await;
 
     let router = Router::new()
@@ -67,11 +68,20 @@ async fn main() {
         .route("/manager/menu/item/details", put(update_menu_item_details))
         .route("/manager/config", get(get_account_page))
         .route("/manager/config/languages", post(post_language))
+        .route("/manager/session/login", get(session::login))
+        .route("/manager/session/login", post(session::do_login))
+        .route("/manager/session/sign_up", get(session::sign_up))
+        .route("/manager/session/sign_up", post(session::do_signup))
         .route(
             "/manager/config/primary_language/:id",
             post(post_primary_language),
         )
+        .route_layer(middleware::from_fn(auth_middleware::check_auth))
         .with_state(state);
+
+    // let router = ServiceBuilder::new()
+    //     .route
+    //     .service(router);
     let listener = tokio::net::TcpListener::bind(&"127.0.0.1:4444")
         .await
         .unwrap();

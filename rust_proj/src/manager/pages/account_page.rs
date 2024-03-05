@@ -9,9 +9,9 @@ use http::StatusCode;
 
 pub async fn get_account_page(State(app_state): State<AppState>) -> (StatusCode, Html<String>) {
     let languages = crate::data::references::get_languages(&app_state).await;
-    let account = crate::data::manager::account::get(&app_state).await;
+    let account = crate::data::manager::profile::get(&app_state).await;
     let account_languages =
-        crate::data::manager::account_languages::get_all(&app_state, account.id).await;
+        crate::data::manager::profile_languages::get_all(&app_state, account.id).await;
     let account_languages = account_languages
         .iter()
         .map(|ac_lang_model| ac_lang_model.language)

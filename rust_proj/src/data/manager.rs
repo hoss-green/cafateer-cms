@@ -1,5 +1,5 @@
-pub mod account;
-pub mod account_languages;
+pub mod profile;
+pub mod profile_languages;
 pub mod categories;
 pub mod category;
 pub mod details;
