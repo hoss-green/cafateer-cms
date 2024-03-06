@@ -9,7 +9,7 @@ use chrono::Utc;
 use http::{header::SET_COOKIE, StatusCode};
 use serde::{Deserialize, Serialize};
 
-use crate::{data::context::AppState, session::{security, tokens::user_account_to_jwt}};
+use crate::{data::context::AppState, session::{security, tokens::account_to_jwt}};
 
 use super::{
     data,
@@ -64,7 +64,6 @@ pub async fn do_signup(
     Form(session_form): Form<SessionForm>,
 ) -> (StatusCode, Html<String>) {
     let sign_up_page: SignUpPage = SignUpPage { title: "Sign Up" };
-    println!("{:#?}", session_form);
 
     let creation_timestamp = Utc::now();
     let salt = security::generate_salt();
@@ -94,6 +93,6 @@ pub struct SessionForm {
 }
 
 async fn get_cookie<'a>(account:&AccountModel) -> String {
-    let cookie_string = user_account_to_jwt(&account);
-    format!("token={}; same-site=Lax, path=/;", cookie_string)
+    let cookie_string = account_to_jwt(&account);
+    format!("token={}; same-site=Lax; path=/;", cookie_string)
 }

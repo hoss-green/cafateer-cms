@@ -1,11 +1,10 @@
 use crate::session::claims::Claims;
-use http::{header::COOKIE, HeaderMap};
 use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
-
 use super::models::AccountModel;
+
 const EXPIRY_SECONDS: i64 = 60 * 60; //60 * 60 -> 1 hour
 
-pub fn user_account_to_jwt(user_account: &AccountModel) -> String {
+pub fn account_to_jwt(user_account: &AccountModel) -> String {
     use chrono::{Duration, Utc};
 
     let now = Utc::now();
@@ -36,7 +35,7 @@ pub fn user_account_to_jwt(user_account: &AccountModel) -> String {
     token
 }
 
-pub fn jwt_to_claims(jwt: String) -> Result<Claims, String> {
+pub fn validate_jwt_for_claims(jwt: String) -> Result<Claims, String> {
     use chrono::{DateTime, NaiveDateTime, Utc};
     use jsonwebtoken::decode_header;
     let header = match decode_header(jwt.as_str()) {
@@ -53,12 +52,6 @@ pub fn jwt_to_claims(jwt: String) -> Result<Claims, String> {
         Err(err) => return Err(format!("Could not get claims from token {}", err)),
     };
 
-    //let expiry_time = TimeZone::from_utc_datetime();
-    //Utc::now().checked_add_signed(Duration::seconds(seconds))
-    // let x = chrono::DateTime::from_naive_utc_and_offset(
-    //     NaiveDateTime::from_timestamp_opt(token_data.exp, 0).unwrap(),
-    //     Utc
-    // );
     let expiry_time: DateTime<Utc> = chrono::DateTime::from_naive_utc_and_offset(
         NaiveDateTime::from_timestamp_opt(token_data.exp, 0).unwrap(),
         Utc,

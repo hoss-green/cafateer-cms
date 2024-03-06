@@ -1,26 +1,41 @@
+use crate::session::validate_jwt_for_claims;
 use askama_axum::Response;
 use axum::{extract::Request, middleware::Next};
-use http::{header::COOKIE, HeaderMap, HeaderValue, StatusCode};
-
-use crate::data::context::AppState;
+use http::{header::COOKIE, HeaderMap, StatusCode};
 
 pub async fn check_auth(
-    // app_state: AppState,
     headers: HeaderMap,
-    request: Request,
+    mut request: Request,
     next: Next,
 ) -> Result<Response, StatusCode> {
+    match request.uri().path_and_query() {
+        Some(uri) => {
+            let path = uri.path();
+            println!("{}", path);
+            if !path.starts_with("/manager") {
+                return Ok(next.run(request).await);
+            }
+        }
+        None => return Err(StatusCode::UNAUTHORIZED),
+    };
     let jwt = get_jwt_from_header(headers);
     match jwt {
-        Ok(_) => {
-            println!(
-                "Middleware hit {}",
-                jwt.unwrap_or("Unauthorised".to_string())
-            );
-            Ok(next.run(request).await)
+        Ok(jwt) => {
+            println!("Middleware hit {}", jwt);
+            match validate_jwt_for_claims(jwt) {
+                Ok(cms) => {
+                    request.extensions_mut().insert(cms);
+                    return Ok(next.run(request).await);
+                }
+                Err(err) => println!("Could not validate jwt, err: {}", err),
+            };
         }
-        Err(_) => Err(StatusCode::UNAUTHORIZED),
-    }
+        Err(err) => {
+            println!("Could not decode jwt, err: {}", err);
+        }
+    };
+
+    Err(StatusCode::UNAUTHORIZED)
 }
 
 fn get_jwt_from_header(headers: HeaderMap) -> Result<String, String> {
@@ -44,7 +59,7 @@ fn get_jwt_from_header(headers: HeaderMap) -> Result<String, String> {
 
     let jwt = match token_cookie {
         Some(jwt) => jwt,
-        None => return Err("could not parse jwt cookie".to_string()),
+        None => return Err("could not find token in header".to_string()),
     };
 
     Ok(jwt)
