@@ -1,6 +1,6 @@
 use crate::session::validate_jwt_for_claims;
-use askama_axum::Response;
-use axum::{extract::Request, middleware::Next};
+use askama_axum::{IntoResponse, Response};
+use axum::{extract::Request, middleware::Next, response::Redirect};
 use http::{header::COOKIE, HeaderMap, StatusCode};
 
 pub async fn check_auth(
@@ -35,7 +35,8 @@ pub async fn check_auth(
         }
     };
 
-    Err(StatusCode::UNAUTHORIZED)
+    Ok(Redirect::to("/session/login").into_response())
+    // Err(StatusCode::UNAUTHORIZED)
 }
 
 fn get_jwt_from_header(headers: HeaderMap) -> Result<String, String> {

@@ -1,15 +1,20 @@
+use std::str::FromStr;
+
 use askama::Template;
 use askama_axum::IntoResponse;
 use axum::{
     extract::State,
-    response::{AppendHeaders, Html},
+    response::{AppendHeaders, Html, Redirect},
     Form,
 };
 use chrono::Utc;
-use http::{header::SET_COOKIE, StatusCode};
+use http::{header::SET_COOKIE, HeaderValue, StatusCode};
 use serde::{Deserialize, Serialize};
 
-use crate::{data::context::AppState, session::{security, tokens::account_to_jwt}};
+use crate::{
+    data::context::AppState,
+    session::{security, tokens::account_to_jwt},
+};
 
 use super::{
     data,
@@ -47,16 +52,24 @@ pub async fn do_login(
 
     if password_hash == user_account.password_hash {
         println!("User {} SUCCEEDED to log in", user_account.email);
-        let headers: AppendHeaders<[(http::HeaderName, String); 1]> =
-            AppendHeaders([(SET_COOKIE, get_cookie(&user_account).await)]);
-        return (headers, Html(login_page));
+        // let headers: AppendHeaders<[(http::HeaderName, String); 1]> =
+        //     AppendHeaders([(SET_COOKIE, get_cookie(&user_account).await)]);
+        // return (headers, Html(login_page)).into_response();
+        match HeaderValue::from_str(&get_cookie(&user_account).await) {
+            Ok(header_val) => {
+                let mut redirect = Redirect::to("/manager").into_response();
+                redirect.headers_mut().insert(SET_COOKIE, header_val);
+                return redirect;
+            }
+            Err(_) => println!("could not parse header"),
+        };
+        // Redirect::to("/manager");
     }
 
-        println!("User {} FAILED to log in", user_account.email);
+    println!("User {} FAILED to log in", user_account.email);
     let headers: AppendHeaders<[(http::HeaderName, String); 1]> =
         AppendHeaders([(SET_COOKIE, String::new())]);
-    (headers, Html(login_page))
-    // (headers, Html(login_page))
+    (headers, Html(login_page)).into_response()
 }
 
 pub async fn do_signup(
@@ -92,7 +105,7 @@ pub struct SessionForm {
     remember: Option<bool>,
 }
 
-async fn get_cookie<'a>(account:&AccountModel) -> String {
+async fn get_cookie<'a>(account: &AccountModel) -> String {
     let cookie_string = account_to_jwt(&account);
     format!("token={}; same-site=Lax; path=/;", cookie_string)
 }
