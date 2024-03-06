@@ -9,7 +9,7 @@ use chrono::Utc;
 use http::{header::SET_COOKIE, StatusCode};
 use serde::{Deserialize, Serialize};
 
-use crate::{data::context::AppState, session::security};
+use crate::{data::context::AppState, session::{security, tokens::user_account_to_jwt}};
 
 use super::{
     data,
@@ -48,7 +48,7 @@ pub async fn do_login(
     if password_hash == user_account.password_hash {
         println!("User {} SUCCEEDED to log in", user_account.email);
         let headers: AppendHeaders<[(http::HeaderName, String); 1]> =
-            AppendHeaders([(SET_COOKIE, get_cookie().await)]);
+            AppendHeaders([(SET_COOKIE, get_cookie(&user_account).await)]);
         return (headers, Html(login_page));
     }
 
@@ -93,6 +93,7 @@ pub struct SessionForm {
     remember: Option<bool>,
 }
 
-async fn get_cookie<'a>() -> String {
-    format!("token={}; same-site=Lax, path=/;", "tooookkkeeennnn")
+async fn get_cookie<'a>(account:&AccountModel) -> String {
+    let cookie_string = user_account_to_jwt(&account);
+    format!("token={}; same-site=Lax, path=/;", cookie_string)
 }
