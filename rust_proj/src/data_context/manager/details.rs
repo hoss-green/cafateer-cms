@@ -1,5 +1,5 @@
 use crate::models::data::{DetailLangModel, DetailsModel};
-use crate::data::context::AppState;
+use crate::data_context::context::AppState;
 
 pub async fn get_detail(app_state: &AppState, account_id: &uuid::Uuid, id: i32) -> DetailLangModel {
     let result = sqlx::query_as!(DetailLangModel, "select details.id, details.lang, details.blurb, ref_languages.code as lang_code, ref_languages.name as lang_name from details join ref_languages on details.lang = ref_languages.id where details.id = $1 AND ref_languages.id = $2", account_id,id)

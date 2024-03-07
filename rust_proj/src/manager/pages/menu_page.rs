@@ -1,5 +1,5 @@
 use crate::{
-    data::{self, context::AppState},
+    data_context::{self, context::AppState},
     manager::{macro_templates::MenuItemButton, templates::MenuPage},
     models::data::{reference_items::Language, MenuItemDetailsModel},
 };
@@ -9,16 +9,16 @@ use http::StatusCode;
 use std::collections::HashMap;
 
 pub async fn get_menu_page(State(app_state): State<AppState>) -> (StatusCode, Html<String>) {
-    let account = data::manager::profile::get(&app_state).await;
+    let profile = data_context::manager::profile::get(&app_state.database_pool).await;
     let menu_item_details: Vec<MenuItemDetailsModel> =
-        data::manager::menu_item_details::get_menu_item_details(&app_state, &account.id).await;
-    let account_languages = crate::data::manager::profile_languages::get_all(&app_state, account.id).await;
+        data_context::manager::menu_item_details::get_menu_item_details(&app_state, &profile.id).await;
+    let account_languages = crate::data_context::manager::profile_languages::get_all(&app_state, profile.id).await;
     let languages = account_languages.iter().map(|ac_lang_model| ac_lang_model.language).collect::<Vec<i32>>();
     let languages = Language::vec_from_int_vec(
-        &data::references::get_languages(&app_state).await,
+        &data_context::references::get_languages(&app_state).await,
         &languages,
     );
-    let mut menu_items = data::manager::menu_items::get_items_for_account(&app_state).await;
+    let mut menu_items = data_context::manager::menu_items::get_items_for_account(&app_state,&profile.id).await;
     let mut unique_menu_ids: HashMap<uuid::Uuid, bool> = HashMap::new();
     menu_items.sort_by(|a, b| (format!("{}{}", a.id, a.lang)).cmp(&format!("{}{}", b.id, b.lang)));
     menu_items.clone().into_iter().for_each(|mi| {
@@ -30,7 +30,7 @@ pub async fn get_menu_page(State(app_state): State<AppState>) -> (StatusCode, Ht
         .map(|unique_mi| {
             let button_title = match menu_items
                 .iter()
-                .find(|mi| mi.id == *unique_mi.0 && mi.lang == account.primary_language)
+                .find(|mi| mi.id == *unique_mi.0 && mi.lang == profile.primary_language)
             {
                 Some(cat) => cat.clone().title,
                 None => "No title".to_string(),

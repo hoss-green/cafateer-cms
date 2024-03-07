@@ -1,4 +1,4 @@
-use crate::{data::context::AppState, models::data::reference_items::Allergy};
+use crate::{data_context::context::AppState, models::data::reference_items::Allergy};
 
 pub async fn get_allergies(state: &AppState) -> Vec<Allergy> {
     let result = sqlx::query_as!(

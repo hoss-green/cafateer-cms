@@ -1,5 +1,12 @@
-use std::str::FromStr;
-
+use super::{
+    data,
+    models::AccountModel,
+    templates::{LoginPage, SignUpPage, SignUpSuccessPage},
+};
+use crate::{
+    data_context::context::AppState,
+    session::{security, tokens::account_to_jwt},
+};
 use askama::Template;
 use askama_axum::IntoResponse;
 use axum::{
@@ -11,26 +18,20 @@ use chrono::Utc;
 use http::{header::SET_COOKIE, HeaderValue, StatusCode};
 use serde::{Deserialize, Serialize};
 
-use crate::{
-    data::context::AppState,
-    session::{security, tokens::account_to_jwt},
-};
-
-use super::{
-    data,
-    models::AccountModel,
-    templates::{LoginPage, SignUpPage},
-};
-
-pub async fn login(State(app_state): State<AppState>) -> impl IntoResponse {
+pub async fn login() -> impl IntoResponse {
     let login_page: LoginPage = LoginPage { title: "Login" };
     let login_page: String = login_page.render().unwrap().to_string();
     (StatusCode::OK, Html(login_page))
 }
 
-pub async fn sign_up(State(app_state): State<AppState>) -> (StatusCode, Html<String>) {
+pub async fn sign_up() -> (StatusCode, Html<String>) {
     let sign_up_page: SignUpPage = SignUpPage { title: "Sign Up" };
     let sign_up_page: String = sign_up_page.render().unwrap().to_string();
+    (StatusCode::OK, Html(sign_up_page))
+}
+pub async fn sign_up_success() -> (StatusCode, Html<String>) {
+    let sign_up_success_page: SignUpSuccessPage = SignUpSuccessPage { title: "Sign Up Success" };
+    let sign_up_page: String = sign_up_success_page.render().unwrap().to_string();
     (StatusCode::OK, Html(sign_up_page))
 }
 

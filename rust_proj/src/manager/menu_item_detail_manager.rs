@@ -1,6 +1,6 @@
 use super::components::MenuItemDetailsEditor;
 use crate::{
-    data::{self, context::AppState},
+    data_context::{self, context::AppState},
     models::data::{reference_items::Language, CategoryModel, MenuItemDetailsModel},
 };
 use askama::Template;
@@ -17,15 +17,15 @@ pub async fn get_menu_item_details(
     State(app_state): State<AppState>,
     Path(id): Path<uuid::Uuid>,
 ) -> (StatusCode, Html<String>) {
-    let account = data::manager::profile::get(&app_state).await;
-    let account_languages = data::manager::profile_languages::get_all(&app_state, account.id).await;
+    let profile = data_context::manager::profile::get(&app_state.database_pool).await;
+    let account_languages = data_context::manager::profile_languages::get_all(&app_state, profile.id).await;
     let languages = Language::vec_from_int_vec(
-        &data::references::get_languages(&app_state).await,
+        &data_context::references::get_languages(&app_state).await,
         &account_languages.iter().map(|al| al.language).collect::<Vec<i32>>()
     );
     let fetched_categories =
-        data::manager::categories::get_category_list(&app_state, &account.id).await;
-    let ref_allergies = data::references::get_allergies(&app_state).await;
+        data_context::manager::categories::get_category_list(&app_state, &profile.id).await;
+    let ref_allergies = data_context::references::get_allergies(&app_state).await;
     let mut unique_category_ids: HashMap<uuid::Uuid, bool> = HashMap::new();
     fetched_categories.clone().into_iter().for_each(|cat| {
         unique_category_ids.insert(cat.id, true);
@@ -44,22 +44,22 @@ pub async fn get_menu_item_details(
                     None => Some(CategoryModel {
                         id: *unique_cat.0,
                         lang: lang.id,
-                        owner_id: account.id,
+                        owner_id: profile.id,
                         title: Some(format!("Missing Translation [{}]", lang.name).to_string()),
                         lang_name: Some(lang.name.to_string()),
                     }),
                 }
             })
-            .filter(|cm| cm.lang == account.primary_language) // account.languages.main_language)
+            .filter(|cm| cm.lang == profile.primary_language) // account.languages.main_language)
             .collect::<Vec<CategoryModel>>();
         categories.append(&mut fc);
     });
 
     let menu_item_details =
-        data::manager::menu_item_details::get_menu_item_detail(&app_state, &account.id, &id).await;
+        data_context::manager::menu_item_details::get_menu_item_detail(&app_state, &profile.id, &id).await;
     let menu_item_editor = MenuItemDetailsEditor {
         id: menu_item_details.id,
-        owner_id: account.id,
+        owner_id: profile.id,
         allergies: ref_allergies,
         category: menu_item_details.category.unwrap_or(uuid::Uuid::nil()),
         price: menu_item_details.price.unwrap_or(0.0),
@@ -73,14 +73,14 @@ pub async fn update_menu_item_details(
     State(app_state): State<AppState>,
     Form(menu_item_form): Form<MenuItemDetailsForm>,
 ) -> (StatusCode, Html<String>) {
-    let account = data::manager::profile::get(&app_state).await;
+    let profile = data_context::manager::profile::get(&app_state.database_pool).await;
 
-    let result = data::manager::menu_item_details::set(
+    let result = data_context::manager::menu_item_details::set(
         &app_state,
-        &account.id,
+        &profile.id,
         &MenuItemDetailsModel {
             id: menu_item_form.id,
-            owner_id: account.id,
+            owner_id: profile.id,
             category: menu_item_form.category,
             allergies: match menu_item_form.allergies {
                 Some(ags) => Some(sqlx::types::Json(ags)),

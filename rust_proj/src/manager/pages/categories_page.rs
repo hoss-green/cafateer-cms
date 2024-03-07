@@ -1,6 +1,7 @@
-// use super::{macro_templates::CategoryButton, templates::CategoriesPage};
 use crate::{
-    data::{self, context::AppState}, manager::{macro_templates::CategoryButton, templates::CategoriesPage}, models::data::reference_items::Language
+    data_context::{self, context::AppState},
+    manager::{macro_templates::CategoryButton, templates::CategoriesPage},
+    models::data::reference_items::Language,
 };
 use askama::Template;
 use axum::{extract::State, response::Html};
@@ -9,15 +10,19 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 pub async fn get_categories_page(State(app_state): State<AppState>) -> (StatusCode, Html<String>) {
-    let account = data::manager::profile::get(&app_state).await;
-    let account_languages = crate::data::manager::profile_languages::get_all(&app_state, account.id).await;
-    let languages = account_languages.iter().map(|ac_lang_model| ac_lang_model.language).collect::<Vec<i32>>();
+    let profile = data_context::manager::profile::get(&app_state.database_pool).await;
+    let account_languages =
+        crate::data_context::manager::profile_languages::get_all(&app_state, profile.id).await;
+    let languages = account_languages
+        .iter()
+        .map(|ac_lang_model| ac_lang_model.language)
+        .collect::<Vec<i32>>();
     let languages = Language::vec_from_int_vec(
-        &data::references::get_languages(&app_state).await,
+        &data_context::references::get_languages(&app_state).await,
         &languages,
     );
     let mut fetched_categories =
-        data::manager::categories::get_category_list(&app_state, &account.id).await;
+        data_context::manager::categories::get_category_list(&app_state, &profile.id).await;
     fetched_categories
         .sort_by(|a, b| (format!("{}{}", a.id, a.lang)).cmp(&format!("{}{}", b.id, b.lang)));
 
@@ -32,7 +37,7 @@ pub async fn get_categories_page(State(app_state): State<AppState>) -> (StatusCo
         .map(|unique_cat| {
             let button_title = match fetched_categories
                 .iter()
-                .find(|cat| cat.id == *unique_cat.0 && cat.lang == account.primary_language)
+                .find(|cat| cat.id == *unique_cat.0 && cat.lang == profile.primary_language)
             {
                 Some(cat) => cat.clone().title.unwrap_or("No title".to_string()),
                 None => "No title".to_string(),

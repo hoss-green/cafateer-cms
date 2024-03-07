@@ -1,9 +1,9 @@
 use axum::{
-    extract::Request, middleware, routing::{delete, get, post, put}, Router, 
+    extract::Request, middleware, response::Redirect, routing::{delete, get, post, put}, Router
 };
 use cafeteer::{
     auth_middleware,
-    data::context::AppState,
+    data_context::context::AppState,
     manager::{
         create_category_item, delete_category_item, get_category_item, get_menu_item_details,
         menu_item_manager::*,
@@ -14,7 +14,7 @@ use cafeteer::{
     session,
 };
 use cafeteer::{
-    data::setup_db,
+    data_context::setup_db,
     manager::{get_details_home, post_language},
 };
 use cafeteer::{
@@ -22,7 +22,7 @@ use cafeteer::{
     presenter::restaurant::get_restaurant,
 };
 use dotenv::dotenv;
-use tower::{Layer, ServiceExt};
+use tower::Layer;
 use tower_http::normalize_path::NormalizePathLayer;
 
 #[tokio::main]
@@ -30,7 +30,7 @@ async fn main() {
     dotenv().ok();
     let pg = std::env::var("DATABASE_URL").unwrap();
     let state: AppState = AppState {
-        database_pool: match cafeteer::data::context::get_db_pool(pg).await {
+        database_pool: match cafeteer::data_context::context::get_db_pool(pg).await {
             Ok(db) => {
                 println!("Connected to database");
                 db
@@ -68,10 +68,12 @@ async fn main() {
         .route("/manager/menu/item/details", put(update_menu_item_details))
         .route("/manager/config", get(get_account_page))
         .route("/manager/config/languages", post(post_language))
+        .route("/session", get(Redirect::permanent("/session/login")))
         .route("/session/login", get(session::login))
         .route("/session/login", post(session::do_login))
         .route("/session/sign_up", get(session::sign_up))
         .route("/session/sign_up", post(session::do_signup))
+        .route("/session/sign_up_success", get(session::sign_up_success))
         .route(
             "/manager/config/primary_language/:id",
             post(post_primary_language),
@@ -79,13 +81,16 @@ async fn main() {
         .route_layer(middleware::from_fn(auth_middleware::check_auth))
         .with_state(state);
 
-
     let listener = tokio::net::TcpListener::bind(&"127.0.0.1:4444")
         .await
         .unwrap();
     // this is to ignore the trailing slash
     // everthing in app happens BEFORE the routing
     let app = NormalizePathLayer::trim_trailing_slash().layer(router);
-    let server = axum::serve(listener, axum::ServiceExt::<Request>::into_make_service(app));
+    let server = axum::serve(
+        listener,
+        axum::ServiceExt::<Request>::into_make_service(app),
+    );
+
     server.await.unwrap()
 }

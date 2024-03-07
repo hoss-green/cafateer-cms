@@ -6,7 +6,7 @@ use axum::{
 use http::StatusCode;
 
 use crate::{
-    data::context::AppState,
+    data_context::context::AppState,
     models::views::{
         components::{MenuItemComponent, MenuTabComponent},
         pages::{MenuPage, RestaurantPage},
@@ -21,9 +21,9 @@ pub async fn get_restaurant_with_lang(
     State(app_state): State<AppState>,
     Path(lang): Path<i32>,
 ) -> (StatusCode, Html<String>) {
-    let details = crate::data::presenter::fetcher::get_details(&app_state, lang).await;
-    let categories = crate::data::presenter::fetcher::get_categories(&app_state, lang).await;
-    let mut menu_items = crate::data::presenter::fetcher::get_menu_item_vms(&app_state, lang).await;
+    let details = crate::data_context::presenter::fetcher::get_details(&app_state, lang).await;
+    let categories = crate::data_context::presenter::fetcher::get_categories(&app_state, lang).await;
+    let mut menu_items = crate::data_context::presenter::fetcher::get_menu_item_vms(&app_state, lang).await;
 
     // println!("{:#?}", menu_items.clone());
     

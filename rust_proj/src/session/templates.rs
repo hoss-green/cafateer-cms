@@ -11,3 +11,8 @@ pub struct LoginPage<'a> {
 pub struct SignUpPage<'a> {
     pub title: &'a str,
 }
+#[derive(Template, Debug, Clone)]
+#[template(path = "session/sign_up_success.html")]
+pub struct SignUpSuccessPage<'a> {
+    pub title: &'a str,
+}

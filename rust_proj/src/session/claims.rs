@@ -1,6 +1,6 @@
-use chrono::NaiveDateTime;
 use ::serde::{Deserialize, Serialize};
 use uuid::*;
+
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct Claims {
     pub sub: Uuid,

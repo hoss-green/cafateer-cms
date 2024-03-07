@@ -1,9 +1,5 @@
-use chrono::Utc;
-
-use crate::data::context::AppState;
-
+use crate::data_context::context::AppState;
 use super::models::AccountModel;
-    // , security::{calculate_hash, generate_salt}};
 
 pub async fn save_sign_up(app_state: &AppState, account_model: &AccountModel) -> bool {
     let result = sqlx::query!(

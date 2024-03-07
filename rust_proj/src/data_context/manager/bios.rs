@@ -1,5 +1,4 @@
 use crate::data_models::BioItem;
-
 use super::context::AppState;
 
 pub async fn get_details(app_state: &AppState) -> BioItem {

@@ -1,6 +1,6 @@
 use super::components::ComponentCategoryEditor;
 use crate::{
-    data::{self, context::AppState},
+    data_context::{self, context::AppState},
     models::data::CategoryModel,
 };
 use askama::Template;
@@ -17,8 +17,8 @@ pub async fn get_category_item(
     Path((id, lang)): Path<(uuid::Uuid, i32)>,
 ) -> (StatusCode, Html<String>) {
     println!("{:#?}", lang);
-    let account = data::manager::profile::get(&app_state).await;
-    let category = data::manager::category::get(&app_state, (id, lang), &account.id).await;
+    let profile = data_context::manager::profile::get(&app_state.database_pool).await;
+    let category = data_context::manager::category::get(&app_state, (id, lang), &profile.id).await;
     let category_editor = ComponentCategoryEditor {
         id: category.id,
         title: category.title.unwrap_or("".to_string()),
@@ -29,14 +29,14 @@ pub async fn get_category_item(
 }
 
 pub async fn create_category_item(State(app_state): State<AppState>) -> (StatusCode, Html<String>) {
-    let account = data::manager::profile::get(&app_state).await;
-    let result = data::manager::category::set(
+    let profile = data_context::manager::profile::get(&app_state.database_pool).await;
+    let result = data_context::manager::category::set(
         &app_state,
-        &account.id,
+        &profile.id,
         CategoryModel {
             id: uuid::Uuid::new_v4(),
-            lang: account.primary_language,
-            owner_id: account.id,
+            lang: profile.primary_language,
+            owner_id: profile.id,
             title: Some("new category".to_string()),
             lang_name: None,
         },
@@ -52,8 +52,8 @@ pub async fn delete_category_item(
     State(app_state): State<AppState>,
     Path(id): Path<uuid::Uuid>,
 ) -> (StatusCode, Html<String>) {
-    let account = data::manager::profile::get(&app_state).await;
-    let result = data::manager::category::delete(&app_state, &account.id, &id).await;
+    let profile = data_context::manager::profile::get(&app_state.database_pool).await;
+    let result = data_context::manager::category::delete(&app_state, &profile.id, &id).await;
     if result {
         return (StatusCode::OK, Html(String::new()));
     }
@@ -64,14 +64,14 @@ pub async fn update_category_item(
     State(app_state): State<AppState>,
     Form(details_item): Form<CategoryForm>,
 ) -> (StatusCode, Html<String>) {
-    let account = data::manager::profile::get(&app_state).await;
-    let result = data::manager::category::set(
+    let profile = data_context::manager::profile::get(&app_state.database_pool).await;
+    let result = data_context::manager::category::set(
         &app_state,
-        &account.id,
+        &profile.id,
         CategoryModel {
             id: details_item.id,
             lang: details_item.lang,
-            owner_id: account.id,
+            owner_id: profile.id,
             title: details_item.title,
             lang_name: None,
         },

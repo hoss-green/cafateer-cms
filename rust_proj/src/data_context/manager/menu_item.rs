@@ -1,4 +1,4 @@
-use crate::{data::context::AppState, models::data::MenuItemModel};
+use crate::{data_context::context::AppState, models::data::MenuItemModel};
 
 pub async fn get(
     app_state: &AppState,
@@ -6,7 +6,6 @@ pub async fn get(
     lang: i32,
     owner_id: uuid::Uuid,
 ) -> MenuItemModel {
-    let account = crate::data::manager::profile::get(app_state).await;
     let result = sqlx::query_as!(
         MenuItemModel,
         "select id, lang, title, description, owner_id from menu_items where id=$1 and lang=$2 and owner_id=$3",
@@ -22,12 +21,12 @@ pub async fn get(
             Some(item) => item,
             None => {
                 println!("Cannot find menu item");
-                MenuItemModel::new(uuid::Uuid::new_v4(), account.id, lang)
+                MenuItemModel::new(uuid::Uuid::new_v4(), owner_id, lang)
             }
         },
         Err(err) => {
             println!("Cannot fetch menu item, err: {}", err);
-            MenuItemModel::new(uuid::Uuid::new_v4(), account.id, lang)
+            MenuItemModel::new(uuid::Uuid::new_v4(), owner_id, lang)
         }
     }
 }
@@ -37,7 +36,6 @@ pub async fn set(
     account_id: &uuid::Uuid,
     details_item: MenuItemModel,
 ) -> bool {
-    println!("hit");
     let result = sqlx::query!(
         "insert into menu_items(owner_id, id, lang, title, description) 
             VALUES ($1, $2, $3, $4, $5) ON CONFLICT (id, lang) DO UPDATE SET title=$4, description=$5
@@ -50,8 +48,6 @@ pub async fn set(
     )
     .execute(&app_state.database_pool)
     .await;
-
-    println!("hit2");
     match result {
         Ok(_r) => {
             println!("Saved item succesfully");

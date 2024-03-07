@@ -1,6 +1,6 @@
 use super:: components::MenuItemEditor ;
 use crate::{
-    data::{self, context::AppState},
+    data_context::{self, context::AppState},
     models::data::MenuItemModel,
 };
 use askama::Template;
@@ -17,9 +17,9 @@ pub async fn get_menu_item(
     Path((id, lang)): Path<(uuid::Uuid, i32)>,
 ) -> (StatusCode, Html<String>) {
     println!("{:#?}", (id, lang));
-    let account = data::manager::profile::get(&app_state).await;
+    let profile = data_context::manager::profile::get(&app_state.database_pool).await;
     let menu_item =
-        data::manager::menu_items::get_item_by_lang(&app_state, id, lang, account.id).await;
+        data_context::manager::menu_items::get_item_by_lang(&app_state, id, lang, profile.id).await;
     let menu_item_editor = MenuItemEditor {
         id: menu_item.id,
         title: menu_item.title,
@@ -35,14 +35,14 @@ pub async fn update_menu_item(
     Form(menu_item_form): Form<MenuItemForm>,
 ) -> (StatusCode, Html<String>) {
     println!("{:#?}", menu_item_form.clone());
-    let account = data::manager::profile::get(&app_state).await;
-    let result = data::manager::menu_item::set(
+    let profile = data_context::manager::profile::get(&app_state.database_pool).await;
+    let result = data_context::manager::menu_item::set(
         &app_state,
-        &account.id,
+        &profile.id,
         MenuItemModel {
             id: menu_item_form.id,
             lang: menu_item_form.lang,
-            owner_id: account.id,
+            owner_id: profile.id,
             title: menu_item_form.title,
             description: menu_item_form.description,
         },
@@ -56,14 +56,14 @@ pub async fn update_menu_item(
 
 
 pub async fn create_menu_item(State(app_state): State<AppState>) -> (StatusCode, Html<String>) {
-    let account = data::manager::profile::get(&app_state).await;
-    let result = data::manager::menu_item::set(
+    let profile = data_context::manager::profile::get(&app_state.database_pool).await;
+    let result = data_context::manager::menu_item::set(
         &app_state,
-        &account.id,
+        &profile.id,
         MenuItemModel {
             id: uuid::Uuid::new_v4(),
-            lang: account.primary_language,
-            owner_id: account.id,
+            lang: profile.primary_language,
+            owner_id: profile.id,
             title: "new menu_item".to_string(),
             description: None,
         },
@@ -79,13 +79,14 @@ pub async fn delete_menu_item(
     State(app_state): State<AppState>,
     Path(id): Path<uuid::Uuid>,
 ) -> (StatusCode, Html<String>) {
-    let account = data::manager::profile::get(&app_state).await;
-    let result = data::manager::menu_item::delete(&app_state, &account.id, &id).await;
+    let profile = data_context::manager::profile::get(&app_state.database_pool).await;
+    let result = data_context::manager::menu_item::delete(&app_state, &profile.id, &id).await;
     if result {
         return (StatusCode::OK, Html(String::new()));
     }
     (StatusCode::INTERNAL_SERVER_ERROR, Html("Error".to_string()))
 }
+
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct MenuItemForm {
     pub id: uuid::Uuid,

@@ -1,4 +1,4 @@
-use crate::{data::context::AppState, models::data::ProfileLanguagesModel};
+use crate::{data_context::context::AppState, models::data::ProfileLanguagesModel};
 
 pub async fn get_all(app_state: &AppState, owner_id: uuid::Uuid) -> Vec<ProfileLanguagesModel> {
     let result = sqlx::query_as!(
