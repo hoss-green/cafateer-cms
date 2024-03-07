@@ -7,6 +7,7 @@ pub struct Claims {
     pub email: String,
     pub exp: i64,
     pub roles: Vec<String>,
+    pub language: i32,
     // pub sub_expiry: NaiveDateTime,
     // pub product_id: String,
     // pub sub_status: String,
@@ -17,6 +18,7 @@ impl Claims {
         Claims {
             sub: Uuid::nil(),
             email: String::new(),
+            language: 0,
             // sub_expiry: NaiveDateTime::default(),
             exp: 0,
             roles: Vec::<String>::new(),

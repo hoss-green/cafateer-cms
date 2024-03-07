@@ -1,10 +1,10 @@
-use crate::session::claims::Claims;
+use crate::{models::data::ProfileModel, session::claims::Claims};
 use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
 use super::models::AccountModel;
 
 const EXPIRY_SECONDS: i64 = 60 * 60; //60 * 60 -> 1 hour
 
-pub fn account_to_jwt(user_account: &AccountModel) -> String {
+pub fn account_to_jwt(user_account: &AccountModel, profile_model: &ProfileModel) -> String {
     use chrono::{Duration, Utc};
 
     let now = Utc::now();
@@ -13,6 +13,7 @@ pub fn account_to_jwt(user_account: &AccountModel) -> String {
         sub: user_account.id,
         email: user_account.email_normalised.clone(),
         roles: vec![],
+        language: profile_model.primary_language,
         // roles: user_account.roles,
         // sub_expiry: user_account.subscription_expiry,
         // sub_status: user_account.subscription_status.unwrap_or(String::new()),
@@ -63,8 +64,6 @@ pub fn validate_jwt_and_get_claims(jwt: String) -> Result<Claims, String> {
 
     Ok(token_data)
 }
-
-
 
 fn get_secret() -> String {
     use std::env;

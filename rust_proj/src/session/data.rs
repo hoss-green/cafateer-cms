@@ -1,7 +1,7 @@
-use crate::data_context::context::AppState;
+use crate::data_context::context::DatabasePool;
 use super::models::AccountModel;
 
-pub async fn save_sign_up(app_state: &AppState, account_model: &AccountModel) -> bool {
+pub async fn save_sign_up(database_pool: &DatabasePool, account_model: &AccountModel) -> bool {
     let result = sqlx::query!(
         "insert into accounts(id, email, email_normalised, password_hash, salt, sign_up, status) VALUES ($1, $2, $3, $4, $5, $6, $7)",
         account_model.id,
@@ -12,7 +12,7 @@ pub async fn save_sign_up(app_state: &AppState, account_model: &AccountModel) ->
         account_model.sign_up,
         account_model.status
     )
-    .execute(&app_state.database_pool)
+    .execute(database_pool)
     .await;
 
     match result {
@@ -27,10 +27,10 @@ pub async fn save_sign_up(app_state: &AppState, account_model: &AccountModel) ->
     }
 }
 
-pub async fn get_account_by_email(app_state: &AppState, email_normalised: &String) -> Option<AccountModel> {
+pub async fn get_account_by_email(database_pool: &DatabasePool, email_normalised: &String) -> Option<AccountModel> {
     let result = sqlx::query_as!(AccountModel, 
         "select id, email, email_normalised, password_hash, salt, sign_up, status FROM accounts where email_normalised=$1",
-   email_normalised).fetch_optional(&app_state.database_pool).await;
+   email_normalised).fetch_optional(database_pool).await;
     match result {
         Ok(am) => am,
         Err(err) => {

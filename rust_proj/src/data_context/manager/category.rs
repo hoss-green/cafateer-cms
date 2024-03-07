@@ -29,7 +29,7 @@ pub async fn get(
 pub async fn set(
     database_pool: &DatabasePool,
     account_id: &uuid::Uuid,
-    details_item: CategoryModel,
+    details_item: &CategoryModel,
 ) -> bool {
     let result = sqlx::query!(
         "insert into menu_categories(owner_id, id, lang, title) VALUES ($1, $2, $3, $4) ON CONFLICT (id, lang) DO UPDATE SET title=$4 WHERE menu_categories.id=$2 and menu_categories.lang=$3",

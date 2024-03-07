@@ -1,11 +1,12 @@
-use super::{
-    data,
-    models::AccountModel,
-    templates::{LoginPage, SignUpPage, SignUpSuccessPage},
-};
 use crate::{
-    data_context::context::AppState,
-    session::{security, tokens::account_to_jwt},
+    data_context::{context::AppState, manager::profile},
+    models::data::ProfileModel,
+    session::{
+        models::AccountModel,
+        security,
+        templates::{LoginPage, SignUpPage, SignUpSuccessPage},
+        tokens::account_to_jwt,
+    },
 };
 use askama::Template;
 use askama_axum::IntoResponse;
@@ -49,19 +50,24 @@ pub async fn do_login(
     State(app_state): State<AppState>,
     Form(session_form): Form<SessionForm>,
 ) -> impl IntoResponse {
-    println!("{:#?}", session_form);
-
+    let database_pool = &app_state.database_pool;
     let normalised_email = session_form.email.to_uppercase();
-
-    let user_account = match data::get_account_by_email(&app_state, &normalised_email).await {
+    let user_account = match crate::session::data::get_account_by_email(
+        &app_state.database_pool,
+        &normalised_email,
+    )
+    .await
+    {
         Some(user) => user,
         None => panic!("user not found for email {}", &session_form.email),
     };
+
     let password_hash = security::calculate_hash(&session_form.password, &user_account.salt);
 
     if password_hash == user_account.password_hash {
+        let profile = profile::get(database_pool).await;
         println!("User {} SUCCEEDED to log in", user_account.email);
-        match HeaderValue::from_str(&get_cookie(&user_account).await) {
+        match HeaderValue::from_str(&get_cookie(&user_account, &profile).await) {
             Ok(header_val) => {
                 let mut redirect = Redirect::to("/manager").into_response();
                 redirect.headers_mut().insert(SET_COOKIE, header_val);
@@ -90,8 +96,8 @@ pub async fn do_signup(
     let creation_timestamp = Utc::now();
     let salt = security::generate_salt();
     let hash = security::calculate_hash(&session_form.password, &salt);
-    match data::save_sign_up(
-        &app_state,
+    match crate::session::data::save_sign_up(
+        &app_state.database_pool,
         &AccountModel {
             id: uuid::Uuid::new_v4(),
             email: session_form.email.clone(),
@@ -124,7 +130,7 @@ pub struct SessionForm {
     remember: Option<bool>,
 }
 
-async fn get_cookie<'a>(account: &AccountModel) -> String {
-    let cookie_string = account_to_jwt(&account);
+async fn get_cookie<'a>(account: &AccountModel, profile: &ProfileModel) -> String {
+    let cookie_string = account_to_jwt(&account, &profile);
     format!("token={}; same-site=Lax; path=/;", cookie_string)
 }

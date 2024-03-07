@@ -15,7 +15,6 @@ use cafeteer::{
         post_details_home, update_category_item, update_menu_item_details,
     },
     presenter::{menu::get_menu, restaurant::get_restaurant_with_lang},
-    session,
 };
 use cafeteer::{
     data_context::setup_db,
@@ -73,11 +72,11 @@ async fn main() {
         .route("/manager/config", get(get_account_page))
         .route("/manager/config/languages", post(post_language))
         .route("/session", get(Redirect::permanent("/session/login")))
-        .route("/session/login", get(session::login))
-        .route("/session/login", post(session::do_login))
-        .route("/session/sign_up", get(session::sign_up))
-        .route("/session/sign_up", post(session::do_signup))
-        .route("/session/sign_up_success", get(session::sign_up_success))
+        .route("/session/login", get(cafeteer::manager::session::login))
+        .route("/session/login", post(cafeteer::manager::session::do_login))
+        .route("/session/sign_up", get(cafeteer::manager::session::sign_up))
+        .route("/session/sign_up", post(cafeteer::manager::session::do_signup))
+        .route("/session/sign_up_success", get(cafeteer::manager::session::sign_up_success))
         .route(
             "/manager/config/primary_language/:id",
             post(post_primary_language),
