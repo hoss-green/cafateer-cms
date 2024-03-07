@@ -1,9 +1,6 @@
-use uuid::Uuid;
-
 use crate::{data_context::context::AppState, models::data::MenuItemModel};
 
 pub async fn get_items_for_account(app_state: &AppState, owner_id: &uuid::Uuid) -> Vec<MenuItemModel> {
-    // let account = crate::data_context::manager::profile::get(app_state).await;
     let result = sqlx::query_as!(
         MenuItemModel,
         "select id, lang, title, description, owner_id from menu_items where owner_id=$1",

@@ -19,7 +19,7 @@ use http::{header::SET_COOKIE, HeaderValue, StatusCode};
 use serde::{Deserialize, Serialize};
 
 pub async fn login() -> impl IntoResponse {
-    let login_page: LoginPage = LoginPage { title: "Login" };
+    let login_page: LoginPage = LoginPage { title: "Login", email: None, message: None};
     let login_page: String = login_page.render().unwrap().to_string();
     (StatusCode::OK, Html(login_page))
 }
@@ -30,7 +30,9 @@ pub async fn sign_up() -> (StatusCode, Html<String>) {
     (StatusCode::OK, Html(sign_up_page))
 }
 pub async fn sign_up_success() -> (StatusCode, Html<String>) {
-    let sign_up_success_page: SignUpSuccessPage = SignUpSuccessPage { title: "Sign Up Success" };
+    let sign_up_success_page: SignUpSuccessPage = SignUpSuccessPage {
+        title: "Sign Up Success",
+    };
     let sign_up_page: String = sign_up_success_page.render().unwrap().to_string();
     (StatusCode::OK, Html(sign_up_page))
 }
@@ -40,22 +42,17 @@ pub async fn do_login(
     Form(session_form): Form<SessionForm>,
 ) -> impl IntoResponse {
     println!("{:#?}", session_form);
-    let login_page: LoginPage = LoginPage { title: "Login" };
-    let login_page: String = login_page.render().unwrap().to_string();
 
     let normalised_email = session_form.email.to_uppercase();
 
     let user_account = match data::get_account_by_email(&app_state, &normalised_email).await {
         Some(user) => user,
-        None => panic!("user not found for email {}", session_form.email),
+        None => panic!("user not found for email {}", &session_form.email),
     };
     let password_hash = security::calculate_hash(&session_form.password, &user_account.salt);
 
     if password_hash == user_account.password_hash {
         println!("User {} SUCCEEDED to log in", user_account.email);
-        // let headers: AppendHeaders<[(http::HeaderName, String); 1]> =
-        //     AppendHeaders([(SET_COOKIE, get_cookie(&user_account).await)]);
-        // return (headers, Html(login_page)).into_response();
         match HeaderValue::from_str(&get_cookie(&user_account).await) {
             Ok(header_val) => {
                 let mut redirect = Redirect::to("/manager").into_response();
@@ -64,9 +61,14 @@ pub async fn do_login(
             }
             Err(_) => println!("could not parse header"),
         };
-        // Redirect::to("/manager");
     }
 
+    let login_page: LoginPage = LoginPage {
+        title: "Login",
+        email: Some(session_form.email.as_str()),
+        message: Some("Username or Password Error"),
+    };
+    let login_page: String = login_page.render().unwrap().to_string();
     println!("User {} FAILED to log in", user_account.email);
     let headers: AppendHeaders<[(http::HeaderName, String); 1]> =
         AppendHeaders([(SET_COOKIE, String::new())]);

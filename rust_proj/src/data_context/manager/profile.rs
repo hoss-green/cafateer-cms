@@ -1,4 +1,4 @@
-use crate::data_context::context::{AppState, DatabasePool};
+use crate::data_context::context::DatabasePool;
 use crate::models::data::ProfileModel;
 
 pub async fn get(database_pool: &DatabasePool) -> ProfileModel {
