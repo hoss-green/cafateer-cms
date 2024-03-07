@@ -1016,12 +1016,20 @@ input[type="range"]::-ms-fill-lower {
   margin-inline-start: 0.5rem;
 }
 
+.mt-12 {
+  margin-top: 3rem;
+}
+
 .mt-2 {
   margin-top: 0.5rem;
 }
 
 .mt-5 {
   margin-top: 1.25rem;
+}
+
+.mt-24 {
+  margin-top: 6rem;
 }
 
 .block {
@@ -1291,6 +1299,10 @@ input[type="range"]::-ms-fill-lower {
   border-width: 2px;
 }
 
+.border-4 {
+  border-width: 4px;
+}
+
 .border-r {
   border-right-width: 1px;
 }
@@ -1307,6 +1319,11 @@ input[type="range"]::-ms-fill-lower {
 .border-gray-300 {
   --tw-border-opacity: 1;
   border-color: rgb(209 213 219 / var(--tw-border-opacity));
+}
+
+.border-gray-50 {
+  --tw-border-opacity: 1;
+  border-color: rgb(249 250 251 / var(--tw-border-opacity));
 }
 
 .bg-blue-700 {
