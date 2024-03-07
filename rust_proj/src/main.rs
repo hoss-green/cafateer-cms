@@ -72,11 +72,11 @@ async fn main() {
         .route("/manager/config", get(get_account_page))
         .route("/manager/config/languages", post(post_language))
         .route("/session", get(Redirect::permanent("/session/login")))
-        .route("/session/login", get(cafeteer::manager::session::login))
-        .route("/session/login", post(cafeteer::manager::session::do_login))
-        .route("/session/sign_up", get(cafeteer::manager::session::sign_up))
-        .route("/session/sign_up", post(cafeteer::manager::session::do_signup))
-        .route("/session/sign_up_success", get(cafeteer::manager::session::sign_up_success))
+        .route("/session/login", get(cafeteer::manager::session::pages::login))
+        .route("/session/login", post(cafeteer::manager::session::pages::do_login))
+        .route("/session/sign_up", get(cafeteer::manager::session::pages::sign_up))
+        .route("/session/sign_up", post(cafeteer::manager::session::pages::do_signup))
+        .route("/session/sign_up_success", get(cafeteer::manager::session::pages::sign_up_success))
         .route(
             "/manager/config/primary_language/:id",
             post(post_primary_language),

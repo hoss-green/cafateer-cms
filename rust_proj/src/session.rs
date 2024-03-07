@@ -1,7 +1,6 @@
 pub mod data;
 pub mod security;
 pub mod models;
-pub mod templates;
 pub mod tokens;
 pub mod claims;
 
