@@ -16,7 +16,7 @@ pub async fn post_language(
     body: String,
 ) -> (StatusCode, Html<String>) {
     let database_pool = &app_state.database_pool;
-    let mut profile = crate::data_context::manager::profile::get(database_pool).await;
+    let mut profile = crate::data_context::manager::profile::get(database_pool, &claims.sub).await;
     let lang_setting = match body.contains("&") {
         true => match body.split("&").last() {
             Some(body) => match body.split("=").last() {
@@ -91,7 +91,7 @@ pub async fn post_primary_language(
 ) -> (StatusCode, Html<String>) {
     let database_pool = &app_state.database_pool;
     let languages = get_languages(database_pool).await;
-    let mut profile = crate::data_context::manager::profile::get(database_pool).await;
+    let mut profile = crate::data_context::manager::profile::get(database_pool, &claims.sub).await;
     let account_languages =
         crate::data_context::manager::profile_languages::get_all(database_pool, &claims.sub)
             .await

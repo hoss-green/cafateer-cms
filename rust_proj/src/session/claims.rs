@@ -12,19 +12,3 @@ pub struct Claims<T> {
     // pub product_id: String,
     // pub sub_status: String,
 }
-
-// impl Claims<T> {
-//     pub fn new() -> Claims {
-//         Claims {
-//             sub: Uuid::nil(),
-//             email: String::new(),
-//             language: 0,
-//             // sub_expiry: NaiveDateTime::default(),
-//             exp: 0,
-//             roles: Vec::<String>::new(),
-//             body: None//T::default()
-//             // product_id: String::new(),
-//             // sub_status: String::new(),
-//         }
-//     }
-// }

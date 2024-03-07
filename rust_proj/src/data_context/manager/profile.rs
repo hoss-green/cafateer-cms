@@ -1,10 +1,14 @@
 use crate::data_context::context::DatabasePool;
 use crate::models::data::ProfileModel;
 
-pub async fn get(database_pool: &DatabasePool) -> ProfileModel {
-    let result = sqlx::query_as!(ProfileModel, r#"select id, primary_language from profiles"#,)
-        .fetch_one(database_pool)
-        .await;
+pub async fn get(database_pool: &DatabasePool, owner_id: &uuid::Uuid) -> ProfileModel {
+    let result = sqlx::query_as!(
+        ProfileModel,
+        r#"select id, primary_language from profiles where id=$1"#,
+        owner_id
+    )
+    .fetch_one(database_pool)
+    .await;
     match result {
         Ok(r) => r,
         Err(err) => {

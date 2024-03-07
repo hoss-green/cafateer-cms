@@ -1,30 +1,15 @@
 use crate::session::claims::Claims;
+use chrono::{DateTime, Duration, NaiveDateTime, Utc};
 use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
-use serde::{de::DeserializeOwned, Deserialize, Serialize};
-use super::models::AccountModel;
+use serde::{de::DeserializeOwned, Serialize};
 
 const EXPIRY_SECONDS: i64 = 60 * 60; //60 * 60 -> 1 hour
 
-pub fn account_to_jwt<T: Serialize>(user_account: &AccountModel, claims_model: &T) -> String {
-    use chrono::{Duration, Utc};
-
-    let now = Utc::now();
-
-    let claims = Claims {
-        sub: user_account.id,
-        email: user_account.email_normalised.clone(),
-        roles: vec![],
-        body: claims_model,// ClaimsModel { lang: profile_model.primary_language },
-        // roles: user_account.roles,
-        // sub_expiry: user_account.subscription_expiry,
-        // sub_status: user_account.subscription_status.unwrap_or(String::new()),
-        // product_id: user_account.product_id.unwrap_or(String::new()),
-        exp: now
-            .checked_add_signed(Duration::seconds(EXPIRY_SECONDS))
-            .unwrap()
-            .timestamp(),
-    };
-
+pub fn account_to_jwt<T: Serialize>(mut claims: Claims<T>) -> String {
+    claims.exp = Utc::now()
+        .checked_add_signed(Duration::seconds(EXPIRY_SECONDS))
+        .unwrap()
+        .timestamp();
     let token = encode(
         &Header::default(),
         &claims,
@@ -38,7 +23,6 @@ pub fn account_to_jwt<T: Serialize>(user_account: &AccountModel, claims_model: &
 }
 
 pub fn validate_jwt_and_get_claims<T: DeserializeOwned>(jwt: String) -> Result<Claims<T>, String> {
-    use chrono::{DateTime, NaiveDateTime, Utc};
     use jsonwebtoken::decode_header;
     let header = match decode_header(jwt.as_str()) {
         Ok(header_values) => header_values,

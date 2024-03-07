@@ -1,11 +1,7 @@
 use crate::{
     data_context::{context::AppState, manager::profile},
-    models::data::{ClaimsModel, ProfileModel},
-    session::{
-        models::AccountModel,
-        security, 
-        tokens::account_to_jwt,
-    },
+    manager::session::create_cookie_header,
+    session::{models::AccountModel, security},
 };
 use askama::Template;
 use askama_axum::IntoResponse;
@@ -66,16 +62,12 @@ pub async fn do_login(
     let password_hash = security::calculate_hash(&session_form.password, &user_account.salt);
 
     if password_hash == user_account.password_hash {
-        let profile = profile::get(database_pool).await;
+        let profile = profile::get(database_pool, &user_account.id).await;
         println!("User {} SUCCEEDED to log in", user_account.email);
-        match HeaderValue::from_str(&get_cookie(&user_account, &profile).await) {
-            Ok(header_val) => {
-                let mut redirect = Redirect::to("/manager").into_response();
-                redirect.headers_mut().insert(SET_COOKIE, header_val);
-                return redirect;
-            }
-            Err(_) => println!("could not parse header"),
-        };
+        let mut redirect = Redirect::to("/manager").into_response();
+        let header_val = create_cookie_header(&user_account, &profile).await; 
+        redirect.headers_mut().insert(SET_COOKIE, header_val);
+        return redirect;
     }
 
     let login_page: LoginPage = LoginPage {
@@ -129,10 +121,4 @@ pub struct SessionForm {
     email: String,
     password: String,
     remember: Option<bool>,
-}
-
-async fn get_cookie<'a>(account: &AccountModel, profile: &ProfileModel) -> String {
-    let claims_model:ClaimsModel = ClaimsModel { lang: profile.primary_language };
-    let cookie_string = account_to_jwt::<ClaimsModel>(&account, &claims_model);
-    format!("token={}; same-site=Lax; path=/;", cookie_string)
 }
