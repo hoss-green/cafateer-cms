@@ -7,7 +7,7 @@ pub async fn get_home_page(
     Extension(claims): Extension<Claims>,
     State(_app_state): State<AppState>) -> (StatusCode, Html<String>) {
 
-    println!("{:#?}", claims);
+    // println!("{:#?}", claims);
 
     let editor_home = StartPage {
         title: "Editor Home for SC",

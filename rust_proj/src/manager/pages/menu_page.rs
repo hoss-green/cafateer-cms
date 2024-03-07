@@ -12,7 +12,6 @@ pub async fn get_menu_page(
     Extension(claims):Extension<Claims>,
     State(app_state): State<AppState>) -> (StatusCode, Html<String>) {
     let database_pool = &app_state.database_pool;
-    let profile = data_context::manager::profile::get(database_pool).await;
     let menu_item_details: Vec<MenuItemDetailsModel> =
         data_context::manager::menu_item_details::get_menu_item_details(&app_state, &claims.sub)
             .await;
@@ -39,7 +38,7 @@ pub async fn get_menu_page(
         .map(|unique_mi| {
             let button_title = match menu_items
                 .iter()
-                .find(|mi| mi.id == *unique_mi.0 && mi.lang == profile.primary_language)
+                .find(|mi| mi.id == *unique_mi.0 && mi.lang == claims.language)
             {
                 Some(cat) => cat.clone().title,
                 None => "No title".to_string(),

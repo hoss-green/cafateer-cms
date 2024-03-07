@@ -13,7 +13,6 @@ pub async fn get_categories_page(
     Extension(claims): Extension<Claims>,
     State(app_state): State<AppState>) -> (StatusCode, Html<String>) {
     let database_pool = &app_state.database_pool;
-    let profile = data_context::manager::profile::get(database_pool).await;
     let account_languages =
         crate::data_context::manager::profile_languages::get_all(database_pool, &claims.sub).await;
     let languages = account_languages
@@ -25,7 +24,7 @@ pub async fn get_categories_page(
         &languages,
     );
     let mut fetched_categories =
-        data_context::manager::categories::get_category_list(database_pool, &profile.id).await;
+        data_context::manager::categories::get_category_list(database_pool, &claims.sub).await;
     fetched_categories
         .sort_by(|a, b| (format!("{}{}", a.id, a.lang)).cmp(&format!("{}{}", b.id, b.lang)));
 
@@ -39,7 +38,7 @@ pub async fn get_categories_page(
         .map(|unique_cat| {
             let button_title = match fetched_categories
                 .iter()
-                .find(|cat| cat.id == *unique_cat.0 && cat.lang == profile.primary_language)
+                .find(|cat| cat.id == *unique_cat.0 && cat.lang == claims.language)
             {
                 Some(cat) => cat.clone().title.unwrap_or("No title".to_string()),
                 None => "No title".to_string(),

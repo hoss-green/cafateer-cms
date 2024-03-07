@@ -20,7 +20,6 @@ pub async fn get_menu_item_details(
     Path(id): Path<uuid::Uuid>,
 ) -> (StatusCode, Html<String>) {
     let database_pool = &app_state.database_pool;
-    let profile = data_context::manager::profile::get(database_pool).await;
     let account_languages =
         data_context::manager::profile_languages::get_all(database_pool, &claims.sub).await;
     let languages = Language::vec_from_int_vec(
@@ -57,7 +56,7 @@ pub async fn get_menu_item_details(
                     }),
                 }
             })
-            .filter(|cm| cm.lang == profile.primary_language) // account.languages.main_language)
+            .filter(|cm| cm.lang == claims.language) // account.languages.main_language)
             .collect::<Vec<CategoryModel>>();
         categories.append(&mut fc);
     });
@@ -81,17 +80,16 @@ pub async fn get_menu_item_details(
 }
 
 pub async fn update_menu_item_details(
+    Extension(claims): Extension<Claims>,
     State(app_state): State<AppState>,
     Form(menu_item_form): Form<MenuItemDetailsForm>,
 ) -> (StatusCode, Html<String>) {
-    let profile = data_context::manager::profile::get(&app_state.database_pool).await;
-
     let result = data_context::manager::menu_item_details::set(
         &app_state,
-        &profile.id,
+        &claims.sub,
         &MenuItemDetailsModel {
             id: menu_item_form.id,
-            owner_id: profile.id,
+            owner_id: claims.sub,
             category: menu_item_form.category,
             allergies: match menu_item_form.allergies {
                 Some(ags) => Some(sqlx::types::Json(ags)),

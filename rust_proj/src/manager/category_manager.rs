@@ -36,13 +36,12 @@ pub async fn create_category_item(
     State(app_state): State<AppState>,
 ) -> (StatusCode, Html<String>) {
     let database_pool = &app_state.database_pool;
-    let profile = data_context::manager::profile::get(database_pool).await;
     let result = data_context::manager::category::set(
         database_pool,
         &claims.sub,
         &CategoryModel {
             id: uuid::Uuid::new_v4(),
-            lang: profile.primary_language,
+            lang: claims.language,
             owner_id: claims.sub,
             title: Some("new category".to_string()),
             lang_name: None,
