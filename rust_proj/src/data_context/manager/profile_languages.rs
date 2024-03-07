@@ -2,7 +2,7 @@ use crate::{data_context::context::DatabasePool, models::data::ProfileLanguagesM
 
 pub async fn get_all(
     database_pool: &DatabasePool,
-    owner_id: uuid::Uuid,
+    owner_id: &uuid::Uuid,
 ) -> Vec<ProfileLanguagesModel> {
     let result = sqlx::query_as!(
         ProfileLanguagesModel,

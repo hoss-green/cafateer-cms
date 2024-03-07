@@ -2,30 +2,36 @@ use super::components::MenuItemDetailsEditor;
 use crate::{
     data_context::{self, context::AppState},
     models::data::{reference_items::Language, CategoryModel, MenuItemDetailsModel},
+    session::claims::Claims,
 };
 use askama::Template;
 use axum::{
     extract::{Path, State},
     response::Html,
-    Form,
+    Extension, Form,
 };
 use http::StatusCode;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 pub async fn get_menu_item_details(
+    Extension(claims): Extension<Claims>,
     State(app_state): State<AppState>,
     Path(id): Path<uuid::Uuid>,
 ) -> (StatusCode, Html<String>) {
     let database_pool = &app_state.database_pool;
     let profile = data_context::manager::profile::get(database_pool).await;
-    let account_languages = data_context::manager::profile_languages::get_all(database_pool, profile.id).await;
+    let account_languages =
+        data_context::manager::profile_languages::get_all(database_pool, &claims.sub).await;
     let languages = Language::vec_from_int_vec(
         &data_context::references::get_languages(database_pool).await,
-        &account_languages.iter().map(|al| al.language).collect::<Vec<i32>>()
+        &account_languages
+            .iter()
+            .map(|al| al.language)
+            .collect::<Vec<i32>>(),
     );
     let fetched_categories =
-        data_context::manager::categories::get_category_list(database_pool, &profile.id).await;
+        data_context::manager::categories::get_category_list(database_pool, &claims.sub).await;
     let ref_allergies = data_context::references::get_allergies(database_pool).await;
     let mut unique_category_ids: HashMap<uuid::Uuid, bool> = HashMap::new();
     fetched_categories.clone().into_iter().for_each(|cat| {
@@ -45,7 +51,7 @@ pub async fn get_menu_item_details(
                     None => Some(CategoryModel {
                         id: *unique_cat.0,
                         lang: lang.id,
-                        owner_id: profile.id,
+                        owner_id: claims.sub,
                         title: Some(format!("Missing Translation [{}]", lang.name).to_string()),
                         lang_name: Some(lang.name.to_string()),
                     }),
@@ -56,11 +62,15 @@ pub async fn get_menu_item_details(
         categories.append(&mut fc);
     });
 
-    let menu_item_details =
-        data_context::manager::menu_item_details::get_menu_item_detail(&app_state, &profile.id, &id).await;
+    let menu_item_details = data_context::manager::menu_item_details::get_menu_item_detail(
+        &app_state,
+        &claims.sub,
+        &id,
+    )
+    .await;
     let menu_item_editor = MenuItemDetailsEditor {
         id: menu_item_details.id,
-        owner_id: profile.id,
+        owner_id: claims.sub,
         allergies: ref_allergies,
         category: menu_item_details.category.unwrap_or(uuid::Uuid::nil()),
         price: menu_item_details.price.unwrap_or(0.0),

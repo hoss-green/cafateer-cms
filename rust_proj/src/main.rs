@@ -1,5 +1,9 @@
 use axum::{
-    extract::Request, middleware, response::Redirect, routing::{delete, get, post, put}, Router
+    extract::Request,
+    middleware,
+    response::Redirect,
+    routing::{delete, get, post, put},
+    Router,
 };
 use cafeteer::{
     auth_middleware,

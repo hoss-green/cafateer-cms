@@ -1,16 +1,17 @@
 use crate::{
     data_context::{context::AppState, references::get_languages},
     manager::components::PrimaryLanguageList,
-    models::data::{reference_items::Language, ProfileLanguagesModel},
+    models::data::{reference_items::Language, ProfileLanguagesModel}, session::claims::Claims,
 };
 use askama::Template;
 use axum::{
     extract::{Path, State},
-    response::Html,
+    response::Html, Extension,
 };
 use http::StatusCode;
 
 pub async fn post_language(
+    Extension(claims): Extension<Claims>,
     State(app_state): State<AppState>,
     body: String,
 ) -> (StatusCode, Html<String>) {
@@ -36,20 +37,20 @@ pub async fn post_language(
                 database_pool,
                 &ProfileLanguagesModel {
                     id: uuid::Uuid::new_v4(),
-                    owner_id: profile.id,
+                    owner_id: claims.sub,
                     language: lang_setting.0,
                 },
             )
             .await
         }
         false => {
-            crate::data_context::manager::profile_languages::delete(database_pool, profile.id, lang_setting.0)
+            crate::data_context::manager::profile_languages::delete(database_pool, claims.sub, lang_setting.0)
                 .await
         }
     };
 
     let account_languages =
-        crate::data_context::manager::profile_languages::get_all(database_pool, profile.id)
+        crate::data_context::manager::profile_languages::get_all(database_pool, &claims.sub)
             .await
             .iter()
             .map(|al| al.language)
@@ -58,7 +59,7 @@ pub async fn post_language(
         0 => {
             let am = ProfileLanguagesModel {
                     id: uuid::Uuid::new_v4(),
-                    owner_id: profile.id,
+                    owner_id: claims.sub,
                     language: 0,
                 };
             crate::data_context::manager::profile_languages::add(
@@ -84,6 +85,7 @@ pub async fn post_language(
 }
 
 pub async fn post_primary_language(
+    Extension(claims): Extension<Claims>,
     State(app_state): State<AppState>,
     Path(id): Path<i32>,
 ) -> (StatusCode, Html<String>) {
@@ -91,7 +93,7 @@ pub async fn post_primary_language(
     let languages = get_languages(database_pool).await;
     let mut profile = crate::data_context::manager::profile::get(database_pool).await;
     let account_languages =
-        crate::data_context::manager::profile_languages::get_all(database_pool, profile.id)
+        crate::data_context::manager::profile_languages::get_all(database_pool, &claims.sub)
             .await
             .iter()
             .map(|al| al.language)

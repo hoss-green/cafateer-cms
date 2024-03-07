@@ -35,7 +35,7 @@ pub fn account_to_jwt(user_account: &AccountModel) -> String {
     token
 }
 
-pub fn validate_jwt_for_claims(jwt: String) -> Result<Claims, String> {
+pub fn validate_jwt_and_get_claims(jwt: String) -> Result<Claims, String> {
     use chrono::{DateTime, NaiveDateTime, Utc};
     use jsonwebtoken::decode_header;
     let header = match decode_header(jwt.as_str()) {

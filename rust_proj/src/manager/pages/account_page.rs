@@ -1,18 +1,19 @@
-// use super::templates::AccountPage;
 use crate::{
     data_context::context::AppState, manager::templates::AccountPage,
-    models::data::reference_items::Language,
+    models::data::reference_items::Language, session::claims::Claims,
 };
 use askama::Template;
-use axum::{extract::State, response::Html};
+use axum::{extract::State, response::Html, Extension};
 use http::StatusCode;
 
-pub async fn get_account_page(State(app_state): State<AppState>) -> (StatusCode, Html<String>) {
+pub async fn get_account_page(
+    Extension(claims): Extension<Claims>,
+    State(app_state): State<AppState>) -> (StatusCode, Html<String>) {
     let database_pool = &app_state.database_pool;
     let languages = crate::data_context::references::get_languages(database_pool).await;
     let account = crate::data_context::manager::profile::get(database_pool).await;
     let account_languages =
-        crate::data_context::manager::profile_languages::get_all(database_pool, account.id).await;
+        crate::data_context::manager::profile_languages::get_all(database_pool, &claims.sub).await;
     let account_languages = account_languages
         .iter()
         .map(|ac_lang_model| ac_lang_model.language)

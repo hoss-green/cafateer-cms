@@ -11,6 +11,7 @@ pub struct AppState {
     pub database_pool: DatabasePool,
 }
 
+
 pub async fn get_db_pool(conn_string: String) -> Result<DatabasePool, sqlx::Error> {
     let dur: Duration = Duration::new(DB_CONN_TIMEOUT_SEC, 0);
     PgPoolOptions::new()

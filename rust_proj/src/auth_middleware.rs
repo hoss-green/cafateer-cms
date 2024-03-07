@@ -1,4 +1,4 @@
-use crate::session::validate_jwt_for_claims;
+use crate::session::validate_jwt_and_get_claims;
 use askama_axum::{IntoResponse, Response};
 use axum::{extract::Request, middleware::Next, response::Redirect};
 use http::{header::COOKIE, HeaderMap, StatusCode};
@@ -11,7 +11,7 @@ pub async fn check_auth(
     match request.uri().path_and_query() {
         Some(uri) => {
             let path = uri.path();
-            println!("{}", path);
+            // println!("{}", path);
             if !path.starts_with("/manager") {
                 return Ok(next.run(request).await);
             }
@@ -21,8 +21,8 @@ pub async fn check_auth(
     let jwt = get_jwt_from_header(headers);
     match jwt {
         Ok(jwt) => {
-            println!("Middleware hit {}", jwt);
-            match validate_jwt_for_claims(jwt) {
+            // println!("Middleware hit {}", jwt);
+            match validate_jwt_and_get_claims(jwt) {
                 Ok(cms) => {
                     request.extensions_mut().insert(cms);
                     return Ok(next.run(request).await);
@@ -36,7 +36,6 @@ pub async fn check_auth(
     };
 
     Ok(Redirect::to("/session/login").into_response())
-    // Err(StatusCode::UNAUTHORIZED)
 }
 
 fn get_jwt_from_header(headers: HeaderMap) -> Result<String, String> {
