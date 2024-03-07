@@ -19,13 +19,21 @@ use http::{header::SET_COOKIE, HeaderValue, StatusCode};
 use serde::{Deserialize, Serialize};
 
 pub async fn login() -> impl IntoResponse {
-    let login_page: LoginPage = LoginPage { title: "Login", email: None, message: None};
+    let login_page: LoginPage = LoginPage {
+        title: "Login",
+        email: None,
+        message: None,
+    };
     let login_page: String = login_page.render().unwrap().to_string();
     (StatusCode::OK, Html(login_page))
 }
 
 pub async fn sign_up() -> (StatusCode, Html<String>) {
-    let sign_up_page: SignUpPage = SignUpPage { title: "Sign Up" };
+    let sign_up_page: SignUpPage = SignUpPage {
+        title: "Sign Up",
+        email: None,
+        message: None,
+    };
     let sign_up_page: String = sign_up_page.render().unwrap().to_string();
     (StatusCode::OK, Html(sign_up_page))
 }
@@ -78,13 +86,11 @@ pub async fn do_login(
 pub async fn do_signup(
     State(app_state): State<AppState>,
     Form(session_form): Form<SessionForm>,
-) -> (StatusCode, Html<String>) {
-    let sign_up_page: SignUpPage = SignUpPage { title: "Sign Up" };
-
+) -> impl IntoResponse {
     let creation_timestamp = Utc::now();
     let salt = security::generate_salt();
     let hash = security::calculate_hash(&session_form.password, &salt);
-    let success = data::save_sign_up(
+    match data::save_sign_up(
         &app_state,
         &AccountModel {
             id: uuid::Uuid::new_v4(),
@@ -96,9 +102,19 @@ pub async fn do_signup(
             status: 0,
         },
     )
-    .await;
-    let sign_up_page: String = sign_up_page.render().unwrap().to_string();
-    (StatusCode::OK, Html(sign_up_page))
+    .await
+    {
+        true => Redirect::to("/session/sign_up_success").into_response(),
+        false => {
+            let sign_up_page: SignUpPage = SignUpPage {
+                title: "Sign Up",
+                email: Some(session_form.email.as_str()),
+                message: Some("Email Taken"),
+            };
+            let sign_up_page: String = sign_up_page.render().unwrap().to_string();
+            (StatusCode::OK, Html(sign_up_page)).into_response()
+        }
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
