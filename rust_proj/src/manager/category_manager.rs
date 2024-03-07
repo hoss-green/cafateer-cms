@@ -16,9 +16,10 @@ pub async fn get_category_item(
     State(app_state): State<AppState>,
     Path((id, lang)): Path<(uuid::Uuid, i32)>,
 ) -> (StatusCode, Html<String>) {
-    println!("{:#?}", lang);
-    let profile = data_context::manager::profile::get(&app_state.database_pool).await;
-    let category = data_context::manager::category::get(&app_state, (id, lang), &profile.id).await;
+    let database_pool = &app_state.database_pool;
+    let profile = data_context::manager::profile::get(database_pool).await;
+    let category =
+        data_context::manager::category::get(database_pool, (id, lang), &profile.id).await;
     let category_editor = ComponentCategoryEditor {
         id: category.id,
         title: category.title.unwrap_or("".to_string()),
@@ -29,9 +30,10 @@ pub async fn get_category_item(
 }
 
 pub async fn create_category_item(State(app_state): State<AppState>) -> (StatusCode, Html<String>) {
-    let profile = data_context::manager::profile::get(&app_state.database_pool).await;
+    let database_pool = &app_state.database_pool;
+    let profile = data_context::manager::profile::get(database_pool).await;
     let result = data_context::manager::category::set(
-        &app_state,
+        database_pool,
         &profile.id,
         CategoryModel {
             id: uuid::Uuid::new_v4(),
@@ -52,8 +54,9 @@ pub async fn delete_category_item(
     State(app_state): State<AppState>,
     Path(id): Path<uuid::Uuid>,
 ) -> (StatusCode, Html<String>) {
-    let profile = data_context::manager::profile::get(&app_state.database_pool).await;
-    let result = data_context::manager::category::delete(&app_state, &profile.id, &id).await;
+    let database_pool = &app_state.database_pool;
+    let profile = data_context::manager::profile::get(database_pool).await;
+    let result = data_context::manager::category::delete(database_pool, &profile.id, &id).await;
     if result {
         return (StatusCode::OK, Html(String::new()));
     }
@@ -64,9 +67,10 @@ pub async fn update_category_item(
     State(app_state): State<AppState>,
     Form(details_item): Form<CategoryForm>,
 ) -> (StatusCode, Html<String>) {
-    let profile = data_context::manager::profile::get(&app_state.database_pool).await;
+    let database_pool = &app_state.database_pool;
+    let profile = data_context::manager::profile::get(database_pool).await;
     let result = data_context::manager::category::set(
-        &app_state,
+        database_pool,
         &profile.id,
         CategoryModel {
             id: details_item.id,

@@ -1,9 +1,8 @@
-use crate::models::data::{DetailLangModel, DetailsModel};
-use crate::data_context::context::AppState;
+use crate::{data_context::context::DatabasePool, models::data::{DetailLangModel, DetailsModel}};
 
-pub async fn get_detail(app_state: &AppState, account_id: &uuid::Uuid, id: i32) -> DetailLangModel {
+pub async fn get_detail(database_pool: &DatabasePool, account_id: &uuid::Uuid, id: i32) -> DetailLangModel {
     let result = sqlx::query_as!(DetailLangModel, "select details.id, details.lang, details.blurb, ref_languages.code as lang_code, ref_languages.name as lang_name from details join ref_languages on details.lang = ref_languages.id where details.id = $1 AND ref_languages.id = $2", account_id,id)
-        .fetch_optional(&app_state.database_pool)
+        .fetch_optional(database_pool)
         .await;
     match result {
         Ok(r) => match r {
@@ -16,9 +15,9 @@ pub async fn get_detail(app_state: &AppState, account_id: &uuid::Uuid, id: i32) 
         }
     }
 }
-pub async fn get_details_list(app_state: &AppState) -> Vec<DetailLangModel> {
+pub async fn get_details_list(database_pool: &DatabasePool) -> Vec<DetailLangModel> {
     let result = sqlx::query_as!(DetailLangModel, "select details.id, details.lang, details.blurb, ref_languages.code as lang_code, ref_languages.name as lang_name from details join ref_languages on details.lang = ref_languages.id")
-        .fetch_all(&app_state.database_pool)
+        .fetch_all(database_pool)
         .await;
     match result {
         Ok(r) => r,
@@ -29,14 +28,14 @@ pub async fn get_details_list(app_state: &AppState) -> Vec<DetailLangModel> {
     }
 }
 
-pub async fn set_details(app_state: &AppState, account_id:&uuid::Uuid, details_item: DetailsModel) -> bool {
+pub async fn set_details(database_pool: &DatabasePool,account_id:&uuid::Uuid, details_item: DetailsModel) -> bool {
     let result = sqlx::query!(
         "insert into details(id, lang, blurb) VALUES ($1, $2, $3) ON CONFLICT (id, lang) DO UPDATE SET blurb=$3 WHERE details.id=$1 and details.lang=$2",
         &account_id,
         details_item.lang,
         details_item.blurb,
     )
-    .execute(&app_state.database_pool)
+    .execute(database_pool)
     .await;
 
     match result {

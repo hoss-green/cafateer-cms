@@ -1,13 +1,14 @@
-use crate::{data_context::context::AppState, models::data::MenuItemModel};
+use crate::{
+    data_context::context::DatabasePool, models::data::MenuItemModel};
 
-pub async fn get_items_for_account(app_state: &AppState, owner_id: &uuid::Uuid) -> Vec<MenuItemModel> {
+pub async fn get_items_for_account(database_pool: &DatabasePool, owner_id: &uuid::Uuid) -> Vec<MenuItemModel> {
     let result = sqlx::query_as!(
         MenuItemModel,
         "select id, lang, title, description, owner_id from menu_items where owner_id=$1",
         owner_id
     )
 
-    .fetch_all(&app_state.database_pool)
+    .fetch_all(database_pool)
     .await;
 
     match result {
@@ -19,13 +20,13 @@ pub async fn get_items_for_account(app_state: &AppState, owner_id: &uuid::Uuid) 
     }
 }
 
-pub async fn get_items_by_lang(app_state: &AppState, lang: i32) -> Vec<MenuItemModel> {
+pub async fn get_items_by_lang(database_pool: &DatabasePool, lang: i32) -> Vec<MenuItemModel> {
     let result = sqlx::query_as!(
         MenuItemModel,
         "select id, lang, title, description, owner_id from menu_items where lang=$1",
         lang
     )
-    .fetch_all(&app_state.database_pool)
+    .fetch_all(database_pool)
     .await;
 
     match result {
@@ -37,7 +38,7 @@ pub async fn get_items_by_lang(app_state: &AppState, lang: i32) -> Vec<MenuItemM
     }
 }
 
-pub async fn get_item_by_lang(app_state: &AppState, id:uuid::Uuid, lang: i32, owner_id:uuid::Uuid) -> MenuItemModel {
+pub async fn get_item_by_lang(database_pool: &DatabasePool, id:uuid::Uuid, lang: i32, owner_id:uuid::Uuid) -> MenuItemModel {
     // let account = crate::data_context::manager::profile::get(app_state).await;
     let result = sqlx::query_as!(
         MenuItemModel,
@@ -46,7 +47,7 @@ pub async fn get_item_by_lang(app_state: &AppState, id:uuid::Uuid, lang: i32, ow
         lang,
         owner_id
     )
-    .fetch_optional(&app_state.database_pool)
+    .fetch_optional(database_pool)
     .await;
 
     match result {
@@ -64,34 +65,3 @@ pub async fn get_item_by_lang(app_state: &AppState, id:uuid::Uuid, lang: i32, ow
         }
     }
 }
-
-// pub async fn set_item(
-//     app_state: &AppState,
-//     account_id: &uuid::Uuid,
-//     details_item: MenuItemModel,
-// ) -> bool {
-//     let result = sqlx::query!(
-//         "insert into menu_items(id, lang, owner_id, title, description) VALUES ($1, $2, $3, $4, $5) ON CONFLICT (id, lang) DO UPDATE SET title=$4, description=$5 WHERE menu_items.id=$1 and menu_items.lang=$2",
-//         details_item.id,
-//         details_item.lang,
-//         &account_id,
-//         details_item.title,
-//         details_item.description,
-//     )
-//     .execute(&app_state.database_pool)
-//     .await;
-//
-//     match result {
-//         Ok(_r) => {
-//             println!("Saved item succesfully");
-//             true
-//         }
-//         Err(err) => {
-//             println!("Cannot save item, fail, error: {}", err);
-//             false
-//         }
-//     }
-// }
-//
-//
-//

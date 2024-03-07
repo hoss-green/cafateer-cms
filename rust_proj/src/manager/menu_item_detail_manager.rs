@@ -17,15 +17,16 @@ pub async fn get_menu_item_details(
     State(app_state): State<AppState>,
     Path(id): Path<uuid::Uuid>,
 ) -> (StatusCode, Html<String>) {
-    let profile = data_context::manager::profile::get(&app_state.database_pool).await;
-    let account_languages = data_context::manager::profile_languages::get_all(&app_state, profile.id).await;
+    let database_pool = &app_state.database_pool;
+    let profile = data_context::manager::profile::get(database_pool).await;
+    let account_languages = data_context::manager::profile_languages::get_all(database_pool, profile.id).await;
     let languages = Language::vec_from_int_vec(
-        &data_context::references::get_languages(&app_state).await,
+        &data_context::references::get_languages(database_pool).await,
         &account_languages.iter().map(|al| al.language).collect::<Vec<i32>>()
     );
     let fetched_categories =
-        data_context::manager::categories::get_category_list(&app_state, &profile.id).await;
-    let ref_allergies = data_context::references::get_allergies(&app_state).await;
+        data_context::manager::categories::get_category_list(database_pool, &profile.id).await;
+    let ref_allergies = data_context::references::get_allergies(database_pool).await;
     let mut unique_category_ids: HashMap<uuid::Uuid, bool> = HashMap::new();
     fetched_categories.clone().into_iter().for_each(|cat| {
         unique_category_ids.insert(cat.id, true);

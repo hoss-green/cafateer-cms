@@ -10,19 +10,20 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 pub async fn get_categories_page(State(app_state): State<AppState>) -> (StatusCode, Html<String>) {
-    let profile = data_context::manager::profile::get(&app_state.database_pool).await;
+    let database_pool = &app_state.database_pool;
+    let profile = data_context::manager::profile::get(database_pool).await;
     let account_languages =
-        crate::data_context::manager::profile_languages::get_all(&app_state, profile.id).await;
+        crate::data_context::manager::profile_languages::get_all(database_pool, profile.id).await;
     let languages = account_languages
         .iter()
         .map(|ac_lang_model| ac_lang_model.language)
         .collect::<Vec<i32>>();
     let languages = Language::vec_from_int_vec(
-        &data_context::references::get_languages(&app_state).await,
+        &data_context::references::get_languages(database_pool).await,
         &languages,
     );
     let mut fetched_categories =
-        data_context::manager::categories::get_category_list(&app_state, &profile.id).await;
+        data_context::manager::categories::get_category_list(database_pool, &profile.id).await;
     fetched_categories
         .sort_by(|a, b| (format!("{}{}", a.id, a.lang)).cmp(&format!("{}{}", b.id, b.lang)));
 
@@ -31,7 +32,6 @@ pub async fn get_categories_page(State(app_state): State<AppState>) -> (StatusCo
         unique_category_ids.insert(cat.id, true);
     });
 
-    // println!("{:#?}", fetched_categories);
     let category_item_buttons: Vec<CategoryButton> = unique_category_ids
         .iter()
         .map(|unique_cat| {

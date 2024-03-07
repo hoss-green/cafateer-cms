@@ -16,10 +16,10 @@ pub async fn get_menu_item(
     State(app_state): State<AppState>,
     Path((id, lang)): Path<(uuid::Uuid, i32)>,
 ) -> (StatusCode, Html<String>) {
-    println!("{:#?}", (id, lang));
-    let profile = data_context::manager::profile::get(&app_state.database_pool).await;
+    let database_pool = &app_state.database_pool;
+    let profile = data_context::manager::profile::get(database_pool).await;
     let menu_item =
-        data_context::manager::menu_items::get_item_by_lang(&app_state, id, lang, profile.id).await;
+        data_context::manager::menu_items::get_item_by_lang(database_pool, id, lang, profile.id).await;
     let menu_item_editor = MenuItemEditor {
         id: menu_item.id,
         title: menu_item.title,
@@ -34,10 +34,10 @@ pub async fn update_menu_item(
     State(app_state): State<AppState>,
     Form(menu_item_form): Form<MenuItemForm>,
 ) -> (StatusCode, Html<String>) {
-    println!("{:#?}", menu_item_form.clone());
-    let profile = data_context::manager::profile::get(&app_state.database_pool).await;
+    let database_pool = &app_state.database_pool;
+    let profile = data_context::manager::profile::get(database_pool).await;
     let result = data_context::manager::menu_item::set(
-        &app_state,
+        database_pool,
         &profile.id,
         MenuItemModel {
             id: menu_item_form.id,
@@ -56,9 +56,10 @@ pub async fn update_menu_item(
 
 
 pub async fn create_menu_item(State(app_state): State<AppState>) -> (StatusCode, Html<String>) {
-    let profile = data_context::manager::profile::get(&app_state.database_pool).await;
+    let database_pool = &app_state.database_pool;
+    let profile = data_context::manager::profile::get(database_pool).await;
     let result = data_context::manager::menu_item::set(
-        &app_state,
+        database_pool,
         &profile.id,
         MenuItemModel {
             id: uuid::Uuid::new_v4(),
@@ -79,8 +80,9 @@ pub async fn delete_menu_item(
     State(app_state): State<AppState>,
     Path(id): Path<uuid::Uuid>,
 ) -> (StatusCode, Html<String>) {
-    let profile = data_context::manager::profile::get(&app_state.database_pool).await;
-    let result = data_context::manager::menu_item::delete(&app_state, &profile.id, &id).await;
+    let database_pool = &app_state.database_pool;
+    let profile = data_context::manager::profile::get(database_pool).await;
+    let result = data_context::manager::menu_item::delete(database_pool, &profile.id, &id).await;
     if result {
         return (StatusCode::OK, Html(String::new()));
     }

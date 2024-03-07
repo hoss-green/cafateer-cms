@@ -9,16 +9,23 @@ use http::StatusCode;
 use std::collections::HashMap;
 
 pub async fn get_menu_page(State(app_state): State<AppState>) -> (StatusCode, Html<String>) {
-    let profile = data_context::manager::profile::get(&app_state.database_pool).await;
+    let database_pool = &app_state.database_pool;
+    let profile = data_context::manager::profile::get(database_pool).await;
     let menu_item_details: Vec<MenuItemDetailsModel> =
-        data_context::manager::menu_item_details::get_menu_item_details(&app_state, &profile.id).await;
-    let account_languages = crate::data_context::manager::profile_languages::get_all(&app_state, profile.id).await;
-    let languages = account_languages.iter().map(|ac_lang_model| ac_lang_model.language).collect::<Vec<i32>>();
+        data_context::manager::menu_item_details::get_menu_item_details(&app_state, &profile.id)
+            .await;
+    let account_languages =
+        crate::data_context::manager::profile_languages::get_all(database_pool, profile.id).await;
+    let languages = account_languages
+        .iter()
+        .map(|ac_lang_model| ac_lang_model.language)
+        .collect::<Vec<i32>>();
     let languages = Language::vec_from_int_vec(
-        &data_context::references::get_languages(&app_state).await,
+        &data_context::references::get_languages(database_pool).await,
         &languages,
     );
-    let mut menu_items = data_context::manager::menu_items::get_items_for_account(&app_state,&profile.id).await;
+    let mut menu_items =
+        data_context::manager::menu_items::get_items_for_account(database_pool, &profile.id).await;
     let mut unique_menu_ids: HashMap<uuid::Uuid, bool> = HashMap::new();
     menu_items.sort_by(|a, b| (format!("{}{}", a.id, a.lang)).cmp(&format!("{}{}", b.id, b.lang)));
     menu_items.clone().into_iter().for_each(|mi| {

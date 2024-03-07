@@ -1,11 +1,11 @@
-use crate::{data_context::context::AppState, models::data::reference_items::Allergy};
+use crate::{data_context::context::DatabasePool, models::data::reference_items::Allergy};
 
-pub async fn get_allergies(state: &AppState) -> Vec<Allergy> {
+pub async fn get_allergies(database_pool: &DatabasePool) -> Vec<Allergy> {
     let result = sqlx::query_as!(
         Allergy,
         "select id, lang, title, colour, icon from ref_allergens",
     )
-    .fetch_all(&state.database_pool)
+    .fetch_all(database_pool)
     .await;
     match result {
         Ok(res) => res,

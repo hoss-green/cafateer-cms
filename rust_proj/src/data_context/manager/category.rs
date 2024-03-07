@@ -1,8 +1,7 @@
-use crate::data_context::context::AppState;
-use crate::models::data::CategoryModel;
+use crate::{data_context::context::DatabasePool, models::data::CategoryModel};
 
 pub async fn get(
-    app_state: &AppState,
+    database_pool: &DatabasePool,
     (id, lang): (uuid::Uuid, i32),
     owner_id: &uuid::Uuid,
 ) -> CategoryModel {
@@ -13,7 +12,7 @@ pub async fn get(
         lang,
         owner_id
     )
-    .fetch_optional(&app_state.database_pool)
+    .fetch_optional(database_pool)
     .await;
     match result {
         Ok(r) => match r {
@@ -28,7 +27,7 @@ pub async fn get(
 }
 
 pub async fn set(
-    app_state: &AppState,
+    database_pool: &DatabasePool,
     account_id: &uuid::Uuid,
     details_item: CategoryModel,
 ) -> bool {
@@ -39,7 +38,7 @@ pub async fn set(
         details_item.lang,
         details_item.title,
     )
-    .execute(&app_state.database_pool)
+    .execute(database_pool)
     .await;
 
     match result {
@@ -55,7 +54,7 @@ pub async fn set(
 }
 
 pub async fn delete(
-    app_state: &AppState,
+    database_pool: &DatabasePool,
     account_id: &uuid::Uuid,
     category_id: &uuid::Uuid,
 ) -> bool {
@@ -64,7 +63,7 @@ pub async fn delete(
         &account_id,
         &category_id,
     )
-    .execute(&app_state.database_pool)
+    .execute(database_pool)
     .await;
 
     match result {

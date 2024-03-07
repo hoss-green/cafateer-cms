@@ -14,8 +14,8 @@ pub async fn post_language(
     State(app_state): State<AppState>,
     body: String,
 ) -> (StatusCode, Html<String>) {
-    println!("{:#?}", body);
-    let mut profile = crate::data_context::manager::profile::get(&app_state.database_pool).await;
+    let database_pool = &app_state.database_pool;
+    let mut profile = crate::data_context::manager::profile::get(database_pool).await;
     let lang_setting = match body.contains("&") {
         true => match body.split("&").last() {
             Some(body) => match body.split("=").last() {
@@ -33,7 +33,7 @@ pub async fn post_language(
     match lang_setting.1 {
         true => {
             crate::data_context::manager::profile_languages::add(
-                &app_state,
+                database_pool,
                 &ProfileLanguagesModel {
                     id: uuid::Uuid::new_v4(),
                     owner_id: profile.id,
@@ -43,13 +43,13 @@ pub async fn post_language(
             .await
         }
         false => {
-            crate::data_context::manager::profile_languages::delete(&app_state, profile.id, lang_setting.0)
+            crate::data_context::manager::profile_languages::delete(database_pool, profile.id, lang_setting.0)
                 .await
         }
     };
 
     let account_languages =
-        crate::data_context::manager::profile_languages::get_all(&app_state, profile.id)
+        crate::data_context::manager::profile_languages::get_all(database_pool, profile.id)
             .await
             .iter()
             .map(|al| al.language)
@@ -62,7 +62,7 @@ pub async fn post_language(
                     language: 0,
                 };
             crate::data_context::manager::profile_languages::add(
-                &app_state,
+                database_pool,
                 &am
             )
             .await;
@@ -74,7 +74,7 @@ pub async fn post_language(
         profile.primary_language = *account_languages.iter().last().unwrap_or(&0);
         crate::data_context::manager::profile::set(&app_state.database_pool, &profile).await;
     }
-    let languages = get_languages(&app_state).await;
+    let languages = get_languages(database_pool).await;
     let primary_dropdown = PrimaryLanguageList {
         primary_language_id: profile.primary_language,
         user_selected_languages: Language::vec_from_int_vec(&languages, &account_languages),
@@ -87,10 +87,11 @@ pub async fn post_primary_language(
     State(app_state): State<AppState>,
     Path(id): Path<i32>,
 ) -> (StatusCode, Html<String>) {
-    let languages = get_languages(&app_state).await;
-    let mut profile = crate::data_context::manager::profile::get(&app_state.database_pool).await;
+    let database_pool = &app_state.database_pool;
+    let languages = get_languages(database_pool).await;
+    let mut profile = crate::data_context::manager::profile::get(database_pool).await;
     let account_languages =
-        crate::data_context::manager::profile_languages::get_all(&app_state, profile.id)
+        crate::data_context::manager::profile_languages::get_all(database_pool, profile.id)
             .await
             .iter()
             .map(|al| al.language)

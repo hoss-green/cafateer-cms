@@ -1,7 +1,7 @@
-use crate::{data_context::context::AppState, models::data::MenuItemModel};
+use crate::{data_context::context::DatabasePool, models::data::MenuItemModel};
 
 pub async fn get(
-    app_state: &AppState,
+    database_pool: &DatabasePool,
     id: uuid::Uuid,
     lang: i32,
     owner_id: uuid::Uuid,
@@ -13,7 +13,7 @@ pub async fn get(
         lang,
         owner_id
     )
-    .fetch_optional(&app_state.database_pool)
+    .fetch_optional(database_pool)
     .await;
 
     match result {
@@ -32,7 +32,7 @@ pub async fn get(
 }
 
 pub async fn set(
-    app_state: &AppState,
+    database_pool: &DatabasePool,
     account_id: &uuid::Uuid,
     details_item: MenuItemModel,
 ) -> bool {
@@ -46,7 +46,7 @@ pub async fn set(
         details_item.title,
         details_item.description,
     )
-    .execute(&app_state.database_pool)
+    .execute(database_pool)
     .await;
     match result {
         Ok(_r) => {
@@ -60,13 +60,13 @@ pub async fn set(
     }
 }
 
-pub async fn delete(app_state: &AppState, owner_id: &uuid::Uuid, id: &uuid::Uuid) -> bool {
+pub async fn delete(database_pool: &DatabasePool, owner_id: &uuid::Uuid, id: &uuid::Uuid) -> bool {
     let result = sqlx::query!(
         "delete from menu_items where id=$1 and owner_id=$2",
         &id,
         &owner_id,
     )
-    .execute(&app_state.database_pool)
+    .execute(database_pool)
     .await;
 
     match result {
