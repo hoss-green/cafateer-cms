@@ -1,7 +1,7 @@
 use crate::{
     data_context::{context::AppState, references::get_languages},
     manager::components::PrimaryLanguageList,
-    models::data::{reference_items::Language, ProfileLanguagesModel}, session::claims::Claims,
+    models::data::{reference_items::Language, ClaimsModel, ProfileLanguagesModel}, session::claims::Claims,
 };
 use askama::Template;
 use axum::{
@@ -11,7 +11,7 @@ use axum::{
 use http::StatusCode;
 
 pub async fn post_language(
-    Extension(claims): Extension<Claims>,
+    Extension(claims): Extension<Claims<ClaimsModel>>,
     State(app_state): State<AppState>,
     body: String,
 ) -> (StatusCode, Html<String>) {
@@ -85,7 +85,7 @@ pub async fn post_language(
 }
 
 pub async fn post_primary_language(
-    Extension(claims): Extension<Claims>,
+    Extension(claims): Extension<Claims<ClaimsModel>>,
     State(app_state): State<AppState>,
     Path(id): Path<i32>,
 ) -> (StatusCode, Html<String>) {

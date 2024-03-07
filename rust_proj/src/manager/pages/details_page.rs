@@ -1,7 +1,7 @@
 use crate::{
     data_context::{self, context::AppState},
     manager::templates::DetailsPage,
-    models::data::reference_items::Language, session::claims::Claims,
+    models::data::{reference_items::Language, ClaimsModel}, session::claims::Claims,
 };
 use askama::Template;
 use axum::{extract::State, response::Html, Extension};
@@ -9,7 +9,7 @@ use http::StatusCode;
 use serde::{Deserialize, Serialize};
 
 pub async fn get_details_home(
-    Extension(claims): Extension<Claims>,
+    Extension(claims): Extension<Claims<ClaimsModel>>,
     State(app_state): State<AppState>) -> (StatusCode, Html<String>) {
     let database_pool = &app_state.database_pool;
     let all_langs = data_context::references::get_languages(database_pool).await;

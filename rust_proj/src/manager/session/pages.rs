@@ -1,9 +1,9 @@
 use crate::{
     data_context::{context::AppState, manager::profile},
-    models::data::ProfileModel,
+    models::data::{ClaimsModel, ProfileModel},
     session::{
         models::AccountModel,
-        security,
+        security, 
         tokens::account_to_jwt,
     },
 };
@@ -132,6 +132,7 @@ pub struct SessionForm {
 }
 
 async fn get_cookie<'a>(account: &AccountModel, profile: &ProfileModel) -> String {
-    let cookie_string = account_to_jwt(&account, &profile);
+    let claims_model:ClaimsModel = ClaimsModel { lang: profile.primary_language };
+    let cookie_string = account_to_jwt::<ClaimsModel>(&account, &claims_model);
     format!("token={}; same-site=Lax; path=/;", cookie_string)
 }

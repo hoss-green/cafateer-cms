@@ -1,10 +1,11 @@
-use crate::{models::data::ProfileModel, session::claims::Claims};
+use crate::session::claims::Claims;
 use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
+use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use super::models::AccountModel;
 
 const EXPIRY_SECONDS: i64 = 60 * 60; //60 * 60 -> 1 hour
 
-pub fn account_to_jwt(user_account: &AccountModel, profile_model: &ProfileModel) -> String {
+pub fn account_to_jwt<T: Serialize>(user_account: &AccountModel, claims_model: &T) -> String {
     use chrono::{Duration, Utc};
 
     let now = Utc::now();
@@ -13,7 +14,7 @@ pub fn account_to_jwt(user_account: &AccountModel, profile_model: &ProfileModel)
         sub: user_account.id,
         email: user_account.email_normalised.clone(),
         roles: vec![],
-        language: profile_model.primary_language,
+        body: claims_model,// ClaimsModel { lang: profile_model.primary_language },
         // roles: user_account.roles,
         // sub_expiry: user_account.subscription_expiry,
         // sub_status: user_account.subscription_status.unwrap_or(String::new()),
@@ -36,7 +37,7 @@ pub fn account_to_jwt(user_account: &AccountModel, profile_model: &ProfileModel)
     token
 }
 
-pub fn validate_jwt_and_get_claims(jwt: String) -> Result<Claims, String> {
+pub fn validate_jwt_and_get_claims<T: DeserializeOwned>(jwt: String) -> Result<Claims<T>, String> {
     use chrono::{DateTime, NaiveDateTime, Utc};
     use jsonwebtoken::decode_header;
     let header = match decode_header(jwt.as_str()) {
@@ -44,7 +45,7 @@ pub fn validate_jwt_and_get_claims(jwt: String) -> Result<Claims, String> {
         Err(err) => return Err(format!("Could not get claims from token {}", err)),
     };
 
-    let token_data = match decode::<Claims>(
+    let token_data = match decode::<Claims<T>>(
         &jwt,
         &DecodingKey::from_secret(get_secret().as_ref()),
         &Validation::new(header.alg),

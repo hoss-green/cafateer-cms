@@ -1,7 +1,7 @@
 use super::components::MenuItemDetailsEditor;
 use crate::{
     data_context::{self, context::AppState},
-    models::data::{reference_items::Language, CategoryModel, MenuItemDetailsModel},
+    models::data::{reference_items::Language, CategoryModel, ClaimsModel, MenuItemDetailsModel},
     session::claims::Claims,
 };
 use askama::Template;
@@ -15,7 +15,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 pub async fn get_menu_item_details(
-    Extension(claims): Extension<Claims>,
+    Extension(claims): Extension<Claims<ClaimsModel>>,
     State(app_state): State<AppState>,
     Path(id): Path<uuid::Uuid>,
 ) -> (StatusCode, Html<String>) {
@@ -56,7 +56,7 @@ pub async fn get_menu_item_details(
                     }),
                 }
             })
-            .filter(|cm| cm.lang == claims.language) // account.languages.main_language)
+            .filter(|cm| cm.lang == claims.body.lang) // account.languages.main_language)
             .collect::<Vec<CategoryModel>>();
         categories.append(&mut fc);
     });
@@ -80,7 +80,7 @@ pub async fn get_menu_item_details(
 }
 
 pub async fn update_menu_item_details(
-    Extension(claims): Extension<Claims>,
+    Extension(claims): Extension<Claims<ClaimsModel>>,
     State(app_state): State<AppState>,
     Form(menu_item_form): Form<MenuItemDetailsForm>,
 ) -> (StatusCode, Html<String>) {

@@ -1,6 +1,6 @@
 use super::templates::DetailsPage;
 use crate::{
-    data_context::{self, context::AppState}, manager::components::ComponentDetailEditor, models::data::{reference_items::Language, DetailsModel}, session::claims::Claims
+    data_context::{self, context::AppState}, manager::components::ComponentDetailEditor, models::data::{reference_items::Language, ClaimsModel, DetailsModel}, session::claims::Claims
 };
 use askama::Template;
 use axum::{
@@ -10,7 +10,7 @@ use http::StatusCode;
 use serde::{Deserialize, Serialize};
 
 pub async fn get_details_data(
-    Extension(claims): Extension<Claims>,
+    Extension(claims): Extension<Claims<ClaimsModel>>,
     State(app_state): State<AppState>,
     Path(id): Path<i32>,
 ) -> (StatusCode, Html<String>) {
@@ -46,7 +46,7 @@ pub async fn get_details_data(
 }
 
 pub async fn get_details_home(
-    Extension(claims): Extension<Claims>,
+    Extension(claims): Extension<Claims<ClaimsModel>>,
     State(app_state): State<AppState>) -> (StatusCode, Html<String>) {
     let database_pool = &app_state.database_pool;
     let account_languages = data_context::manager::profile_languages::get_all(database_pool, &claims.sub).await;
@@ -63,7 +63,7 @@ pub async fn get_details_home(
 }
 
 pub async fn post_details_home(
-    Extension(claims): Extension<Claims>,
+    Extension(claims): Extension<Claims<ClaimsModel>>,
     State(app_state): State<AppState>,
     Form(details_item): Form<DetailsModel>,
 ) -> (StatusCode, Html<String>) {

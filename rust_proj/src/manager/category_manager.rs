@@ -1,7 +1,7 @@
 use super::components::ComponentCategoryEditor;
 use crate::{
     data_context::{self, context::AppState},
-    models::data::CategoryModel,
+    models::data::{CategoryModel, ClaimsModel},
     session::claims::Claims,
 };
 use askama::Template;
@@ -15,7 +15,7 @@ use http::StatusCode;
 use serde::{Deserialize, Serialize};
 
 pub async fn get_category_item(
-    Extension(claims): Extension<Claims>,
+    Extension(claims): Extension<Claims<ClaimsModel>>,
     State(app_state): State<AppState>,
     Path((id, lang)): Path<(uuid::Uuid, i32)>,
 ) -> (StatusCode, Html<String>) {
@@ -32,7 +32,7 @@ pub async fn get_category_item(
 }
 
 pub async fn create_category_item(
-    Extension(claims): Extension<Claims>,
+    Extension(claims): Extension<Claims<ClaimsModel>>,
     State(app_state): State<AppState>,
 ) -> (StatusCode, Html<String>) {
     let database_pool = &app_state.database_pool;
@@ -41,7 +41,7 @@ pub async fn create_category_item(
         &claims.sub,
         &CategoryModel {
             id: uuid::Uuid::new_v4(),
-            lang: claims.language,
+            lang:claims.body.lang,
             owner_id: claims.sub,
             title: Some("new category".to_string()),
             lang_name: None,
@@ -55,7 +55,7 @@ pub async fn create_category_item(
 }
 
 pub async fn delete_category_item(
-    Extension(claims): Extension<Claims>,
+    Extension(claims): Extension<Claims<ClaimsModel>>,
     State(app_state): State<AppState>,
     Path(id): Path<uuid::Uuid>,
 ) -> impl IntoResponse {
@@ -67,7 +67,7 @@ pub async fn delete_category_item(
 }
 
 pub async fn update_category_item(
-    Extension(claims): Extension<Claims>,
+    Extension(claims): Extension<Claims<ClaimsModel>>,
     State(app_state): State<AppState>,
     Form(details_item): Form<CategoryForm>,
 ) -> (StatusCode, Html<String>) {

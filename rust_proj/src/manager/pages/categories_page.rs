@@ -1,7 +1,7 @@
 use crate::{
     data_context::{self, context::AppState},
     manager::{macro_templates::CategoryButton, templates::CategoriesPage},
-    models::data::reference_items::Language, session::claims::Claims,
+    models::data::{reference_items::Language, ClaimsModel}, session::claims::Claims,
 };
 use askama::Template;
 use axum::{extract::State, response::Html, Extension};
@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 pub async fn get_categories_page(
-    Extension(claims): Extension<Claims>,
+    Extension(claims): Extension<Claims<ClaimsModel>>,
     State(app_state): State<AppState>) -> (StatusCode, Html<String>) {
     let database_pool = &app_state.database_pool;
     let account_languages =
@@ -38,7 +38,7 @@ pub async fn get_categories_page(
         .map(|unique_cat| {
             let button_title = match fetched_categories
                 .iter()
-                .find(|cat| cat.id == *unique_cat.0 && cat.lang == claims.language)
+                .find(|cat| cat.id == *unique_cat.0 && cat.lang == claims.body.lang)
             {
                 Some(cat) => cat.clone().title.unwrap_or("No title".to_string()),
                 None => "No title".to_string(),

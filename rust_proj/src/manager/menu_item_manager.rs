@@ -1,7 +1,7 @@
 use super:: components::MenuItemEditor ;
 use crate::{
     data_context::{self, context::AppState},
-    models::data::MenuItemModel, session::claims::Claims,
+    models::data::{ClaimsModel, MenuItemModel}, session::claims::Claims,
 };
 use askama::Template;
 use axum::{
@@ -11,7 +11,7 @@ use http::StatusCode;
 use serde::{Deserialize, Serialize};
 
 pub async fn get_menu_item(
-    Extension(claims): Extension<Claims>,
+    Extension(claims): Extension<Claims<ClaimsModel>>,
     State(app_state): State<AppState>,
     Path((id, lang)): Path<(uuid::Uuid, i32)>,
 ) -> (StatusCode, Html<String>) {
@@ -29,7 +29,7 @@ pub async fn get_menu_item(
 }
 
 pub async fn update_menu_item(
-    Extension(claims):Extension<Claims>,
+    Extension(claims):Extension<Claims<ClaimsModel>>,
     State(app_state): State<AppState>,
     Form(menu_item_form): Form<MenuItemForm>,
 ) -> (StatusCode, Html<String>) {
@@ -54,7 +54,7 @@ pub async fn update_menu_item(
 
 
 pub async fn create_menu_item(
-    Extension(claims): Extension<Claims>,
+    Extension(claims): Extension<Claims<ClaimsModel>>,
     State(app_state): State<AppState>) -> (StatusCode, Html<String>) {
     let database_pool = &app_state.database_pool;
     let result = data_context::manager::menu_item::set(
@@ -62,7 +62,7 @@ pub async fn create_menu_item(
         &claims.sub,
         MenuItemModel {
             id: uuid::Uuid::new_v4(),
-            lang: claims.language,
+            lang: claims.body.lang,
             owner_id: claims.sub,
             title: "new menu_item".to_string(),
             description: None,
@@ -76,7 +76,7 @@ pub async fn create_menu_item(
 }
 
 pub async fn delete_menu_item(
-    Extension(claims): Extension<Claims>,
+    Extension(claims): Extension<Claims<ClaimsModel>>,
     State(app_state): State<AppState>,
     Path(id): Path<uuid::Uuid>,
 ) -> (StatusCode, Html<String>) {

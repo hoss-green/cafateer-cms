@@ -1,7 +1,7 @@
 use crate::{
     data_context::{self, context::AppState},
     manager::{macro_templates::MenuItemButton, templates::MenuPage},
-    models::data::{reference_items::Language, MenuItemDetailsModel}, session::claims::Claims,
+    models::data::{reference_items::Language, ClaimsModel, MenuItemDetailsModel}, session::claims::Claims,
 };
 use askama::Template;
 use axum::{extract::State, response::Html, Extension};
@@ -9,7 +9,7 @@ use http::StatusCode;
 use std::collections::HashMap;
 
 pub async fn get_menu_page(
-    Extension(claims):Extension<Claims>,
+    Extension(claims):Extension<Claims<ClaimsModel>>,
     State(app_state): State<AppState>) -> (StatusCode, Html<String>) {
     let database_pool = &app_state.database_pool;
     let menu_item_details: Vec<MenuItemDetailsModel> =
@@ -38,7 +38,7 @@ pub async fn get_menu_page(
         .map(|unique_mi| {
             let button_title = match menu_items
                 .iter()
-                .find(|mi| mi.id == *unique_mi.0 && mi.lang == claims.language)
+                .find(|mi| mi.id == *unique_mi.0 && mi.lang == claims.body.lang)
             {
                 Some(cat) => cat.clone().title,
                 None => "No title".to_string(),

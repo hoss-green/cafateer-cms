@@ -1,4 +1,4 @@
-use crate::session::validate_jwt_and_get_claims;
+use crate::{models::data::ClaimsModel, session::validate_jwt_and_get_claims};
 use askama_axum::{IntoResponse, Response};
 use axum::{extract::Request, middleware::Next, response::Redirect};
 use http::{header::COOKIE, HeaderMap, StatusCode};
@@ -22,9 +22,9 @@ pub async fn check_auth(
     match jwt {
         Ok(jwt) => {
             // println!("Middleware hit {}", jwt);
-            match validate_jwt_and_get_claims(jwt) {
+            match validate_jwt_and_get_claims::<ClaimsModel>(jwt) {
                 Ok(cms) => {
-                    request.extensions_mut().insert(cms);
+                    request.extensions_mut().insert(cms.clone());
                     return Ok(next.run(request).await);
                 }
                 Err(err) => println!("Could not validate jwt, err: {}", err),
