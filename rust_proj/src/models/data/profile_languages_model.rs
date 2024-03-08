@@ -5,7 +5,7 @@ pub struct ProfileLanguagesModel {
     pub id: uuid::Uuid,
     pub owner_id: uuid::Uuid,
     pub language: i32,
-    // pub is_primary: bool,
+    pub published: bool,
 }
 
 impl ProfileLanguagesModel {
@@ -14,7 +14,7 @@ impl ProfileLanguagesModel {
             id: uuid::Uuid::new_v4(),
             owner_id,
             language: 0,
-            // is_primary: false 
+            published: false 
         }
     }
 }

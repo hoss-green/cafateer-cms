@@ -1,4 +1,4 @@
-use super::components::MenuItemDetailsEditor;
+use crate::manager::templates::components::MenuItemDetailsEditor;
 use crate::{
     data_context::{self, context::AppState},
     models::data::{reference_items::Language, CategoryModel, ClaimsModel, MenuItemDetailsModel},
@@ -60,12 +60,8 @@ pub async fn get_menu_item_details(
         categories.append(&mut fc);
     });
 
-    let menu_item_details = data_context::manager::menu_item_detail::get(
-        &app_state,
-        &claims.sub,
-        &id,
-    )
-    .await;
+    let menu_item_details =
+        data_context::manager::menu_item_detail::get(&app_state, &claims.sub, &id).await;
     let menu_item_editor = MenuItemDetailsEditor {
         id: menu_item_details.id,
         owner_id: claims.sub,

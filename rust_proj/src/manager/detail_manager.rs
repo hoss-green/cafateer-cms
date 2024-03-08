@@ -1,6 +1,5 @@
-use super::templates::DetailsPage;
 use crate::{
-    data_context::{self, context::AppState}, manager::components::ComponentDetailEditor, models::data::{reference_items::Language, ClaimsModel, DetailsModel}, session::claims::Claims
+    data_context::{self, context::AppState}, manager::templates::components::ComponentDetailEditor, models::data::{reference_items::Language, ClaimsModel, DetailsModel}, session::claims::Claims
 };
 use askama::Template;
 use axum::{
@@ -8,6 +7,8 @@ use axum::{
 };
 use http::StatusCode;
 use serde::{Deserialize, Serialize};
+
+use super::templates::pages::DetailsPageVm;
 
 pub async fn get_details_data(
     Extension(claims): Extension<Claims<ClaimsModel>>,
@@ -55,7 +56,7 @@ pub async fn get_details_home(
     let language_list = Language::vec_from_int_vec(&all_langs, &account_languages);
         // .iter().map(|ml| ml.language).collect::<Vec<i32>>());
 
-    let editor_home = DetailsPage {
+    let editor_home = DetailsPageVm {
         title: "Editor Home for SC",
         languages: language_list,
     };

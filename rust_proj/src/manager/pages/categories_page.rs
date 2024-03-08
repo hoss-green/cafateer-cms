@@ -1,7 +1,8 @@
 use crate::{
     data_context::{self, context::AppState},
-    manager::{macro_templates::CategoryButton, templates::CategoriesPage},
-    models::data::{reference_items::Language, ClaimsModel}, session::claims::Claims,
+    manager::{templates::macros::CategoryButton, templates::pages::CategoriesPageVm},
+    models::data::{reference_items::Language, ClaimsModel},
+    session::claims::Claims,
 };
 use askama::Template;
 use axum::{extract::State, response::Html, Extension};
@@ -11,7 +12,8 @@ use std::collections::HashMap;
 
 pub async fn get_categories_page(
     Extension(claims): Extension<Claims<ClaimsModel>>,
-    State(app_state): State<AppState>) -> (StatusCode, Html<String>) {
+    State(app_state): State<AppState>,
+) -> (StatusCode, Html<String>) {
     let database_pool = &app_state.database_pool;
     let account_languages =
         crate::data_context::manager::profile_languages::get_all(database_pool, &claims.sub).await;
@@ -47,7 +49,7 @@ pub async fn get_categories_page(
         })
         .collect();
 
-    let menu_editor = CategoriesPage {
+    let menu_editor = CategoriesPageVm {
         title: "Edit Menu",
         category_buttons: category_item_buttons,
     };

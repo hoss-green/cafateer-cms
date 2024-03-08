@@ -1,6 +1,6 @@
 use crate::{
     data_context::{self, context::AppState},
-    manager::templates::DetailsPage,
+    manager::templates::pages::DetailsPageVm,
     models::data::{reference_items::Language, ClaimsModel}, session::claims::Claims,
 };
 use askama::Template;
@@ -17,7 +17,7 @@ pub async fn get_details_home(
     // let languages = account_languages.iter().map(|ac_lang_model| ac_lang_model.language).collect::<Vec<i32>>();
     let language_list = Language::vec_from_int_vec(&all_langs, &account_languages);
 
-    let editor_home = DetailsPage {
+    let editor_home = DetailsPageVm {
         title: "Editor Home for SC",
         languages: language_list,
     };

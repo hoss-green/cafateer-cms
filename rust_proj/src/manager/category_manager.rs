@@ -1,4 +1,4 @@
-use super::components::ComponentCategoryEditor;
+use crate::manager::templates::components::ComponentCategoryEditor;
 use crate::{
     data_context::{self, context::AppState},
     models::data::{CategoryModel, ClaimsModel},
@@ -41,7 +41,7 @@ pub async fn create_category_item(
         &claims.sub,
         &CategoryModel {
             id: uuid::Uuid::new_v4(),
-            lang:claims.body.lang,
+            lang: claims.body.lang,
             owner_id: claims.sub,
             title: Some("new category".to_string()),
             lang_name: None,
@@ -62,7 +62,7 @@ pub async fn delete_category_item(
     match data_context::manager::category::delete(&app_state.database_pool, &claims.sub, &id).await
     {
         true => return (StatusCode::OK, Html(String::new())).into_response(),
-        false => (StatusCode::INTERNAL_SERVER_ERROR, Html("Error".to_string())).into_response()
+        false => (StatusCode::INTERNAL_SERVER_ERROR, Html("Error".to_string())).into_response(),
     }
 }
 

@@ -1,4 +1,3 @@
-use super::components::MenuItemEditor;
 use crate::{
     data_context::{self, context::AppState},
     models::data::{ClaimsModel, MenuItemModel},
@@ -13,6 +12,8 @@ use axum::{
 };
 use http::StatusCode;
 use serde::{Deserialize, Serialize};
+
+use super::templates::components::MenuItemEditor;
 
 pub async fn get_menu_item(
     Extension(claims): Extension<Claims<ClaimsModel>>,

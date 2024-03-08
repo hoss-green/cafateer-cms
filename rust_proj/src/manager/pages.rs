@@ -3,6 +3,7 @@ mod categories_page;
 mod menu_page;
 mod details_page;
 mod home_page;
+pub mod languages_page;
 pub use account_page::get_account_page;
 pub use categories_page::get_categories_page;
 pub use menu_page::get_menu_page;

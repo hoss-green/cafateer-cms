@@ -1,6 +1,6 @@
+use crate::manager::templates::components::PrimaryLanguageList;
 use crate::{
     data_context::{context::AppState, references::get_languages},
-    manager::components::PrimaryLanguageList,
     models::data::{reference_items::Language, ClaimsModel, ProfileLanguagesModel},
     session::claims::Claims,
 };
@@ -41,6 +41,7 @@ pub async fn post_language(
                     id: uuid::Uuid::new_v4(),
                     owner_id: claims.sub,
                     language: lang_setting.0,
+                    published: false,
                 },
             )
             .await
@@ -57,15 +58,13 @@ pub async fn post_language(
 
     let account_languages =
         crate::data_context::manager::profile_languages::get_all(database_pool, &claims.sub).await;
-    // .iter()
-    // .map(|al| al.language)
-    // .collect::<Vec<i32>>();
     let account_languages = match account_languages.len() {
         0 => {
             let am = ProfileLanguagesModel {
                 id: uuid::Uuid::new_v4(),
                 owner_id: claims.sub,
                 language: 0,
+                published: false,
             };
             crate::data_context::manager::profile_languages::add(database_pool, &am).await;
             vec![0]
@@ -98,10 +97,6 @@ pub async fn post_primary_language(
     let mut profile = crate::data_context::manager::profile::get(database_pool, &claims.sub).await;
     let account_languages =
         crate::data_context::manager::profile_languages::get_all(database_pool, &claims.sub).await;
-    // .await
-    // .iter()
-    // .map(|al| al.language)
-    // .collect::<Vec<i32>>();
     profile.primary_language = id;
     crate::data_context::manager::profile::set(&app_state.database_pool, &profile).await;
     let primary_dropdown = PrimaryLanguageList {

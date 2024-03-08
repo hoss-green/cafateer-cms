@@ -1,6 +1,6 @@
 use crate::{
     data_context::{self, context::AppState, manager::menu_item_details},
-    manager::{macro_templates::MenuItemButton, templates::MenuPage},
+    manager::templates::{macros::MenuItemButton, pages::MenuPageVm},
     models::data::{reference_items::Language, ClaimsModel, MenuItemDetailsModel},
     session::claims::Claims,
 };
@@ -56,7 +56,7 @@ pub async fn get_menu_page(
         })
         .collect();
 
-    let menu_editor = MenuPage {
+    let menu_editor = MenuPageVm {
         title: "Edit Menu",
         menu_item_buttons,
     };

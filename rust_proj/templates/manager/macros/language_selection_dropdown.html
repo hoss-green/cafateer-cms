@@ -14,7 +14,6 @@
           class="flex items-center text-sm font-medium text-gray-900 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-md px-1.5 py-1 w-full">
         <form hx-post="/manager/config/languages">
           <input  name="{{ lang.id }}" type="checkbox" hx-post="/manager/config/languages" hx-target="#primary_lang_list" hx-swap="outerHTML" 
-            {{ crate::manager::templates::is_selected(lang.id, user_selected_languages) }}
             class="w-4 h-4 mr-2 bg-gray-100 border-gray-300 rounded text-primary-600 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500" />
           {{ lang.name }}
           <input type="hidden" name="id" value="{{lang.id}}"/>

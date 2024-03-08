@@ -1,5 +1,5 @@
 use crate::{
-    data_context::context::AppState, manager::templates::StartPage, models::data::ClaimsModel,
+    data_context::context::AppState, manager::templates::pages::StartPageVm, models::data::ClaimsModel,
     session::claims::Claims,
 };
 use askama::Template;
@@ -12,7 +12,7 @@ pub async fn get_home_page(
 ) -> (StatusCode, Html<String>) {
     println!("{:#?}", claims);
 
-    let editor_home = StartPage {
+    let editor_home = StartPageVm {
         title: "Editor Home for SC",
     };
 

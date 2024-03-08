@@ -1,8 +1,6 @@
 mod category_manager;
-pub mod components;
 mod detail_manager;
 mod language_manager;
-pub mod macro_templates;
 pub mod menu_item_detail_manager;
 pub mod menu_item_manager;
 pub mod pages;
@@ -23,8 +21,3 @@ pub use menu_item_manager::delete_menu_item;
 pub use menu_item_manager::get_menu_item;
 pub use menu_item_manager::update_menu_item;
 pub mod session;
-// pub use session::do_login;
-// pub use session::do_signup;
-// pub use session::login;
-// pub use session::sign_up;
-// pub use session::sign_up_success;

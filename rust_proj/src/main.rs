@@ -11,15 +11,14 @@ use cafeteer::{
     manager::{
         create_category_item, delete_category_item, get_category_item, get_menu_item_details,
         menu_item_manager::*,
-        pages::{get_account_page, get_categories_page, get_home_page, get_menu_page},
+        pages::{
+            get_account_page, get_categories_page, get_home_page, get_menu_page, languages_page,
+        },
         post_details_home, update_category_item, update_menu_item_details,
     },
     presenter::{menu::get_menu, restaurant::get_restaurant_with_lang},
 };
-use cafeteer::{
-    data_context::setup_db,
-    manager::{get_details_home, post_language},
-};
+use cafeteer::{data_context::setup_db, manager::get_details_home};
 use cafeteer::{
     manager::{get_details_data, post_primary_language},
     presenter::restaurant::get_restaurant,
@@ -69,14 +68,31 @@ async fn main() {
         .route("/manager/menu/item/:id", delete(delete_menu_item))
         .route("/manager/menu/item/details/:id", get(get_menu_item_details))
         .route("/manager/menu/item/details", put(update_menu_item_details))
+        .route("/manager/config/languages", get(languages_page::get))
+        // .route("/manager/languages", post(post_language))
         .route("/manager/config", get(get_account_page))
-        .route("/manager/config/languages", post(post_language))
+        // .route("/manager/config/languages", post(post_language))
         .route("/session", get(Redirect::permanent("/session/login")))
-        .route("/session/login", get(cafeteer::manager::session::pages::login))
-        .route("/session/login", post(cafeteer::manager::session::pages::do_login))
-        .route("/session/sign_up", get(cafeteer::manager::session::pages::sign_up))
-        .route("/session/sign_up", post(cafeteer::manager::session::pages::do_signup))
-        .route("/session/sign_up_success", get(cafeteer::manager::session::pages::sign_up_success))
+        .route(
+            "/session/login",
+            get(cafeteer::manager::session::pages::login),
+        )
+        .route(
+            "/session/login",
+            post(cafeteer::manager::session::pages::do_login),
+        )
+        .route(
+            "/session/sign_up",
+            get(cafeteer::manager::session::pages::sign_up),
+        )
+        .route(
+            "/session/sign_up",
+            post(cafeteer::manager::session::pages::do_signup),
+        )
+        .route(
+            "/session/sign_up_success",
+            get(cafeteer::manager::session::pages::sign_up_success),
+        )
         .route(
             "/manager/config/primary_language/:id",
             post(post_primary_language),
