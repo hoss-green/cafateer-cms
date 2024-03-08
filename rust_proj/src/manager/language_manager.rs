@@ -56,11 +56,10 @@ pub async fn post_language(
     };
 
     let account_languages =
-        crate::data_context::manager::profile_languages::get_all(database_pool, &claims.sub)
-            .await;
-            // .iter()
-            // .map(|al| al.language)
-            // .collect::<Vec<i32>>();
+        crate::data_context::manager::profile_languages::get_all(database_pool, &claims.sub).await;
+    // .iter()
+    // .map(|al| al.language)
+    // .collect::<Vec<i32>>();
     let account_languages = match account_languages.len() {
         0 => {
             let am = ProfileLanguagesModel {
