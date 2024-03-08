@@ -9,20 +9,13 @@ use cafeteer::{
     auth_middleware,
     data_context::context::AppState,
     manager::{
-        create_category_item, delete_category_item, get_category_item, get_menu_item_details,
-        menu_item_manager::*,
-        pages::{
-            get_account_page, get_categories_page, get_home_page, get_menu_page, languages_page,
-        },
-        post_details_home, update_category_item, update_menu_item_details,
+        editors::{self, get_menu_item_details, post_details_home, update_menu_item_details},
+        pages::{account_page, categories_page, home_page, languages_page, menu_page},
     },
     presenter::{menu::get_menu, restaurant::get_restaurant_with_lang},
 };
-use cafeteer::{data_context::setup_db, manager::get_details_home};
-use cafeteer::{
-    manager::{get_details_data, post_primary_language},
-    presenter::restaurant::get_restaurant,
-};
+use cafeteer::{data_context::setup_db, manager::editors::get_details_home};
+use cafeteer::{manager::session, presenter::restaurant::get_restaurant};
 use dotenv::dotenv;
 use tower::Layer;
 use tower_http::normalize_path::NormalizePathLayer;
@@ -50,52 +43,52 @@ async fn main() {
         .route("/", get(get_restaurant))
         .route("/:lang", get(get_restaurant_with_lang))
         .route("/menu", get(get_menu))
-        .route("/manager", get(get_home_page))
+        .route("/manager", get(home_page::get))
         .route(
             "/manager/details",
             get(get_details_home).post(post_details_home),
         )
-        .route("/manager/details/data/:id", get(get_details_data))
-        .route("/manager/menu", get(get_menu_page))
-        .route("/manager/menu/categories", get(get_categories_page))
-        .route("/manager/menu/categories/:id/:lang", get(get_category_item))
-        .route("/manager/menu/categories", put(update_category_item))
-        .route("/manager/menu/categories", post(create_category_item))
-        .route("/manager/menu/categories/:id", delete(delete_category_item))
-        .route("/manager/menu/item/:id/:lang", get(get_menu_item))
-        .route("/manager/menu/item", post(create_menu_item))
-        .route("/manager/menu/item", put(update_menu_item))
-        .route("/manager/menu/item/:id", delete(delete_menu_item))
+        .route("/manager/details/data/:id", get(editors::get_details_data))
+        .route("/manager/menu", get(menu_page::get))
+        .route("/manager/menu/categories", get(categories_page::get))
+        .route(
+            "/manager/menu/categories/:id/:lang",
+            get(editors::get_category_item),
+        )
+        .route(
+            "/manager/menu/categories",
+            put(editors::update_category_item),
+        )
+        .route(
+            "/manager/menu/categories",
+            post(editors::create_category_item),
+        )
+        .route(
+            "/manager/menu/categories/:id",
+            delete(editors::delete_category_item),
+        )
+        .route("/manager/menu/item/:id/:lang", get(editors::get_menu_item))
+        .route("/manager/menu/item", post(editors::create_menu_item))
+        .route("/manager/menu/item", put(editors::update_menu_item))
+        .route("/manager/menu/item/:id", delete(editors::delete_menu_item))
         .route("/manager/menu/item/details/:id", get(get_menu_item_details))
         .route("/manager/menu/item/details", put(update_menu_item_details))
         .route("/manager/config/languages", get(languages_page::get))
         // .route("/manager/languages", post(post_language))
-        .route("/manager/config", get(get_account_page))
+        .route("/manager/config", get(account_page::get))
         // .route("/manager/config/languages", post(post_language))
         .route("/session", get(Redirect::permanent("/session/login")))
-        .route(
-            "/session/login",
-            get(cafeteer::manager::session::pages::login),
-        )
-        .route(
-            "/session/login",
-            post(cafeteer::manager::session::pages::do_login),
-        )
-        .route(
-            "/session/sign_up",
-            get(cafeteer::manager::session::pages::sign_up),
-        )
-        .route(
-            "/session/sign_up",
-            post(cafeteer::manager::session::pages::do_signup),
-        )
+        .route("/session/login", get(session::pages::login))
+        .route("/session/login", post(session::pages::do_login))
+        .route("/session/sign_up", get(session::pages::sign_up))
+        .route("/session/sign_up", post(session::pages::do_signup))
         .route(
             "/session/sign_up_success",
-            get(cafeteer::manager::session::pages::sign_up_success),
+            get(session::pages::sign_up_success),
         )
         .route(
             "/manager/config/primary_language/:id",
-            post(post_primary_language),
+            post(editors::post_primary_language),
         )
         .route_layer(middleware::from_fn(auth_middleware::check_auth))
         .with_state(state);

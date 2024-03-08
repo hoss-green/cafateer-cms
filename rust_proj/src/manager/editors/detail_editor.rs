@@ -1,5 +1,5 @@
 use crate::{
-    data_context::{self, context::AppState}, manager::templates::components::ComponentDetailEditorVm, models::data::{reference_items::Language, ClaimsModel, DetailsModel}, session::claims::Claims
+    data_context::{self, context::AppState}, manager::templates::{components::ComponentDetailEditorVm, pages::DetailsPageVm}, models::data::{reference_items::Language, ClaimsModel, DetailsModel}, session::claims::Claims
 };
 use askama::Template;
 use axum::{
@@ -7,8 +7,6 @@ use axum::{
 };
 use http::StatusCode;
 use serde::{Deserialize, Serialize};
-
-use super::templates::pages::DetailsPageVm;
 
 pub async fn get_details_data(
     Extension(claims): Extension<Claims<ClaimsModel>>,

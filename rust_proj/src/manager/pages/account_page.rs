@@ -9,7 +9,7 @@ use askama_axum::IntoResponse;
 use axum::{extract::State, response::Html, Extension};
 use http::StatusCode;
 
-pub async fn get_account_page(
+pub async fn get(
     Extension(claims): Extension<Claims<ClaimsModel>>,
     State(app_state): State<AppState>,
 ) -> impl IntoResponse {

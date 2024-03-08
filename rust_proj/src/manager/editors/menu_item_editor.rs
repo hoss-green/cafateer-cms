@@ -1,7 +1,5 @@
 use crate::{
-    data_context::{self, context::AppState},
-    models::data::{ClaimsModel, MenuItemModel},
-    session::claims::Claims,
+    data_context::{self, context::AppState}, manager::templates::components::MenuItemEditorVm, models::data::{ClaimsModel, MenuItemModel}, session::claims::Claims
 };
 use askama::Template;
 use askama_axum::IntoResponse;
@@ -13,7 +11,6 @@ use axum::{
 use http::StatusCode;
 use serde::{Deserialize, Serialize};
 
-use super::templates::components::MenuItemEditorVm;
 
 pub async fn get_menu_item(
     Extension(claims): Extension<Claims<ClaimsModel>>,

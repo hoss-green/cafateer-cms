@@ -10,7 +10,7 @@ use http::StatusCode;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-pub async fn get_categories_page(
+pub async fn get(
     Extension(claims): Extension<Claims<ClaimsModel>>,
     State(app_state): State<AppState>,
 ) -> (StatusCode, Html<String>) {

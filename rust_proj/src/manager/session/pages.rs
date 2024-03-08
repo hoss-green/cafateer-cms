@@ -11,7 +11,7 @@ use axum::{
     Form,
 };
 use chrono::Utc;
-use http::{header::SET_COOKIE, HeaderValue, StatusCode};
+use http::{header::SET_COOKIE, StatusCode};
 use serde::{Deserialize, Serialize};
 
 use super::templates::{LoginPage, SignUpPage, SignUpSuccessPage};
