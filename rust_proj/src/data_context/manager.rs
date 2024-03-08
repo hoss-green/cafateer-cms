@@ -6,5 +6,6 @@ pub mod details;
 pub mod menu_items;
 pub mod menu_item;
 pub mod menu_item_details;
+pub mod menu_item_detail;
 // pub mod menu_item_utils;
 

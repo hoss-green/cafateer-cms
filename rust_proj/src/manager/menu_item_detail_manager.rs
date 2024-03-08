@@ -60,7 +60,7 @@ pub async fn get_menu_item_details(
         categories.append(&mut fc);
     });
 
-    let menu_item_details = data_context::manager::menu_item_details::get_menu_item_detail(
+    let menu_item_details = data_context::manager::menu_item_detail::get(
         &app_state,
         &claims.sub,
         &id,
@@ -83,7 +83,7 @@ pub async fn update_menu_item_details(
     State(app_state): State<AppState>,
     Form(menu_item_form): Form<MenuItemDetailsForm>,
 ) -> (StatusCode, Html<String>) {
-    let result = data_context::manager::menu_item_details::set(
+    let result = data_context::manager::menu_item_detail::set(
         &app_state,
         &claims.sub,
         &MenuItemDetailsModel {

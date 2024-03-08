@@ -1,5 +1,5 @@
 use crate::{
-    data_context::{self, context::AppState},
+    data_context::{self, context::AppState, manager::menu_item_details},
     manager::{macro_templates::MenuItemButton, templates::MenuPage},
     models::data::{reference_items::Language, ClaimsModel, MenuItemDetailsModel},
     session::claims::Claims,
@@ -16,8 +16,7 @@ pub async fn get_menu_page(
 ) -> impl IntoResponse {
     let database_pool = &app_state.database_pool;
     let menu_item_details: Vec<MenuItemDetailsModel> =
-        data_context::manager::menu_item_details::get_menu_item_details(&app_state, &claims.sub)
-            .await;
+        menu_item_details::get_all(&app_state, &claims.sub).await;
     let account_languages =
         crate::data_context::manager::profile_languages::get_all(database_pool, &claims.sub).await;
     let languages = Language::vec_from_int_vec(
