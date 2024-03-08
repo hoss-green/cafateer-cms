@@ -1,32 +1,31 @@
 use crate::{
     data_context::{self, context::AppState},
     manager::{macro_templates::MenuItemButton, templates::MenuPage},
-    models::data::{reference_items::Language, ClaimsModel, MenuItemDetailsModel}, session::claims::Claims,
+    models::data::{reference_items::Language, ClaimsModel, MenuItemDetailsModel},
+    session::claims::Claims,
 };
 use askama::Template;
+use askama_axum::IntoResponse;
 use axum::{extract::State, response::Html, Extension};
 use http::StatusCode;
 use std::collections::HashMap;
 
 pub async fn get_menu_page(
-    Extension(claims):Extension<Claims<ClaimsModel>>,
-    State(app_state): State<AppState>) -> (StatusCode, Html<String>) {
+    Extension(claims): Extension<Claims<ClaimsModel>>,
+    State(app_state): State<AppState>,
+) -> impl IntoResponse {
     let database_pool = &app_state.database_pool;
     let menu_item_details: Vec<MenuItemDetailsModel> =
         data_context::manager::menu_item_details::get_menu_item_details(&app_state, &claims.sub)
             .await;
     let account_languages =
         crate::data_context::manager::profile_languages::get_all(database_pool, &claims.sub).await;
-    let languages = account_languages
-        .iter()
-        .map(|ac_lang_model| ac_lang_model.language)
-        .collect::<Vec<i32>>();
     let languages = Language::vec_from_int_vec(
         &data_context::references::get_languages(database_pool).await,
-        &languages,
+        &account_languages,
     );
     let mut menu_items =
-        data_context::manager::menu_items::get_items_for_account(database_pool, &claims.sub).await;
+        data_context::manager::menu_items::get_for_account(database_pool, &claims.sub).await;
     let mut unique_menu_ids: HashMap<uuid::Uuid, bool> = HashMap::new();
     menu_items.sort_by(|a, b| (format!("{}{}", a.id, a.lang)).cmp(&format!("{}{}", b.id, b.lang)));
     menu_items.clone().into_iter().for_each(|mi| {
@@ -64,5 +63,5 @@ pub async fn get_menu_page(
     };
 
     let menu_editor: String = menu_editor.render().unwrap().to_string();
-    (StatusCode::OK, Html(menu_editor))
+    (StatusCode::OK, Html(menu_editor)).into_response()
 }

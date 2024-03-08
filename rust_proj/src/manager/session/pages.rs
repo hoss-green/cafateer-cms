@@ -36,11 +36,11 @@ pub async fn sign_up() -> (StatusCode, Html<String>) {
     (StatusCode::OK, Html(sign_up_page))
 }
 pub async fn sign_up_success() -> (StatusCode, Html<String>) {
-    let sign_up_success_page: SignUpSuccessPage = SignUpSuccessPage {
+    let sign_up_success_page: String = SignUpSuccessPage {
         title: "Sign Up Success",
-    };
-    let sign_up_page: String = sign_up_success_page.render().unwrap().to_string();
-    (StatusCode::OK, Html(sign_up_page))
+    }
+        .render().unwrap().to_string();
+    (StatusCode::OK, Html(sign_up_success_page))
 }
 
 pub async fn do_login(
@@ -65,18 +65,20 @@ pub async fn do_login(
         let profile = profile::get(database_pool, &user_account.id).await;
         println!("User {} SUCCEEDED to log in", user_account.email);
         let mut redirect = Redirect::to("/manager").into_response();
-        let header_val = create_cookie_header(&user_account, &profile).await; 
+        let header_val = create_cookie_header(&user_account, &profile);
         redirect.headers_mut().insert(SET_COOKIE, header_val);
         return redirect;
     }
-
-    let login_page: LoginPage = LoginPage {
+    println!("User {} FAILED to log in", user_account.email);
+    let login_page: String = LoginPage {
         title: "Login",
         email: Some(session_form.email.as_str()),
         message: Some("Username or Password Error"),
-    };
-    let login_page: String = login_page.render().unwrap().to_string();
-    println!("User {} FAILED to log in", user_account.email);
+    }
+    .render()
+    .unwrap()
+    .to_string();
+
     let headers: AppendHeaders<[(http::HeaderName, String); 1]> =
         AppendHeaders([(SET_COOKIE, String::new())]);
     (headers, Html(login_page)).into_response()

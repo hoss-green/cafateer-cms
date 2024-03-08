@@ -15,13 +15,9 @@ pub async fn get_categories_page(
     let database_pool = &app_state.database_pool;
     let account_languages =
         crate::data_context::manager::profile_languages::get_all(database_pool, &claims.sub).await;
-    let languages = account_languages
-        .iter()
-        .map(|ac_lang_model| ac_lang_model.language)
-        .collect::<Vec<i32>>();
     let languages = Language::vec_from_int_vec(
         &data_context::references::get_languages(database_pool).await,
-        &languages,
+        &account_languages,
     );
     let mut fetched_categories =
         data_context::manager::categories::get_category_list(database_pool, &claims.sub).await;

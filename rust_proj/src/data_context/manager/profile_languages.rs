@@ -3,7 +3,7 @@ use crate::{data_context::context::DatabasePool, models::data::ProfileLanguagesM
 pub async fn get_all(
     database_pool: &DatabasePool,
     owner_id: &uuid::Uuid,
-) -> Vec<ProfileLanguagesModel> {
+) -> Vec<i32> {
     let result = sqlx::query_as!(
         ProfileLanguagesModel,
         r#"select id, language, owner_id from account_languages where owner_id=$1"#,
@@ -12,7 +12,7 @@ pub async fn get_all(
     .fetch_all(database_pool)
     .await;
     match result {
-        Ok(r) => r,
+        Ok(r) => r.iter().map(|language_model| language_model.language).collect::<Vec<i32>>(),
         Err(err) => {
             println!("Cannot fetch account, err: {}", err);
             vec![]

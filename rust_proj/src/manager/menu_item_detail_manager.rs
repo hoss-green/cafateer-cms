@@ -25,9 +25,9 @@ pub async fn get_menu_item_details(
     let languages = Language::vec_from_int_vec(
         &data_context::references::get_languages(database_pool).await,
         &account_languages
-            .iter()
-            .map(|al| al.language)
-            .collect::<Vec<i32>>(),
+            // .iter()
+            // .map(|al| al.language)
+            // .collect::<Vec<i32>>(),
     );
     let fetched_categories =
         data_context::manager::categories::get_category_list(database_pool, &claims.sub).await;
