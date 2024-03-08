@@ -1,6 +1,6 @@
 use crate::{
     data_context::{self, context::AppState, manager::menu_item_details},
-    manager::templates::{macros::MenuItemButton, pages::MenuPageVm},
+    manager::templates::{buttons::MenuItemButtonVm, pages::MenuPageVm},
     models::data::{reference_items::Language, ClaimsModel, MenuItemDetailsModel},
     session::claims::Claims,
 };
@@ -31,7 +31,7 @@ pub async fn get_menu_page(
         unique_menu_ids.insert(mi.id, true);
     });
 
-    let menu_item_buttons: Vec<MenuItemButton> = unique_menu_ids
+    let menu_item_buttons: Vec<MenuItemButtonVm> = unique_menu_ids
         .iter()
         .map(|unique_mi| {
             let button_title = match menu_items
@@ -41,7 +41,7 @@ pub async fn get_menu_page(
                 Some(cat) => cat.clone().title,
                 None => "No title".to_string(),
             };
-            MenuItemButton {
+            MenuItemButtonVm {
                 id: *unique_mi.0,
                 title: button_title,
                 category: match menu_item_details

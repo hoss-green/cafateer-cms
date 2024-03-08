@@ -1,5 +1,5 @@
-use crate::manager::templates::macros::MenuItemButton;
-use crate::manager::templates::macros::CategoryButton;
+use crate::manager::templates::buttons::MenuItemButtonVm;
+use crate::manager::templates::buttons::CategoryButtonVm;
 use crate::models::data::reference_items::Language;
 use askama::Template;
 
@@ -38,7 +38,7 @@ pub struct DetailsPageVm<'a> {
 #[template(path = "manager/categories_page.html")]
 pub struct CategoriesPageVm<'a> {
     pub title: &'a str,
-    pub category_buttons: Vec<CategoryButton>,
+    pub category_buttons: Vec<CategoryButtonVm>,
 }
 
 #[derive(Template)]
@@ -55,7 +55,7 @@ pub struct BioPageVm<'a> {
 #[template(path = "manager/menu_page.html")]
 pub struct MenuPageVm<'a> {
     pub title: &'a str,
-    pub menu_item_buttons: Vec<MenuItemButton>,
+    pub menu_item_buttons: Vec<MenuItemButtonVm>,
 }
 
 pub fn is_selected(id: &i32, languages: &Vec<Language>) -> String {

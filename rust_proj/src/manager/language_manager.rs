@@ -1,4 +1,4 @@
-use crate::manager::templates::components::PrimaryLanguageList;
+use crate::manager::templates::components::PrimaryLanguageListVm;
 use crate::{
     data_context::{context::AppState, references::get_languages},
     models::data::{reference_items::Language, ClaimsModel, ProfileLanguagesModel},
@@ -79,7 +79,7 @@ pub async fn post_language(
         crate::data_context::manager::profile::set(&app_state.database_pool, &profile).await;
     }
     let languages = get_languages(database_pool).await;
-    let primary_dropdown = PrimaryLanguageList {
+    let primary_dropdown = PrimaryLanguageListVm {
         primary_language_id: profile.primary_language,
         user_selected_languages: Language::vec_from_int_vec(&languages, &account_languages),
     };
@@ -99,7 +99,7 @@ pub async fn post_primary_language(
         crate::data_context::manager::profile_languages::get_all(database_pool, &claims.sub).await;
     profile.primary_language = id;
     crate::data_context::manager::profile::set(&app_state.database_pool, &profile).await;
-    let primary_dropdown = PrimaryLanguageList {
+    let primary_dropdown = PrimaryLanguageListVm {
         primary_language_id: profile.primary_language,
         user_selected_languages: Language::vec_from_int_vec(&languages, &account_languages),
     };

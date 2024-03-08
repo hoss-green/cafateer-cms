@@ -3,7 +3,7 @@ use askama::Template;
 
 #[derive(Template, Debug, Clone)]
 #[template(path = "manager/components/detail_editor.html")]
-pub struct ComponentDetailEditor {
+pub struct ComponentDetailEditorVm {
     pub id: uuid::Uuid,
     pub lang: i32,
     pub lang_name: String,
@@ -12,7 +12,7 @@ pub struct ComponentDetailEditor {
 
 #[derive(Template, Debug, Clone)]
 #[template(path = "manager/components/category_editor.html")]
-pub struct ComponentCategoryEditor {
+pub struct ComponentCategoryEditorVm {
     pub id: uuid::Uuid,
     pub lang: i32,
     pub title: String,
@@ -20,14 +20,14 @@ pub struct ComponentCategoryEditor {
 
 #[derive(Template, Debug, Clone)]
 #[template(path = "manager/components/primary_language_list.html")]
-pub struct PrimaryLanguageList {
+pub struct PrimaryLanguageListVm {
     pub primary_language_id: i32,
     pub user_selected_languages: Vec<Language>,
 }
 
 #[derive(Template, Debug, Clone)]
 #[template(path = "manager/components/menu_item_editor.html")]
-pub struct MenuItemEditor {
+pub struct MenuItemEditorVm {
     pub id: uuid::Uuid,
     pub title: String,
     pub description: String,
@@ -36,7 +36,7 @@ pub struct MenuItemEditor {
 
 #[derive(Template, Debug, Clone)]
 #[template(path = "manager/components/menu_item_details_editor.html")]
-pub struct MenuItemDetailsEditor {
+pub struct MenuItemDetailsEditorVm {
     pub id: uuid::Uuid,
     pub owner_id: uuid::Uuid,
     pub allergies: Vec<Allergy>,

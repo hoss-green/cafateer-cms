@@ -1,5 +1,5 @@
 use crate::{
-    data_context::{self, context::AppState}, manager::templates::components::ComponentDetailEditor, models::data::{reference_items::Language, ClaimsModel, DetailsModel}, session::claims::Claims
+    data_context::{self, context::AppState}, manager::templates::components::ComponentDetailEditorVm, models::data::{reference_items::Language, ClaimsModel, DetailsModel}, session::claims::Claims
 };
 use askama::Template;
 use axum::{
@@ -36,7 +36,7 @@ pub async fn get_details_data(
         detail.lang_code = current_language.code;
         detail.lang_name = current_language.name;
     }
-    let component_edit_details = ComponentDetailEditor {
+    let component_edit_details = ComponentDetailEditorVm {
         id: detail.id,
         lang: detail.lang,
         lang_name: detail.lang_name,

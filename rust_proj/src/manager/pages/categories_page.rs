@@ -1,6 +1,6 @@
 use crate::{
     data_context::{self, context::AppState},
-    manager::{templates::macros::CategoryButton, templates::pages::CategoriesPageVm},
+    manager::templates::{buttons::CategoryButtonVm, pages::CategoriesPageVm},
     models::data::{reference_items::Language, ClaimsModel},
     session::claims::Claims,
 };
@@ -31,7 +31,7 @@ pub async fn get_categories_page(
         unique_category_ids.insert(cat.id, true);
     });
 
-    let category_item_buttons: Vec<CategoryButton> = unique_category_ids
+    let category_item_buttons: Vec<CategoryButtonVm> = unique_category_ids
         .iter()
         .map(|unique_cat| {
             let button_title = match fetched_categories
@@ -41,7 +41,7 @@ pub async fn get_categories_page(
                 Some(cat) => cat.clone().title.unwrap_or("No title".to_string()),
                 None => "No title".to_string(),
             };
-            CategoryButton {
+            CategoryButtonVm {
                 id: *unique_cat.0,
                 title: button_title,
                 user_languages: languages.clone(),

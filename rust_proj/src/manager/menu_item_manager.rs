@@ -13,7 +13,7 @@ use axum::{
 use http::StatusCode;
 use serde::{Deserialize, Serialize};
 
-use super::templates::components::MenuItemEditor;
+use super::templates::components::MenuItemEditorVm;
 
 pub async fn get_menu_item(
     Extension(claims): Extension<Claims<ClaimsModel>>,
@@ -27,7 +27,7 @@ pub async fn get_menu_item(
         &claims.sub,
     )
     .await;
-    let menu_item_editor = MenuItemEditor {
+    let menu_item_editor = MenuItemEditorVm {
         id: menu_item.id,
         title: menu_item.title,
         description: menu_item.description.unwrap_or(String::new()),

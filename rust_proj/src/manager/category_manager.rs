@@ -1,4 +1,4 @@
-use crate::manager::templates::components::ComponentCategoryEditor;
+use crate::manager::templates::components::ComponentCategoryEditorVm;
 use crate::{
     data_context::{self, context::AppState},
     models::data::{CategoryModel, ClaimsModel},
@@ -22,7 +22,7 @@ pub async fn get_category_item(
     let category =
         data_context::manager::category::get(&app_state.database_pool, (id, lang), &claims.sub)
             .await;
-    let category_editor = ComponentCategoryEditor {
+    let category_editor = ComponentCategoryEditorVm {
         id: category.id,
         title: category.title.unwrap_or("".to_string()),
         lang,
