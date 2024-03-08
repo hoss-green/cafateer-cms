@@ -1,5 +1,7 @@
-use crate::models::data::{reference_items::{Allergy, Language}, CategoryModel};
+use crate::models::data::{reference_items::Allergy, CategoryModel};
 use askama::Template;
+
+use super::view_models::AccountLanguageVm;
 
 #[derive(Template, Debug, Clone)]
 #[template(path = "manager/components/detail_editor.html")]
@@ -22,7 +24,7 @@ pub struct ComponentCategoryEditorVm {
 #[template(path = "manager/components/primary_language_list.html")]
 pub struct PrimaryLanguageListVm {
     pub primary_language_id: i32,
-    pub user_selected_languages: Vec<Language>,
+    pub user_selected_languages: Vec<AccountLanguageVm>,
 }
 
 #[derive(Template, Debug, Clone)]

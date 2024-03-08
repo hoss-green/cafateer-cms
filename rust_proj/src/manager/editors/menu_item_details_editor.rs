@@ -21,7 +21,7 @@ pub async fn get_menu_item_details(
 ) -> (StatusCode, Html<String>) {
     let database_pool = &app_state.database_pool;
     let account_languages =
-        data_context::manager::profile_languages::get_all(database_pool, &claims.sub).await;
+        data_context::manager::profile_languages::get_all_ids(database_pool, &claims.sub).await;
     let languages = Language::vec_from_int_vec(
         &data_context::references::get_languages(database_pool).await,
         &account_languages, // .iter()

@@ -1,21 +1,9 @@
-{%- import "manager/macros/primary_language_selector.html" as primary_language_selector  -%}
-{%- import "manager/macros/language_selection_dropdown.html" as language_selection_dropdown -%}
 {% extends "manager/manager_base.html" %}
 {% block title %}{{ title }}{% endblock %}
 {% block content %}
 <div class="max-w-xl mx-auto">
   <div class="mb-5">
-</div>
-  <div class="flex flex-col w-full justify-start gap-2">
-  <form hx-post="/manager/details" hx-target="#detail_response_message">
-        {% call primary_language_selector::show_picker(primary_language.id, user_languages.clone()) %} 
-</form>
-    <div class="flex justify-between">
-      <p>Available Languages</p>
-        {% call language_selection_dropdown::show_picker(system_languages, user_languages) %} 
-    </div>
-  </div>
-<div id="detail_response_message"></div>
+    Hello World
 </div>
 
 {% endblock %}

@@ -1,4 +1,5 @@
 use crate::manager::templates::components::PrimaryLanguageListVm;
+use crate::manager::templates::view_models::AccountLanguageVm;
 use crate::{
     data_context::{context::AppState, references::get_languages},
     models::data::{reference_items::Language, ClaimsModel, ProfileLanguagesModel},
@@ -18,7 +19,7 @@ pub async fn post_language(
     body: String,
 ) -> (StatusCode, Html<String>) {
     let database_pool = &app_state.database_pool;
-    let mut profile = crate::data_context::manager::profile::get(database_pool, &claims.sub).await;
+    let profile = crate::data_context::manager::profile::get(database_pool, &claims.sub).await;
     let lang_setting = match body.contains("&") {
         true => match body.split("&").last() {
             Some(body) => match body.split("=").last() {
@@ -57,7 +58,8 @@ pub async fn post_language(
     };
 
     let account_languages =
-        crate::data_context::manager::profile_languages::get_all(database_pool, &claims.sub).await;
+        crate::data_context::manager::profile_languages::get_all(database_pool, &claims.sub)
+            .await;
     let account_languages = match account_languages.len() {
         0 => {
             let am = ProfileLanguagesModel {
@@ -67,21 +69,30 @@ pub async fn post_language(
                 published: false,
             };
             crate::data_context::manager::profile_languages::add(database_pool, &am).await;
-            vec![0]
+            vec![]
         }
         _ => account_languages,
     };
-    if !account_languages
-        .iter()
-        .any(|&al| al == profile.primary_language)
-    {
-        profile.primary_language = *account_languages.iter().last().unwrap_or(&0);
-        crate::data_context::manager::profile::set(&app_state.database_pool, &profile).await;
-    }
+    // if !account_languages
+    //     .iter()
+    //     .any(|&al| al == profile.primary_language)
+    // {
+    //     profile.primary_language = *account_languages.iter().last().unwrap_or(&0);
+    //     crate::data_context::manager::profile::set(&app_state.database_pool, &profile).await;
+    // }
     let languages = get_languages(database_pool).await;
     let primary_dropdown = PrimaryLanguageListVm {
         primary_language_id: profile.primary_language,
-        user_selected_languages: Language::vec_from_int_vec(&languages, &account_languages),
+        user_selected_languages: account_languages
+            .iter()
+            .map(|lm| AccountLanguageVm {
+                id: lm.id,
+                title: Language::get_from_int(&languages, lm.language).name,
+                code: lm.language,
+                published: lm.published,
+            })
+            .collect::<Vec<AccountLanguageVm>>(),
+        // Language::vec_from_int_vec(&languages, &account_languages),
     };
     let page: String = primary_dropdown.render().unwrap().to_string();
     (StatusCode::OK, Html(page))
@@ -96,12 +107,26 @@ pub async fn post_primary_language(
     let languages = get_languages(database_pool).await;
     let mut profile = crate::data_context::manager::profile::get(database_pool, &claims.sub).await;
     let account_languages =
-        crate::data_context::manager::profile_languages::get_all(database_pool, &claims.sub).await;
+        crate::data_context::manager::profile_languages::get_all(database_pool, &claims.sub)
+            .await;
     profile.primary_language = id;
     crate::data_context::manager::profile::set(&app_state.database_pool, &profile).await;
     let primary_dropdown = PrimaryLanguageListVm {
         primary_language_id: profile.primary_language,
-        user_selected_languages: Language::vec_from_int_vec(&languages, &account_languages),
+        user_selected_languages: account_languages
+            .iter()
+            .map(|lm| AccountLanguageVm {
+                id: lm.id,
+                title: Language::get_from_int(&languages, lm.language).name,
+                code: lm.language,
+                published: lm.published,
+            })
+            .collect::<Vec<AccountLanguageVm>>(),
+        // Language::vec_from_int_vec(&languages,
+        //
+        //     &account_languages
+        //
+        // ),
     };
     let page: String = primary_dropdown.render().unwrap().to_string();
     (StatusCode::OK, Html(page))

@@ -18,7 +18,7 @@ pub async fn get(
     let menu_item_details: Vec<MenuItemDetailsModel> =
         menu_item_details::get_all(&app_state, &claims.sub).await;
     let account_languages =
-        crate::data_context::manager::profile_languages::get_all(database_pool, &claims.sub).await;
+        crate::data_context::manager::profile_languages::get_all_ids(database_pool, &claims.sub).await;
     let languages = Language::vec_from_int_vec(
         &data_context::references::get_languages(database_pool).await,
         &account_languages,

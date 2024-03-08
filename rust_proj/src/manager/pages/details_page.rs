@@ -13,7 +13,7 @@ pub async fn get_details_home(
     State(app_state): State<AppState>) -> (StatusCode, Html<String>) {
     let database_pool = &app_state.database_pool;
     let all_langs = data_context::references::get_languages(database_pool).await;
-    let account_languages = crate::data_context::manager::profile_languages::get_all(database_pool, &claims.sub).await;
+    let account_languages = crate::data_context::manager::profile_languages::get_all_ids(database_pool, &claims.sub).await;
     // let languages = account_languages.iter().map(|ac_lang_model| ac_lang_model.language).collect::<Vec<i32>>();
     let language_list = Language::vec_from_int_vec(&all_langs, &account_languages);
 
