@@ -93,7 +93,13 @@ async fn main() {
         .route_layer(middleware::from_fn(auth_middleware::check_auth))
         .with_state(state);
 
-    let listener = tokio::net::TcpListener::bind(&"127.0.0.1:4444")
+    let host = std::env::var("HOST").unwrap();
+    let post = std::env::var("PORT").unwrap();
+    
+    let advertise_url = format!("{}:{}", host, post);
+    println!("Server is running on: {}", advertise_url);
+
+    let listener = tokio::net::TcpListener::bind(advertise_url)
         .await
         .unwrap();
     // this is to ignore the trailing slash

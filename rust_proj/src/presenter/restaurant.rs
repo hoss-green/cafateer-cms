@@ -24,8 +24,6 @@ pub async fn get_restaurant_with_lang(
     let details = crate::data_context::presenter::fetcher::get_details(&app_state, lang).await;
     let categories = crate::data_context::presenter::fetcher::get_categories(&app_state, lang).await;
     let mut menu_items = crate::data_context::presenter::fetcher::get_menu_item_vms(&app_state, lang).await;
-
-    // println!("{:#?}", menu_items.clone());
     
     let mut menu_tabs: Vec<MenuTabComponent> = vec![];
     menu_items.iter_mut().for_each(|mi| {
