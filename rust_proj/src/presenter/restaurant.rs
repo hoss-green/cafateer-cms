@@ -7,24 +7,30 @@ use http::StatusCode;
 
 use crate::{
     data_context::context::AppState,
-    models::views::{
+    models::{data::reference_items::Language, views::{
         components::{MenuItemComponent, MenuTabComponent},
         pages::{MenuPage, RestaurantPage},
-    },
+    }},
 };
 
 pub async fn get_restaurant(State(app_state): State<AppState>) -> (StatusCode, Html<String>) {
-    get_restaurant_with_lang(State(app_state), Path(0)).await
+    get_restaurant_with_lang(State(app_state), Path(String::from("es"))).await
 }
 
 pub async fn get_restaurant_with_lang(
     State(app_state): State<AppState>,
-    Path(lang): Path<i32>,
+    Path(lang_code): Path<String>,
 ) -> (StatusCode, Html<String>) {
+    let lang = match crate::data_context::references::get_language(&app_state.database_pool, lang_code).await{
+        Some(lang) => lang.id,
+        None => 0,
+    };
+    let available_languages = crate::data_context::references::get_languages(&app_state.database_pool).await;
+    let language_codes = crate::data_context::manager::profile_languages::get_all_ids_debug(&app_state.database_pool).await;
+
     let details = crate::data_context::presenter::fetcher::get_details(&app_state, lang).await;
     let categories = crate::data_context::presenter::fetcher::get_categories(&app_state, lang).await;
     let mut menu_items = crate::data_context::presenter::fetcher::get_menu_item_vms(&app_state, lang).await;
-    
     let mut menu_tabs: Vec<MenuTabComponent> = vec![];
     menu_items.iter_mut().for_each(|mi| {
         let category_id = match mi.category {
@@ -63,8 +69,6 @@ pub async fn get_restaurant_with_lang(
             }
         };
     });
-
-    // println!("{:#?}", menu_tabs.clone());
     
     let title = "Sunny Cafe";
     let restaurant_page = RestaurantPage {
@@ -75,6 +79,7 @@ pub async fn get_restaurant_with_lang(
             menu_tabs,
         },
         blurb: &details.blurb.unwrap_or(String::new()),
+        languages: Language::vec_from_int_vec(&available_languages, &language_codes)
     };
 
     let restaurant_page: String = restaurant_page.render().unwrap().to_string();

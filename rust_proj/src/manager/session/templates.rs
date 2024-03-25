@@ -14,6 +14,7 @@ pub struct SignUpPage<'a> {
     pub title: &'a str,
     pub email: Option<&'a str>,
     pub message: Option<&'a str>,
+    pub reg_code: Option<&'a str>,
 }
 #[derive(Template, Debug, Clone)]
 #[template(path = "session/sign_up_success.html")]

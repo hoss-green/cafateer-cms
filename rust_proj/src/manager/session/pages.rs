@@ -31,6 +31,7 @@ pub async fn sign_up() -> (StatusCode, Html<String>) {
         title: "Sign Up",
         email: None,
         message: None,
+        reg_code: None,
     };
     let sign_up_page: String = sign_up_page.render().unwrap().to_string();
     (StatusCode::OK, Html(sign_up_page))
@@ -88,6 +89,19 @@ pub async fn do_signup(
     State(app_state): State<AppState>,
     Form(session_form): Form<SessionForm>,
 ) -> impl IntoResponse {
+
+    let reg_code = &session_form.reg_code.unwrap_or("".to_string());
+    if reg_code != "Canary24Food" {
+        let sign_up_page: SignUpPage = SignUpPage {
+            title: "Sign Up",
+            email: Some(session_form.email.as_str()),
+            message: Some("Invalid Registration Code"),
+            reg_code: Some(reg_code),
+        };
+        let sign_up_page: String = sign_up_page.render().unwrap().to_string();
+        return (StatusCode::OK, Html(sign_up_page)).into_response();
+    };
+
     let creation_timestamp = Utc::now();
     let salt = security::generate_salt();
     let hash = security::calculate_hash(&session_form.password, &salt);
@@ -111,6 +125,7 @@ pub async fn do_signup(
                 title: "Sign Up",
                 email: Some(session_form.email.as_str()),
                 message: Some("Email Taken"),
+                reg_code: None,
             };
             let sign_up_page: String = sign_up_page.render().unwrap().to_string();
             (StatusCode::OK, Html(sign_up_page)).into_response()
@@ -123,4 +138,5 @@ pub struct SessionForm {
     email: String,
     password: String,
     remember: Option<bool>,
+    reg_code: Option<String>,
 }

@@ -20,6 +20,24 @@ pub async fn get_all(
     }
 }
 
+pub async fn get_all_ids_debug(
+    database_pool: &DatabasePool,
+) -> Vec<i32> {
+    let result = sqlx::query_as!(
+        ProfileLanguagesModel,
+        r#"select id, language, owner_id, published from account_languages"#,
+    )
+    .fetch_all(database_pool)
+    .await;
+    match result {
+        Ok(r) => r.iter().map(|language_model| language_model.language).collect::<Vec<i32>>(),
+        Err(err) => {
+            println!("Cannot fetch account, err: {}", err);
+            vec![]
+        }
+    }
+}
+
 pub async fn get_all_ids(
     database_pool: &DatabasePool,
     owner_id: &uuid::Uuid,
