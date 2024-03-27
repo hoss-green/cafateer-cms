@@ -1,6 +1,6 @@
 use chrono::NaiveDateTime;
 
-pub struct AccountModel {
+pub struct UserAccountModel {
     pub id: uuid::Uuid,
     pub email: String,
     pub email_normalised: String,

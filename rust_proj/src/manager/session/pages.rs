@@ -1,7 +1,7 @@
 use crate::{
     data_context::{context::AppState, manager::profile},
     manager::session::create_cookie_header,
-    session::{models::AccountModel, security},
+    session::{models::UserAccountModel, security},
 };
 use askama::Template;
 use askama_axum::IntoResponse;
@@ -107,7 +107,7 @@ pub async fn do_signup(
     let hash = security::calculate_hash(&session_form.password, &salt);
     match crate::session::data::save_sign_up(
         &app_state.database_pool,
-        &AccountModel {
+        &UserAccountModel {
             id: uuid::Uuid::new_v4(),
             email: session_form.email.clone(),
             email_normalised: session_form.email.to_uppercase(),

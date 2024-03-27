@@ -10,7 +10,7 @@ pub async fn get_languages(database_pool: &DatabasePool) -> Vec<Language> {
     }
 }
 
-pub async fn get_language(database_pool: &DatabasePool, code:String) -> Option<Language> {
+pub async fn get_language(database_pool: &DatabasePool, code:&String) -> Option<Language> {
     let lang_code = code.to_lowercase();
     let result = sqlx::query_as!(Language, "select id, code, name from ref_languages where code = $1", lang_code)
         .fetch_optional(database_pool)

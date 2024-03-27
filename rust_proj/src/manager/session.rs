@@ -1,13 +1,13 @@
 use crate::{
     models::data::{ClaimsModel, ProfileModel},
-    session::{claims::Claims, models::AccountModel, tokens::account_to_jwt},
+    session::{claims::Claims, models::UserAccountModel, tokens::account_to_jwt},
 };
 use http::HeaderValue;
 pub mod pages;
 mod templates;
 
 pub fn create_cookie_header<'a>(
-    user_account: &AccountModel,
+    user_account: &UserAccountModel,
     profile: &ProfileModel,
 ) -> HeaderValue {
     let claims_model: ClaimsModel = ClaimsModel {

@@ -1,9 +1,9 @@
 use crate::data_context::context::DatabasePool;
-use super::models::AccountModel;
+use super::models::UserAccountModel;
 
-pub async fn save_sign_up(database_pool: &DatabasePool, account_model: &AccountModel) -> bool {
+pub async fn save_sign_up(database_pool: &DatabasePool, account_model: &UserAccountModel) -> bool {
     let result = sqlx::query!(
-        "insert into accounts(id, email, email_normalised, password_hash, salt, sign_up, status) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+        "insert into user_accounts(id, email, email_normalised, password_hash, salt, sign_up, status) VALUES ($1, $2, $3, $4, $5, $6, $7)",
         account_model.id,
         account_model.email,
         account_model.email_normalised,
@@ -27,9 +27,9 @@ pub async fn save_sign_up(database_pool: &DatabasePool, account_model: &AccountM
     }
 }
 
-pub async fn get_account_by_email(database_pool: &DatabasePool, email_normalised: &String) -> Option<AccountModel> {
-    let result = sqlx::query_as!(AccountModel, 
-        "select id, email, email_normalised, password_hash, salt, sign_up, status FROM accounts where email_normalised=$1",
+pub async fn get_account_by_email(database_pool: &DatabasePool, email_normalised: &String) -> Option<UserAccountModel> {
+    let result = sqlx::query_as!(UserAccountModel, 
+        "select id, email, email_normalised, password_hash, salt, sign_up, status FROM user_accounts where email_normalised=$1",
    email_normalised).fetch_optional(database_pool).await;
     match result {
         Ok(am) => am,
