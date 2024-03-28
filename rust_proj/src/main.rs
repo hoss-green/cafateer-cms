@@ -1,3 +1,5 @@
+use core::panic;
+
 use axum::{
     extract::Request,
     middleware,
@@ -22,8 +24,22 @@ use tower_http::normalize_path::NormalizePathLayer;
 
 #[tokio::main]
 async fn main() {
+
+    //uuid for single mode = 
+    //deadbeef-0000-dead-beef-010203040506
+    
+    let single_user_id = uuid::Uuid::try_parse("deadbeef-0000-dead-beef-010203040506").unwrap();
     dotenv().ok();
     let pg = std::env::var("DATABASE_URL").unwrap();
+    let single_user_mode: bool = match std::env::var("SINGLE_USER_MODE") {
+        Ok(value) => match value.to_lowercase().as_str() {
+            "true" => true,
+            "false" => false,
+            _ => panic!("SINGLE_USER_MODE must be either 'true' or 'false'"),
+        },
+        Err(err) => panic!("SINGLE_USER_MODE not set error: {}", err),
+    };
+
     let state: AppState = AppState {
         database_pool: match cafeteer::data_context::context::get_db_pool(pg).await {
             Ok(db) => {
@@ -35,6 +51,7 @@ async fn main() {
                 panic!("Could not create database and connect to pool");
             }
         },
+        single_user_mode,
     };
     setup_db(&state).await;
 
@@ -95,13 +112,11 @@ async fn main() {
 
     let host = std::env::var("HOST").unwrap();
     let post = std::env::var("PORT").unwrap();
-    
+
     let advertise_url = format!("{}:{}", host, post);
     println!("Server is running on: {}", advertise_url);
 
-    let listener = tokio::net::TcpListener::bind(advertise_url)
-        .await
-        .unwrap();
+    let listener = tokio::net::TcpListener::bind(advertise_url).await.unwrap();
     // this is to ignore the trailing slash
     // everthing in app happens BEFORE the routing
     let app = NormalizePathLayer::trim_trailing_slash().layer(router);

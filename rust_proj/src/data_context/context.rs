@@ -9,6 +9,7 @@ const DB_CONN_TIMEOUT_SEC: u64 = 3;
 #[derive(Clone)]
 pub struct AppState {
     pub database_pool: DatabasePool,
+    pub single_user_mode: bool
 }
 
 
