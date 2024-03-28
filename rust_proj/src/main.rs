@@ -24,10 +24,9 @@ use tower_http::normalize_path::NormalizePathLayer;
 
 #[tokio::main]
 async fn main() {
-
-    //uuid for single mode = 
+    //uuid for single mode:
     //deadbeef-0000-dead-beef-010203040506
-    
+
     let single_user_id = uuid::Uuid::try_parse("deadbeef-0000-dead-beef-010203040506").unwrap();
     dotenv().ok();
     let pg = std::env::var("DATABASE_URL").unwrap();
@@ -51,6 +50,7 @@ async fn main() {
                 panic!("Could not create database and connect to pool");
             }
         },
+        single_user_id,
         single_user_mode,
     };
     setup_db(&state).await;
