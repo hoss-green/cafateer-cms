@@ -48,7 +48,8 @@ pub async fn get_restaurant_with_lang(
         };
     let available_languages =
         crate::data_context::references::get_languages(&app_state.database_pool).await;
-    let language_codes = crate::data_context::manager::profile_languages::get_all_ids_debug(
+    
+    let language_codes = crate::data_context::presenter::fetcher::get_all_ids_debug(
         &app_state.database_pool,
     )
     .await;

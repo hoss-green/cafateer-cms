@@ -1,9 +1,9 @@
 use sqlx::Postgres;
 
 use crate::{
-    data_context::context::AppState,
+    data_context::context::{AppState, DatabasePool},
     models::{
-        data::{CategoryModel, DetailsModel},
+        data::{CategoryModel, DetailsModel, ProfileLanguagesModel},
         views::menu_item_view_model::MenuItemViewModel,
     },
 };
@@ -44,24 +44,6 @@ pub async fn get_categories(app_state: &AppState, lang: i32) -> Vec<CategoryMode
     }
 }
 
-// pub async fn get_menu_items(app_state: &AppState, lang: i32) -> Vec<MenuItemModel> {
-//     let result = sqlx::query_as!(
-//         MenuItemModel,
-//         "select id, lang, title, description, price, owner_id from menu_items where lang=$1",
-//         lang
-//     )
-//     .fetch_all(&app_state.database_pool)
-//     .await;
-//
-//     match result {
-//         Ok(r) => r,
-//         Err(err) => {
-//             println!("Cannot fetch menu items, err: {}", err);
-//             vec![]
-//         }
-//     }
-// }
-
 pub async fn get_menu_item_vms(app_state: &AppState, lang: i32) -> Vec<MenuItemViewModel> {
     let result = sqlx::query_as::<Postgres, MenuItemViewModel>(
         "select mi.id, title, description, d.price, mi.lang, mi.owner_id, d.category, d.allergies from menu_items as mi join menu_item_details d on mi.id = d.id and mi.owner_id = d.owner_id where mi.lang = $1")
@@ -73,6 +55,24 @@ pub async fn get_menu_item_vms(app_state: &AppState, lang: i32) -> Vec<MenuItemV
         Ok(r) => r,
         Err(err) => {
             println!("Cannot fetch menu items, err: {}", err);
+            vec![]
+        }
+    }
+}
+
+pub async fn get_all_ids_debug(
+    database_pool: &DatabasePool,
+) -> Vec<i32> {
+    let result = sqlx::query_as!(
+        ProfileLanguagesModel,
+        r#"select id, language, owner_id, published from account_languages"#,
+    )
+    .fetch_all(database_pool)
+    .await;
+    match result {
+        Ok(r) => r.iter().map(|language_model| language_model.language).collect::<Vec<i32>>(),
+        Err(err) => {
+            println!("Cannot fetch account, err: {}", err);
             vec![]
         }
     }

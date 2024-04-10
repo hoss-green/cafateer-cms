@@ -1,4 +1,5 @@
 use crate::manager::templates::components::PrimaryLanguageListVm;
+use crate::manager::templates::toggle_buttons::{DisableButton, EnableButton};
 use crate::manager::templates::view_models::AccountLanguageVm;
 use crate::{
     data_context::{context::AppState, references::get_languages},
@@ -6,6 +7,7 @@ use crate::{
     session::claims::Claims,
 };
 use askama::Template;
+use askama_axum::IntoResponse;
 use axum::{
     extract::{Path, State},
     response::Html,
@@ -58,8 +60,7 @@ pub async fn post_language(
     };
 
     let account_languages =
-        crate::data_context::manager::profile_languages::get_all(database_pool, &claims.sub)
-            .await;
+        crate::data_context::manager::profile_languages::get_all(database_pool, &claims.sub).await;
     let account_languages = match account_languages.len() {
         0 => {
             let am = ProfileLanguagesModel {
@@ -98,7 +99,7 @@ pub async fn post_language(
     (StatusCode::OK, Html(page))
 }
 
-pub async fn post_primary_language(
+pub async fn set_primary_language(
     Extension(claims): Extension<Claims<ClaimsModel>>,
     State(app_state): State<AppState>,
     Path(id): Path<i32>,
@@ -107,8 +108,7 @@ pub async fn post_primary_language(
     let languages = get_languages(database_pool).await;
     let mut profile = crate::data_context::manager::profile::get(database_pool, &claims.sub).await;
     let account_languages =
-        crate::data_context::manager::profile_languages::get_all(database_pool, &claims.sub)
-            .await;
+        crate::data_context::manager::profile_languages::get_all(database_pool, &claims.sub).await;
     profile.primary_language = id;
     crate::data_context::manager::profile::set(&app_state.database_pool, &profile).await;
     let primary_dropdown = PrimaryLanguageListVm {
@@ -130,4 +130,39 @@ pub async fn post_primary_language(
     };
     let page: String = primary_dropdown.render().unwrap().to_string();
     (StatusCode::OK, Html(page))
+}
+
+pub async fn enable_language(
+    Extension(claims): Extension<Claims<ClaimsModel>>,
+    State(app_state): State<AppState>,
+    Path(id): Path<uuid::Uuid>,
+) -> impl IntoResponse {
+    let database_pool = &app_state.database_pool;
+    let _enable_success =
+        crate::data_context::manager::profile_languages::enable(database_pool, &claims.sub, &id)
+            .await;
+
+    let button: DisableButton = DisableButton {
+        post_url: format!("/manager/config/language/disable/{}", id),//.to_string(),
+        button_text: "Disable".to_string(),
+    };
+
+    Html(button.render().unwrap()).into_response()
+}
+
+pub async fn disable_language(
+    Extension(claims): Extension<Claims<ClaimsModel>>,
+    State(app_state): State<AppState>,
+    Path(id): Path<uuid::Uuid>,
+) -> impl IntoResponse {
+    let database_pool = &app_state.database_pool;
+    let _disable_success =
+        crate::data_context::manager::profile_languages::disable(database_pool, &claims.sub, &id)
+            .await;
+    let button: EnableButton =  EnableButton {
+        post_url: format!("/manager/config/language/enable/{}", id),//.to_string(),
+        button_text: "Enable".to_string(),
+    };
+
+    Html(button.render().unwrap()).into_response()
 }

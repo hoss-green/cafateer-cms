@@ -26,7 +26,7 @@ pub struct LanguagesPageVm<'a> {
     pub title: &'a str,
     pub primary_language: Language,
     pub system_languages: Vec<Language>,
-    pub user_languages: Vec<AccountLanguageVm>,
+    pub user_languages: Vec<AccountLanguageVm>, 
 }
 
 #[derive(Template)]

@@ -84,16 +84,33 @@ async fn main() {
             "/manager/menu/categories/:id",
             delete(editors::delete_category_item),
         )
+        .route(
+            "/manager/menu/categories/details/:id",
+            get(editors::get_category_details),
+        )
+        .route(
+            "/manager/menu/categories/details/",
+            put(editors::update_category_details),
+        )
+        //MENU_ITEMS
         .route("/manager/menu/item/:id/:lang", get(editors::get_menu_item))
         .route("/manager/menu/item", post(editors::create_menu_item))
         .route("/manager/menu/item", put(editors::update_menu_item))
         .route("/manager/menu/item/:id", delete(editors::delete_menu_item))
         .route("/manager/menu/item/details/:id", get(get_menu_item_details))
         .route("/manager/menu/item/details", put(update_menu_item_details))
+        //LANGUAGES
         .route("/manager/config/languages", get(languages_page::get))
-        // .route("/manager/languages", post(post_language))
+        .route(
+            "/manager/config/language/enable/:id",
+            put(editors::enable_language),
+        )
+        .route(
+            "/manager/config/language/disable/:id",
+            put(editors::disable_language),
+        )
         .route("/manager/config", get(account_page::get))
-        // .route("/manager/config/languages", post(post_language))
+        //SESSION
         .route("/session", get(Redirect::permanent("/session/login")))
         .route("/session/login", get(session::pages::login))
         .route("/session/login", post(session::pages::do_login))
@@ -105,7 +122,7 @@ async fn main() {
         )
         .route(
             "/manager/config/primary_language/:id",
-            post(editors::post_primary_language),
+            post(editors::set_primary_language),
         )
         .route_layer(middleware::from_fn(auth_middleware::check_auth))
         .with_state(state);

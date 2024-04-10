@@ -8,6 +8,7 @@ mod claims_model;
 pub use profile_model::ProfileModel;
 pub use profile_languages_model::ProfileLanguagesModel;
 pub use category_model::CategoryModel;
+pub use category_model::CategoryDetailsModel;
 pub use detail_items::BioModel;
 pub use detail_items::DetailLangModel;
 pub use detail_items::DetailsModel;

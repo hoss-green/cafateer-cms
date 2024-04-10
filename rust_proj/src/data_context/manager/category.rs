@@ -7,21 +7,20 @@ pub async fn get(
 ) -> CategoryModel {
     let result = sqlx::query_as!(
         CategoryModel,
-        "select id, lang, title, owner_id, NULL as lang_name from menu_categories where id = $1 and lang = $2 and owner_id = $3",
+        "select id, lang, owner_id, title, NULL as lang_name from menu_categories where id = $1 and lang = $2",
         id,
         lang,
-        owner_id
     )
     .fetch_optional(database_pool)
     .await;
     match result {
         Ok(r) => match r {
             Some(item) => item,
-            None => CategoryModel::new(Some(id), *owner_id),
+            None => CategoryModel::new(Some(id), owner_id),
         },
         Err(err) => {
             println!("Cannot fetch menu items, err: {}", err);
-            CategoryModel::new(Some(id), *owner_id)
+            CategoryModel::new(Some(id), owner_id)
         }
     }
 }

@@ -1,5 +1,5 @@
 {%- import "presenter/components/menu_item.html" as scope -%}
-{% macro tab(name, menu_items) %}
+{% macro tab(name, menu_items, first_run) %}
 <!-- tab -->
 <input type="radio" name="my_tabs_1" role="tab" class="tab" aria-label="{{ name }}" />
 <div role="tabpanel" class="tab-content w-full max-w-5xl">

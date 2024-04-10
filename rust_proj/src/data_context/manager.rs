@@ -7,3 +7,5 @@ pub mod menu_items;
 pub mod menu_item;
 pub mod menu_item_details;
 pub mod menu_item_detail;
+pub mod category_detail;
+pub mod category_details;

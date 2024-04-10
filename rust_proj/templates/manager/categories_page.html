@@ -18,7 +18,7 @@
 <div id="category_container">
   <div class="flex flex-col gap-2">
     {% for category_button in category_buttons %}
-      {% call category_edit_button::render(category_button.id, category_button.title, category_button.user_languages) %}
+      {% call category_edit_button::render(category_button.id, category_button.title, category_button.user_languages, category_button.published) %}
     {% endfor %}
   <div>
 </div>

@@ -24,4 +24,5 @@ pub struct CategoryButtonVm {
     pub id: uuid::Uuid,
     pub title: String,
     pub user_languages: Vec<Language>,
+    pub published: bool
 }

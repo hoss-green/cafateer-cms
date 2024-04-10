@@ -1,5 +1,5 @@
 use crate::{
-    data_context::{self, context::AppState},
+    data_context::{self, context::AppState, manager::category_detail},
     manager::templates::{buttons::CategoryButtonVm, pages::CategoriesPageVm},
     models::data::{reference_items::Language, ClaimsModel},
     session::claims::Claims,
@@ -16,11 +16,14 @@ pub async fn get(
 ) -> (StatusCode, Html<String>) {
     let database_pool = &app_state.database_pool;
     let account_languages =
-        crate::data_context::manager::profile_languages::get_all_ids(database_pool, &claims.sub).await;
+        crate::data_context::manager::profile_languages::get_all_ids(database_pool, &claims.sub)
+            .await;
     let languages = Language::vec_from_int_vec(
         &data_context::references::get_languages(database_pool).await,
         &account_languages,
     );
+    let category_details =
+        data_context::manager::category_details::get_all(&app_state, &claims.sub).await;
     let mut fetched_categories =
         data_context::manager::categories::get_category_list(database_pool, &claims.sub).await;
     fetched_categories
@@ -41,10 +44,20 @@ pub async fn get(
                 Some(cat) => cat.clone().title.unwrap_or("No title".to_string()),
                 None => "No title".to_string(),
             };
+
+            let published = match category_details
+                .iter()
+                .find(|cat| cat.id == *unique_cat.0)
+            {
+                Some(cat) => cat.published,
+                None => false,
+            };
+
             CategoryButtonVm {
                 id: *unique_cat.0,
                 title: button_title,
                 user_languages: languages.clone(),
+                published,
             }
         })
         .collect();

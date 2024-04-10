@@ -20,24 +20,6 @@ pub async fn get_all(
     }
 }
 
-pub async fn get_all_ids_debug(
-    database_pool: &DatabasePool,
-) -> Vec<i32> {
-    let result = sqlx::query_as!(
-        ProfileLanguagesModel,
-        r#"select id, language, owner_id, published from account_languages"#,
-    )
-    .fetch_all(database_pool)
-    .await;
-    match result {
-        Ok(r) => r.iter().map(|language_model| language_model.language).collect::<Vec<i32>>(),
-        Err(err) => {
-            println!("Cannot fetch account, err: {}", err);
-            vec![]
-        }
-    }
-}
-
 pub async fn get_all_ids(
     database_pool: &DatabasePool,
     owner_id: &uuid::Uuid,
@@ -126,24 +108,53 @@ pub async fn add(
     }
 }
 
-pub async fn set_account_details(
+pub async fn disable(
     database_pool: &DatabasePool,
-    profile_languages_model: &ProfileLanguagesModel,
+    owner_id: &uuid::Uuid,
+    id: &uuid::Uuid,
 ) -> bool {
     let result = sqlx::query!(
-        "insert into profiles(id) VALUES ($1)",
-        profile_languages_model.id
+        "update account_languages
+            SET published = false WHERE owner_id = $1 and id = $2 ",
+        owner_id,
+        id,
     )
     .execute(database_pool)
     .await;
 
     match result {
         Ok(_r) => {
-            println!("Saved account succesful");
+            println!("Language Disabled successfully");
             true
         }
         Err(err) => {
-            println!("Cannot save account fail, error: {}", err);
+            println!("Disable language, fail, error: {}", err);
+            false
+        }
+    }
+}
+
+pub async fn enable(
+    database_pool: &DatabasePool,
+    owner_id: &uuid::Uuid,
+    id: &uuid::Uuid,
+) -> bool {
+    let result = sqlx::query!(
+        "update account_languages
+            SET published = true WHERE owner_id = $1 and id = $2 ",
+        owner_id,
+        id,
+    )
+    .execute(database_pool)
+    .await;
+
+    match result {
+        Ok(_r) => {
+            println!("Enabled language successfully");
+            true
+        }
+        Err(err) => {
+            println!("Enable language, fail, error: {}", err);
             false
         }
     }

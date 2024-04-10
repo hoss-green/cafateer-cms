@@ -1,5 +1,5 @@
 {%- import "manager/macros/category_dropdown_list.html" as
-category_dropdown_list -%} {% macro render(id, title, but_languages) %}
+category_dropdown_list -%} {% macro render(id, title, but_languages, enabled) %}
 <div
   id="category_button{{id}}"
   class="w-full flex flex-col p-1 bg-gray-50 rounded-md"
@@ -11,6 +11,32 @@ category_dropdown_list -%} {% macro render(id, title, but_languages) %}
     <div></div>
   </div>
   <div class="w-full flex justify-end items-center gap-2">
+    {%- if enabled -%}
+    <button
+      data-drawer-target="right-edit-drawer"
+      data-drawer-show="right-edit-drawer"
+      data-drawer-placement="right"
+      aria-controls="right-edit-drawer"
+      hx-get="/manager/menu/item/details/{{ id }}"
+      hx-target="#sidebar_editor"
+      type="button"
+      class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+    >
+        Disable
+      {% else %}
+    <button
+      data-drawer-target="right-edit-drawer"
+      data-drawer-show="right-edit-drawer"
+      data-drawer-placement="right"
+      aria-controls="right-edit-drawer"
+      hx-get="/manager/menu/item/details/{{ id }}"
+      hx-target="#sidebar_editor"
+      type="button"
+      class="text-white bg-slate-700 hover:bg-slate-800 focus:ring-4 focus:outline-none focus:ring-slate-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-slate-600 dark:hover:bg-slate-700 dark:focus:ring-slate-800"
+    >
+        Publish
+      {% endif %}
+    </button>
     <button
       hx-delete="/manager/menu/categories/{{id}}"
       hx-swap="outerHTML"
