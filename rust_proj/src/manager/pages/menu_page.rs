@@ -50,6 +50,13 @@ pub async fn get(
                     None => "None".to_string(),
                 },
                 user_languages: languages.clone(),
+                published: match menu_item_details
+                    .iter()
+                    .find(|menu_item_desc| menu_item_desc.id == *unique_mi.0)
+                {
+                    Some(cat) => cat.published,
+                    None => false,
+                },
             }
         })
         .collect();

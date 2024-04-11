@@ -30,6 +30,7 @@ pub struct MenuItemDetailsModel {
     pub allergies: Option<sqlx::types::Json<Vec<Uuid>>>,
     pub category: Option<Uuid>,
     pub price: Option<f64>,
+    pub published: bool
 }
 
 impl MenuItemDetailsModel {
@@ -40,6 +41,7 @@ impl MenuItemDetailsModel {
             category: None,
             allergies: None,
             price: None,
+            published: false
         }
     }
 }

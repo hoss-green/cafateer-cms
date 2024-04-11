@@ -45,4 +45,5 @@ pub struct MenuItemDetailsEditorVm {
     pub category: uuid::Uuid,
     pub categories: Vec<CategoryModel>,
     pub price: f64,
+    pub published: bool
 }

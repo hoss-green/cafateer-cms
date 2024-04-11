@@ -16,6 +16,7 @@ pub struct MenuItemButtonVm {
     pub title: String,
     pub category: String,
     pub user_languages: Vec<Language>,
+    pub published: bool
 }
 
 #[derive(Template, Debug, Clone)]

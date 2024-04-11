@@ -1,9 +1,8 @@
-use crate::data_context::context::AppState;
+use crate::data_context::context::{AppState, DatabasePool};
 use crate::models::data::CategoryDetailsModel;
-use sqlx::Postgres;
 
 pub async fn get(
-    app_state: &AppState,
+    database_pool: &DatabasePool,
     owner_id: &uuid::Uuid,
     id: &uuid::Uuid,
 ) -> CategoryDetailsModel {
@@ -12,7 +11,7 @@ pub async fn get(
         r#"select id, owner_id, published from menu_category_details where id = $1"#,
         id
     )
-    .fetch_one(&app_state.database_pool)
+    .fetch_one(database_pool)
     .await;
     match result {
         Ok(r) => r,
@@ -24,7 +23,7 @@ pub async fn get(
 }
 
 pub async fn set(
-    app_state: &AppState,
+    database_pool: &DatabasePool,
     account_id: &uuid::Uuid,
     category_details_model: &CategoryDetailsModel,
 ) -> bool {
@@ -37,7 +36,7 @@ pub async fn set(
         account_id,
         category_details_model.published
     )
-    .execute(&app_state.database_pool)
+    .execute(database_pool)
     .await;
 
     match result {
@@ -47,6 +46,58 @@ pub async fn set(
         }
         Err(err) => {
             println!("Cannot save menu item details fail, error: {}", err);
+            false
+        }
+    }
+}
+
+pub async fn disable(
+    database_pool: &DatabasePool,
+    owner_id: &uuid::Uuid,
+    id: &uuid::Uuid,
+) -> bool {
+    let result = sqlx::query!(
+        "update menu_category_details
+            SET published = false WHERE owner_id = $1 and id = $2 ",
+        owner_id,
+        id,
+    )
+    .execute(database_pool)
+    .await;
+
+    match result {
+        Ok(_r) => {
+            println!("Catagory Disabled successfully");
+            true
+        }
+        Err(err) => {
+            println!("Disable category, fail, error: {}", err);
+            false
+        }
+    }
+}
+
+pub async fn enable(
+    database_pool: &DatabasePool,
+    owner_id: &uuid::Uuid,
+    id: &uuid::Uuid,
+) -> bool {
+    let result = sqlx::query!(
+        "update menu_category_details 
+            SET published = true WHERE owner_id = $1 and id = $2 ",
+        owner_id,
+        id,
+    )
+    .execute(database_pool)
+    .await;
+
+    match result {
+        Ok(_r) => {
+            println!("Enabled category successfully");
+            true
+        }
+        Err(err) => {
+            println!("Enable category, fail, error: {}", err);
             false
         }
     }

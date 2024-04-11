@@ -1,10 +1,12 @@
 use crate::manager::templates::components::MenuItemDetailsEditorVm;
+use crate::manager::templates::toggle_buttons::{DisableButton, EnableButton};
 use crate::{
     data_context::{self, context::AppState},
     models::data::{reference_items::Language, CategoryModel, ClaimsModel, MenuItemDetailsModel},
     session::claims::Claims,
 };
 use askama::Template;
+use askama_axum::IntoResponse;
 use axum::{
     extract::{Path, State},
     response::Html,
@@ -61,7 +63,7 @@ pub async fn get_menu_item_details(
     });
 
     let menu_item_details =
-        data_context::manager::menu_item_detail::get(&app_state, &claims.sub, &id).await;
+        data_context::manager::menu_item_detail::get(&app_state.database_pool, &claims.sub, &id).await;
     let menu_item_editor = MenuItemDetailsEditorVm {
         id: menu_item_details.id,
         owner_id: claims.sub,
@@ -69,6 +71,7 @@ pub async fn get_menu_item_details(
         category: menu_item_details.category.unwrap_or(uuid::Uuid::nil()),
         price: menu_item_details.price.unwrap_or(0.0),
         categories,
+        published: menu_item_details.published
     };
     let menu_editor: String = menu_item_editor.render().unwrap().to_string();
     (StatusCode::OK, Html(menu_editor))
@@ -80,7 +83,7 @@ pub async fn update_menu_item_details(
     Form(menu_item_form): Form<MenuItemDetailsForm>,
 ) -> (StatusCode, Html<String>) {
     let result = data_context::manager::menu_item_detail::set(
-        &app_state,
+        &app_state.database_pool,
         &claims.sub,
         &MenuItemDetailsModel {
             id: menu_item_form.id,
@@ -91,6 +94,7 @@ pub async fn update_menu_item_details(
                 None => None,
             },
             price: menu_item_form.price,
+            published: menu_item_form.published 
         },
     )
     .await;
@@ -100,10 +104,46 @@ pub async fn update_menu_item_details(
     (StatusCode::OK, Html("Error".to_string()))
 }
 
+pub async fn enable_menu_item(
+    Extension(claims): Extension<Claims<ClaimsModel>>,
+    State(app_state): State<AppState>,
+    Path(id): Path<uuid::Uuid>,
+) -> impl IntoResponse {
+    let database_pool = &app_state.database_pool;
+    let _enable_success =
+        crate::data_context::manager::menu_item_detail::enable(database_pool, &claims.sub, &id)
+            .await;
+
+    let button: DisableButton = DisableButton {
+        post_url: format!("/manager/menu/categories/disable/{}", id),//.to_string(),
+        button_text: "Disable".to_string(),
+    };
+
+    Html(button.render().unwrap()).into_response()
+}
+
+pub async fn disable_menu_item(
+    Extension(claims): Extension<Claims<ClaimsModel>>,
+    State(app_state): State<AppState>,
+    Path(id): Path<uuid::Uuid>,
+) -> impl IntoResponse {
+    let database_pool = &app_state.database_pool;
+    let _disable_success =
+        crate::data_context::manager::menu_item_detail::disable(database_pool, &claims.sub, &id)
+            .await;
+    let button: EnableButton =  EnableButton {
+        post_url: format!("/manager/menu/categories/enable/{}", id),//.to_string(),
+        button_text: "Enable".to_string(),
+    };
+
+    Html(button.render().unwrap()).into_response()
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct MenuItemDetailsForm {
     pub id: uuid::Uuid,
     pub category: Option<uuid::Uuid>,
     pub allergies: Option<Vec<uuid::Uuid>>,
     pub price: Option<f64>,
+    pub published: bool
 }

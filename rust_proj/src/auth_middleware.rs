@@ -1,9 +1,8 @@
-use std::{borrow::BorrowMut, str::FromStr};
-
 use crate::{models::data::ClaimsModel, session::validate_jwt_and_get_claims};
-use askama_axum::{IntoResponse, Response};
+use askama_axum::IntoResponse;
 use axum::{extract::Request, middleware::Next, response::Redirect};
 use http::{header::COOKIE, HeaderMap, HeaderName, HeaderValue, StatusCode};
+use std::str::FromStr;
 
 pub async fn check_auth(headers: HeaderMap, mut request: Request, next: Next) -> impl IntoResponse {
     match request.uri().path_and_query() {
@@ -13,16 +12,16 @@ pub async fn check_auth(headers: HeaderMap, mut request: Request, next: Next) ->
                 return next.run(request).await.into_response();
             }
         }
-        None => return (StatusCode::UNAUTHORIZED).into_response()
+        None => return (StatusCode::UNAUTHORIZED).into_response(),
     };
-    let jwt = get_jwt_from_header(headers);
+    let jwt = get_jwt_from_header(&headers);
     match jwt {
         Ok(jwt) => {
             // println!("Middleware hit {}", jwt);
             match validate_jwt_and_get_claims::<ClaimsModel>(jwt) {
                 Ok(cms) => {
                     request.extensions_mut().insert(cms.clone());
-                    return (next.run(request).await).into_response()
+                    return (next.run(request).await).into_response();
                 }
                 Err(err) => println!("Could not validate jwt, err: {}", err),
             };
@@ -32,16 +31,35 @@ pub async fn check_auth(headers: HeaderMap, mut request: Request, next: Next) ->
         }
     };
 
+
+    if !is_hx_request(&headers) {
+        return Redirect::to("/session/login").into_response();
+    }
+
     let response = "redirect".into_response();
     let mut red = (StatusCode::OK, response).into_response();
     let _ = red.headers_mut().append(
         HeaderName::from_str("HX-Redirect").unwrap(),
         HeaderValue::from_str("/session/login").unwrap(),
-    ); 
+    );
+    let _ = red.headers_mut().append(
+        HeaderName::from_str("HX-Refresh").unwrap(),
+        HeaderValue::from_str("true").unwrap(),
+    );
     red
 }
 
-fn get_jwt_from_header(headers: HeaderMap) -> Result<String, String> {
+fn is_hx_request(headers: &HeaderMap) -> bool {
+    match headers.get("HX-Request") {
+        Some(hx_header) => match hx_header.to_str().unwrap_or("false").to_lowercase().as_str() {
+            "true" => true,
+            _ => false,
+        },
+        None => false,
+    }
+}
+
+fn get_jwt_from_header(headers: &HeaderMap) -> Result<String, String> {
     let cookie_headers = match headers.get(COOKIE) {
         Some(cookie_header) => cookie_header,
         None => return Err("Could not find header for cookie".to_string()),
