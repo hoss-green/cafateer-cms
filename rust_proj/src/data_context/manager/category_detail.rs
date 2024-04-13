@@ -1,4 +1,4 @@
-use crate::data_context::context::{AppState, DatabasePool};
+use crate::data_context::context::DatabasePool;
 use crate::models::data::CategoryDetailsModel;
 
 pub async fn get(

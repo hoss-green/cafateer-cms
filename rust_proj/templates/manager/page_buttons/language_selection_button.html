@@ -1,0 +1,38 @@
+{%- import "manager/toggle_buttons/enable_button.html" as enable_button -%}<!-- -->
+{%- import "manager/toggle_buttons/disable_button.html" as disable_button -%}<!-- -->
+{%- import "manager/toggle_buttons/activate_button.html" as activate_button -%}<!-- -->
+{% macro render(id, code, name, user_lang_id, published) %}
+<!-- -->
+<div
+  id="language_button{{ id }}"
+  class="w-full flex flex-col p-1 bg-gray-50 rounded-md"
+>
+  <div class="w-full flex justify-between items-center">
+    <div class="flex flex-col items-start">
+      <div class="font-bold">({{ code.to_uppercase() }}) {{ name }}</div>
+    </div>
+    <div></div>
+  </div>
+    {% let lang_id = id.to_string() %}
+    <div id="button_container{{ lang_id }}" class="w-full flex justify-end items-center gap-2">
+    {% let activated = user_lang_id.is_some() %}
+    {% if !activated %}
+    {% call activate_button::render(format!("/manager/config/language/activate/{}", lang_id), lang_id) %}
+    {% else %}
+      {% let ul_id = user_lang_id.unwrap().to_string() %}
+      {%- if published -%}
+      <!-- -->
+      {% call
+      disable_button::render(format!("/manager/config/language/disable/{}", ul_id.to_string()), "Disable".to_string()) %}
+      <!-- -->
+      {% else %}
+      <!-- -->
+      {% call enable_button::render(format!("/manager/config/language/enable/{}",
+      ul_id.to_string()), "Enable".to_string()) %}
+      <!-- -->
+      {% endif %}
+    {% endif %}
+  </div>
+</div>
+
+{% endmacro %}

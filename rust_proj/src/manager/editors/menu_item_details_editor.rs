@@ -20,7 +20,7 @@ pub async fn get_menu_item_details(
     Extension(claims): Extension<Claims<ClaimsModel>>,
     State(app_state): State<AppState>,
     Path(id): Path<uuid::Uuid>,
-) -> (StatusCode, Html<String>) {
+) -> impl IntoResponse {
     let database_pool = &app_state.database_pool;
     let account_languages =
         data_context::manager::profile_languages::get_all_ids(database_pool, &claims.sub).await;
@@ -63,7 +63,8 @@ pub async fn get_menu_item_details(
     });
 
     let menu_item_details =
-        data_context::manager::menu_item_detail::get(&app_state.database_pool, &claims.sub, &id).await;
+        data_context::manager::menu_item_detail::get(&app_state.database_pool, &claims.sub, &id)
+            .await;
     let menu_item_editor = MenuItemDetailsEditorVm {
         id: menu_item_details.id,
         owner_id: claims.sub,
@@ -71,10 +72,11 @@ pub async fn get_menu_item_details(
         category: menu_item_details.category.unwrap_or(uuid::Uuid::nil()),
         price: menu_item_details.price.unwrap_or(0.0),
         categories,
-        published: menu_item_details.published
+        published: menu_item_details.published,
     };
     let menu_editor: String = menu_item_editor.render().unwrap().to_string();
-    (StatusCode::OK, Html(menu_editor))
+    // (StatusCode::OK, Html(menu_editor))
+    menu_editor.into_response()
 }
 
 pub async fn update_menu_item_details(
@@ -94,7 +96,7 @@ pub async fn update_menu_item_details(
                 None => None,
             },
             price: menu_item_form.price,
-            published: menu_item_form.published 
+            published: menu_item_form.published,
         },
     )
     .await;
@@ -115,7 +117,7 @@ pub async fn enable_menu_item(
             .await;
 
     let button: DisableButton = DisableButton {
-        post_url: format!("/manager/menu/categories/disable/{}", id),//.to_string(),
+        post_url: format!("/manager/menu/categories/disable/{}", id), //.to_string(),
         button_text: "Disable".to_string(),
     };
 
@@ -131,8 +133,8 @@ pub async fn disable_menu_item(
     let _disable_success =
         crate::data_context::manager::menu_item_detail::disable(database_pool, &claims.sub, &id)
             .await;
-    let button: EnableButton =  EnableButton {
-        post_url: format!("/manager/menu/categories/enable/{}", id),//.to_string(),
+    let button: EnableButton = EnableButton {
+        post_url: format!("/manager/menu/categories/enable/{}", id), //.to_string(),
         button_text: "Enable".to_string(),
     };
 
@@ -145,5 +147,5 @@ pub struct MenuItemDetailsForm {
     pub category: Option<uuid::Uuid>,
     pub allergies: Option<Vec<uuid::Uuid>>,
     pub price: Option<f64>,
-    pub published: bool
+    pub published: bool,
 }

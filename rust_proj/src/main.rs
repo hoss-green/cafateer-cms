@@ -12,7 +12,7 @@ use cafeteer::{
     data_context::context::AppState,
     manager::{
         editors::{self, get_menu_item_details, post_details_home, update_menu_item_details},
-        pages::{account_page, categories_page, home_page, languages_page, menu_page},
+        pages::{config_page, categories_page, home_page, languages_page, menu_page},
     },
     presenter::{menu::get_menu, restaurant::get_restaurant_with_lang},
 };
@@ -84,14 +84,14 @@ async fn main() {
             "/manager/menu/categories/:id",
             delete(editors::delete_category_item),
         )
-        .route(
-            "/manager/menu/categories/details/:id",
-            get(editors::get_category_details),
-        )
-        .route(
-            "/manager/menu/categories/details/",
-            put(editors::update_category_details),
-        )
+        // .route(
+        //     "/manager/menu/categories/details/:id",
+        //     get(editors::get_category_details),
+        // )
+        // .route(
+        //     "/manager/menu/categories/details/",
+        //     put(editors::update_category_details),
+        // )
         .route(
             "/manager/menu/categories/enable/:id",
             put(editors::enable_category),
@@ -112,6 +112,10 @@ async fn main() {
         //LANGUAGES
         .route("/manager/config/languages", get(languages_page::get))
         .route(
+            "/manager/config/language/activate/:id",
+            put(editors::activate_language),
+        )
+        .route(
             "/manager/config/language/enable/:id",
             put(editors::enable_language),
         )
@@ -119,7 +123,7 @@ async fn main() {
             "/manager/config/language/disable/:id",
             put(editors::disable_language),
         )
-        .route("/manager/config", get(account_page::get))
+        .route("/manager/config", get(config_page::get))
         //SESSION
         .route("/session", get(Redirect::permanent("/session/login")))
         .route("/session/redirect-login", get(Redirect::permanent("/session/login")))

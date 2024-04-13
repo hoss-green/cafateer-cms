@@ -7,3 +7,12 @@ pub struct AccountLanguageVm {
     pub code: i32,
     pub published: bool,
 }
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SelectableLanguageVm {
+    pub lang_id: i32,
+    pub code: String,
+    pub title: String,
+    pub user_lang_id: Option<uuid::Uuid>,
+    pub published: bool
+}

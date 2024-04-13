@@ -1,6 +1,6 @@
 use crate::{
-    data_context::{self, context::AppState, manager::category_detail},
-    manager::templates::{buttons::CategoryButtonVm, pages::CategoriesPageVm},
+    data_context::{self, context::AppState},
+    manager::templates::{component_buttons::CategoryButtonVm, pages::CategoriesPageVm},
     models::data::{reference_items::Language, ClaimsModel},
     session::claims::Claims,
 };
@@ -15,9 +15,15 @@ pub async fn get(
     State(app_state): State<AppState>,
 ) -> (StatusCode, Html<String>) {
     let database_pool = &app_state.database_pool;
-    let account_languages =
-        crate::data_context::manager::profile_languages::get_all_ids(database_pool, &claims.sub)
-            .await;
+    let account_languages: Vec<i32> =
+        crate::data_context::manager::profile_languages::get_all(database_pool, &claims.sub)
+            .await
+            .iter()
+            .filter(|&lang| {
+            lang.published
+            })
+            .map(|lang| lang.language)
+            .collect();
     let languages = Language::vec_from_int_vec(
         &data_context::references::get_languages(database_pool).await,
         &account_languages,
@@ -45,10 +51,7 @@ pub async fn get(
                 None => "No title".to_string(),
             };
 
-            let published = match category_details
-                .iter()
-                .find(|cat| cat.id == *unique_cat.0)
-            {
+            let published = match category_details.iter().find(|cat| cat.id == *unique_cat.0) {
                 Some(cat) => cat.published,
                 None => false,
             };

@@ -88,10 +88,11 @@ pub async fn add(
     account_languages_model: &ProfileLanguagesModel,
 ) -> bool {
     let result = sqlx::query!(
-        "insert into account_languages(owner_id, id, language)  VALUES ($1, $2, $3)",
+        "insert into account_languages(owner_id, id, language, published)  VALUES ($1, $2, $3, $4)",
         &account_languages_model.owner_id,
         account_languages_model.id,
         account_languages_model.language,
+        account_languages_model.published
     )
     .execute(database_pool)
     .await;

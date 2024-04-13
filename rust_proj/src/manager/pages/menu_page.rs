@@ -1,6 +1,6 @@
 use crate::{
     data_context::{self, context::AppState, manager::menu_item_details},
-    manager::templates::{buttons::MenuItemButtonVm, pages::MenuPageVm},
+    manager::templates::{component_buttons::MenuItemButtonVm, pages::MenuPageVm},
     models::data::{reference_items::Language, ClaimsModel, MenuItemDetailsModel},
     session::claims::Claims,
 };
@@ -16,7 +16,15 @@ pub async fn get(
 ) -> impl IntoResponse {
     let database_pool = &app_state.database_pool;
     let menu_item_details: Vec<MenuItemDetailsModel> = menu_item_details::get_all(&app_state, &claims.sub).await;
-    let account_languages = crate::data_context::manager::profile_languages::get_all_ids(database_pool, &claims.sub).await;
+    let account_languages: Vec<i32> =
+        crate::data_context::manager::profile_languages::get_all(database_pool, &claims.sub)
+            .await
+            .iter()
+            .filter(|&lang| {
+            lang.published
+            })
+            .map(|lang| lang.language)
+            .collect();
     let languages = Language::vec_from_int_vec(
         &data_context::references::get_languages(database_pool).await,
         &account_languages,
@@ -54,7 +62,7 @@ pub async fn get(
                     .iter()
                     .find(|menu_item_desc| menu_item_desc.id == *unique_mi.0)
                 {
-                    Some(cat) => cat.published,
+                    Some(menu_item) => menu_item.published,
                     None => false,
                 },
             }

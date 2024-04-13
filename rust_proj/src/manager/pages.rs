@@ -1,4 +1,4 @@
-pub mod account_page;
+pub mod config_page;
 pub mod categories_page;
 pub mod menu_page;
 pub mod details_page;

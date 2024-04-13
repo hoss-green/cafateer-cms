@@ -15,90 +15,6 @@ use axum::{
 };
 use http::StatusCode;
 
-pub async fn post_language(
-    Extension(claims): Extension<Claims<ClaimsModel>>,
-    State(app_state): State<AppState>,
-    body: String,
-) -> (StatusCode, Html<String>) {
-    let database_pool = &app_state.database_pool;
-    let profile = crate::data_context::manager::profile::get(database_pool, &claims.sub).await;
-    let lang_setting = match body.contains("&") {
-        true => match body.split("&").last() {
-            Some(body) => match body.split("=").last() {
-                Some(id) => (id.to_string().parse::<i32>().unwrap(), true),
-                None => return (StatusCode::OK, Html("error".to_string())),
-            },
-            None => return (StatusCode::OK, Html("error".to_string())),
-        },
-        false => match body.split("=").last() {
-            Some(id) => (id.to_string().parse::<i32>().unwrap(), false),
-            None => todo!(),
-        },
-    };
-
-    match lang_setting.1 {
-        true => {
-            crate::data_context::manager::profile_languages::add(
-                database_pool,
-                &ProfileLanguagesModel {
-                    id: uuid::Uuid::new_v4(),
-                    owner_id: claims.sub,
-                    language: lang_setting.0,
-                    published: false,
-                },
-            )
-            .await
-        }
-        false => {
-            crate::data_context::manager::profile_languages::delete(
-                database_pool,
-                claims.sub,
-                lang_setting.0,
-            )
-            .await
-        }
-    };
-
-    let account_languages =
-        crate::data_context::manager::profile_languages::get_all(database_pool, &claims.sub).await;
-    let account_languages = match account_languages.len() {
-        0 => {
-            let am = ProfileLanguagesModel {
-                id: uuid::Uuid::new_v4(),
-                owner_id: claims.sub,
-                language: 0,
-                published: false,
-            };
-            crate::data_context::manager::profile_languages::add(database_pool, &am).await;
-            vec![]
-        }
-        _ => account_languages,
-    };
-    // if !account_languages
-    //     .iter()
-    //     .any(|&al| al == profile.primary_language)
-    // {
-    //     profile.primary_language = *account_languages.iter().last().unwrap_or(&0);
-    //     crate::data_context::manager::profile::set(&app_state.database_pool, &profile).await;
-    // }
-    let languages = get_languages(database_pool).await;
-    let primary_dropdown = PrimaryLanguageListVm {
-        primary_language_id: profile.primary_language,
-        user_selected_languages: account_languages
-            .iter()
-            .map(|lm| AccountLanguageVm {
-                id: lm.id,
-                title: Language::get_from_int(&languages, lm.language).name,
-                code: lm.language,
-                published: lm.published,
-            })
-            .collect::<Vec<AccountLanguageVm>>(),
-        // Language::vec_from_int_vec(&languages, &account_languages),
-    };
-    let page: String = primary_dropdown.render().unwrap().to_string();
-    (StatusCode::OK, Html(page))
-}
-
 pub async fn set_primary_language(
     Extension(claims): Extension<Claims<ClaimsModel>>,
     State(app_state): State<AppState>,
@@ -122,28 +38,47 @@ pub async fn set_primary_language(
                 published: lm.published,
             })
             .collect::<Vec<AccountLanguageVm>>(),
-        // Language::vec_from_int_vec(&languages,
-        //
-        //     &account_languages
-        //
-        // ),
     };
     let page: String = primary_dropdown.render().unwrap().to_string();
     (StatusCode::OK, Html(page))
 }
 
+pub async fn activate_language(
+    Extension(claims): Extension<Claims<ClaimsModel>>,
+    State(app_state): State<AppState>,
+    Path(id): Path<i32>,
+) -> impl IntoResponse {
+    let database_pool = &app_state.database_pool;
+    let language_model: ProfileLanguagesModel = ProfileLanguagesModel {
+        id: uuid::Uuid::new_v4(),
+        owner_id: claims.sub,
+        language: id,
+        published: false,
+    };
+    let _ =
+        crate::data_context::manager::profile_languages::add(database_pool, &language_model)
+            .await;
+    let button: EnableButton = EnableButton {
+        post_url: format!("/manager/config/language/enable/{}", language_model.id), //.to_string(),
+        button_text: "Enable".to_string(),
+    };
+
+    Html(button.render().unwrap()).into_response()
+}
+
 pub async fn enable_language(
     Extension(claims): Extension<Claims<ClaimsModel>>,
+
     State(app_state): State<AppState>,
     Path(id): Path<uuid::Uuid>,
 ) -> impl IntoResponse {
     let database_pool = &app_state.database_pool;
-    let _enable_success =
+    let _ =
         crate::data_context::manager::profile_languages::enable(database_pool, &claims.sub, &id)
             .await;
 
     let button: DisableButton = DisableButton {
-        post_url: format!("/manager/config/language/disable/{}", id),//.to_string(),
+        post_url: format!("/manager/config/language/disable/{}", id), //.to_string(),
         button_text: "Disable".to_string(),
     };
 
@@ -156,11 +91,11 @@ pub async fn disable_language(
     Path(id): Path<uuid::Uuid>,
 ) -> impl IntoResponse {
     let database_pool = &app_state.database_pool;
-    let _disable_success =
+    let _ =
         crate::data_context::manager::profile_languages::disable(database_pool, &claims.sub, &id)
             .await;
-    let button: EnableButton =  EnableButton {
-        post_url: format!("/manager/config/language/enable/{}", id),//.to_string(),
+    let button: EnableButton = EnableButton {
+        post_url: format!("/manager/config/language/enable/{}", id), //.to_string(),
         button_text: "Enable".to_string(),
     };
 

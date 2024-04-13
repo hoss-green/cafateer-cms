@@ -1,0 +1,21 @@
+{% macro render(post_url, id) %}
+<button
+  hx-put="{{ post_url }}"
+  hx-swap="innerHTML"
+  hx-target="#button_container{{ id }}"
+  type="button"
+  class="w-[5.6rem] justify-center text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+>
+  Activate
+</button>
+<button
+  hx-put="{{ post_url }}"
+  hx-swap="innerHTML"
+  hx-target="#button_container{{ id }}"
+  disabled="true"
+  type="button"
+  class="w-[5.6rem] justify-center text-gray-500 bg-gray-200 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center"
+>
+  Enable
+</button>
+{% endmacro %}

@@ -1,5 +1,8 @@
 use crate::{
-    data_context::{self, context::AppState}, manager::templates::components::MenuItemEditorVm, models::data::{ClaimsModel, MenuItemModel}, session::claims::Claims
+    data_context::{self, context::AppState},
+    manager::templates::{components::MenuItemEditorVm, page_buttons::MenuItemEditButton},
+    models::data::{ClaimsModel, MenuItemModel},
+    session::claims::Claims,
 };
 use askama::Template;
 use askama_axum::IntoResponse;
@@ -10,7 +13,6 @@ use axum::{
 };
 use http::StatusCode;
 use serde::{Deserialize, Serialize};
-
 
 pub async fn get_menu_item(
     Extension(claims): Extension<Claims<ClaimsModel>>,
@@ -53,7 +55,7 @@ pub async fn update_menu_item(
         },
     )
     .await;
-    if result {
+    if result.is_some() {
         return (StatusCode::OK, Html("Saved!".to_string()));
     }
     (StatusCode::OK, Html("Error".to_string()))
@@ -62,8 +64,8 @@ pub async fn update_menu_item(
 pub async fn create_menu_item(
     Extension(claims): Extension<Claims<ClaimsModel>>,
     State(app_state): State<AppState>,
-) -> (StatusCode, Html<String>) {
-    let result = data_context::manager::menu_item::set(
+) -> impl IntoResponse {
+    match data_context::manager::menu_item::set(
         &app_state.database_pool,
         &claims.sub,
         MenuItemModel {
@@ -74,11 +76,32 @@ pub async fn create_menu_item(
             description: None,
         },
     )
-    .await;
-    if result {
-        return (StatusCode::OK, Html("Saved!".to_string()));
+    .await
+    {
+        Some(menu_item_button) => MenuItemEditButton {
+            id: menu_item_button.id,
+            category: String::new(),
+            enabled: false,
+            title: menu_item_button.title,
+            languages: vec![],
+        }
+        .render()
+        .unwrap()
+        .into_response(),
+        None => StatusCode::INTERNAL_SERVER_ERROR.into_response(),
     }
-    (StatusCode::OK, Html("Error".to_string()))
+    // match
+    //     let menu_item_button = MenuItemEditButton {
+    //         id: mib.id,
+    //         category: None,
+    //         enabled: result.
+    //     };
+    //     // return (StatusCode::OK, Html("Saved!".to_string()));
+    // }
+    //
+    // StatusCode::INTERNAL_SERVER_ERROR.into_response()
+
+    // (StatusCode::OK, Html("Error".to_string()))
 }
 
 pub async fn delete_menu_item(

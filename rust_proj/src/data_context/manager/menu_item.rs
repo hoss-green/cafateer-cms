@@ -33,7 +33,7 @@ pub async fn set(
     database_pool: &DatabasePool,
     account_id: &uuid::Uuid,
     details_item: MenuItemModel,
-) -> bool {
+) -> Option<MenuItemModel> {
     let result = sqlx::query!(
         "insert into menu_items(owner_id, id, lang, title, description) 
             VALUES ($1, $2, $3, $4, $5) ON CONFLICT (id, lang) DO UPDATE SET title=$4, description=$5
@@ -49,11 +49,11 @@ pub async fn set(
     match result {
         Ok(_r) => {
             println!("Saved item succesfully");
-            true
+            Some(details_item.clone())
         }
         Err(err) => {
             println!("Cannot save item, fail, error: {}", err);
-            false
+            None
         }
     }
 }
@@ -82,7 +82,6 @@ pub async fn delete(database_pool: &DatabasePool, owner_id: &uuid::Uuid, id: &uu
     }
 }
 
-
 pub async fn get_by_lang(
     database_pool: &DatabasePool,
     id: &uuid::Uuid,
@@ -109,7 +108,7 @@ pub async fn get_by_lang(
         },
         Err(err) => {
             println!("Cannot fetch menu item, err: {}", err);
-                MenuItemModel::new(*id, *owner_id, lang)
+            MenuItemModel::new(*id, *owner_id, lang)
         }
     }
 }

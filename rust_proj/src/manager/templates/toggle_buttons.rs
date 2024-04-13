@@ -1,6 +1,5 @@
 use askama::Template;
 
-
 #[derive(Template)]
 #[template(path = "manager/toggle_buttons/enable_button.html")]
 pub struct EnableButton {
