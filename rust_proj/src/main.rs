@@ -1,5 +1,3 @@
-use core::panic;
-
 use axum::{
     extract::Request,
     middleware,
@@ -12,12 +10,13 @@ use cafeteer::{
     data_context::context::AppState,
     manager::{
         editors::{self, get_menu_item_details, post_details_home, update_menu_item_details},
-        pages::{config_page, categories_page, home_page, languages_page, menu_page},
+        pages::{categories_page, config_page, home_page, languages_page, menu_page},
     },
     presenter::{menu::get_menu, restaurant::get_restaurant_with_lang},
 };
 use cafeteer::{data_context::setup_db, manager::editors::get_details_home};
 use cafeteer::{manager::session, presenter::restaurant::get_restaurant};
+use core::panic;
 use dotenv::dotenv;
 use tower::Layer;
 use tower_http::normalize_path::NormalizePathLayer;
@@ -26,7 +25,6 @@ use tower_http::normalize_path::NormalizePathLayer;
 async fn main() {
     //uuid for single mode:
     //deadbeef-0000-dead-beef-010203040506
-
     let single_user_id = uuid::Uuid::try_parse("deadbeef-0000-dead-beef-010203040506").unwrap();
     dotenv().ok();
     let pg = std::env::var("DATABASE_URL").unwrap();
@@ -46,7 +44,7 @@ async fn main() {
                 db
             }
             Err(er) => {
-                println!("Could not create database, err: {}", er.to_string());
+                println!("Could not create database, err: {}", er);
                 panic!("Could not create database and connect to pool");
             }
         },
@@ -101,14 +99,20 @@ async fn main() {
             put(editors::disable_category),
         )
         //MENU_ITEMS
-        .route("/manager/menu/item/:id/:lang", get(editors::get_menu_item))
         .route("/manager/menu/item", post(editors::create_menu_item))
         .route("/manager/menu/item", put(editors::update_menu_item))
         .route("/manager/menu/item/:id", delete(editors::delete_menu_item))
-        .route("/manager/menu/item/details/:id", get(get_menu_item_details))
+        .route("/manager/menu/item/:id/:lang", get(editors::get_menu_item))
         .route("/manager/menu/item/details", put(update_menu_item_details))
-        .route("/manager/menu/item/details/enable/:id", put(editors::enable_menu_item))
-        .route("/manager/menu/item/details/disable/:id", put(editors::disable_menu_item))
+        .route("/manager/menu/item/details/:id", get(get_menu_item_details))
+        .route(
+            "/manager/menu/item/details/enable/:id",
+            put(editors::enable_menu_item),
+        )
+        .route(
+            "/manager/menu/item/details/disable/:id",
+            put(editors::disable_menu_item),
+        )
         //LANGUAGES
         .route("/manager/config/languages", get(languages_page::get))
         .route(
@@ -126,7 +130,10 @@ async fn main() {
         .route("/manager/config", get(config_page::get))
         //SESSION
         .route("/session", get(Redirect::permanent("/session/login")))
-        .route("/session/redirect-login", get(Redirect::permanent("/session/login")))
+        .route(
+            "/session/redirect-login",
+            get(Redirect::permanent("/session/login")),
+        )
         .route("/session/login", get(session::pages::login))
         .route("/session/login", post(session::pages::do_login))
         .route("/session/sign_up", get(session::pages::sign_up))

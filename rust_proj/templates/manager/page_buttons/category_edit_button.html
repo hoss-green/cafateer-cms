@@ -1,7 +1,7 @@
 {%- import "manager/toggle_buttons/enable_button.html" as enable_button -%}
 {%- import "manager/toggle_buttons/disable_button.html" as disable_button -%}
 {%- import "manager/macros/category_dropdown_list.html" as
-category_dropdown_list -%} {% macro render(id, title, but_languages, enabled) %}
+category_dropdown_list -%} {% macro render(id, title, user_languages, enabled) %}
 <div
   id="category_button{{id}}"
   class="w-full flex flex-col p-1 bg-gray-50 rounded-md"
@@ -19,10 +19,6 @@ category_dropdown_list -%} {% macro render(id, title, but_languages, enabled) %}
       {% else %} <!-- -->
        {% call enable_button::render(format!("/manager/menu/categories/enable/{}", lang_id.to_string()), "Enable".to_string()) %} <!-- -->
       {% endif %} <!-- -->
-
-
-
-
     <button
       hx-delete="/manager/menu/categories/{{id}}"
       hx-swap="outerHTML"
@@ -32,7 +28,7 @@ category_dropdown_list -%} {% macro render(id, title, but_languages, enabled) %}
     >
       <i class="fa-solid fa-trash"></i>
     </button>
-    {% call category_dropdown_list::render(id, but_languages.clone()) %}
+    {% call category_dropdown_list::render(id, user_languages.clone()) %}
   </div>
 </div>
 {% endmacro %}

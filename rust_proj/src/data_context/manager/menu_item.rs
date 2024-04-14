@@ -58,6 +58,45 @@ pub async fn set(
     }
 }
 
+pub async fn create(
+    database_pool: &DatabasePool,
+    account_id: &uuid::Uuid,
+    details_item: MenuItemModel,
+) -> Option<MenuItemModel> {
+    let mut tx = database_pool.begin().await.expect("Could not create transaction");
+    let _ = sqlx::query!(
+        "insert into menu_items(owner_id, id, lang, title, description) VALUES ($1, $2, $3, $4, $5)",
+        &account_id,
+        details_item.id,
+        details_item.lang,
+        details_item.title,
+        details_item.description,
+    )
+    .execute(&mut *tx)
+    .await;
+
+    let _ = sqlx::query!(
+        "insert into menu_item_details(id, owner_id, published)
+            VALUES ($1, $2, false) ",
+        details_item.id,
+        account_id,
+    )
+    .execute(&mut *tx)
+    .await;
+
+    let result = tx.commit().await;
+    match result {
+        Ok(_) => {
+            println!("Created menu item succesfully");
+            Some(details_item.clone())
+        }
+        Err(err) => {
+            println!("Cannot create menu item, fail, error: {}", err);
+            None
+        }
+    }
+}
+
 pub async fn delete(database_pool: &DatabasePool, owner_id: &uuid::Uuid, id: &uuid::Uuid) -> bool {
     let result = sqlx::query!(
         "delete from menu_items where id=$1 and owner_id=$2",

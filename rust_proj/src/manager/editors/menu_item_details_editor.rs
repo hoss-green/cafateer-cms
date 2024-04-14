@@ -26,9 +26,7 @@ pub async fn get_menu_item_details(
         data_context::manager::profile_languages::get_all_ids(database_pool, &claims.sub).await;
     let languages = Language::vec_from_int_vec(
         &data_context::references::get_languages(database_pool).await,
-        &account_languages, // .iter()
-                            // .map(|al| al.language)
-                            // .collect::<Vec<i32>>(),
+        &account_languages,
     );
     let fetched_categories =
         data_context::manager::categories::get_category_list(database_pool, &claims.sub).await;
@@ -40,7 +38,7 @@ pub async fn get_menu_item_details(
 
     let mut categories: Vec<CategoryModel> = vec![];
     unique_category_ids.iter().for_each(|unique_cat| {
-        let mut fc = languages
+        let mut fc: Vec<CategoryModel> = languages
             .iter()
             .filter_map(|lang| {
                 match fetched_categories
@@ -58,7 +56,7 @@ pub async fn get_menu_item_details(
                 }
             })
             .filter(|cm| cm.lang == claims.body.lang) // account.languages.main_language)
-            .collect::<Vec<CategoryModel>>();
+            .collect();
         categories.append(&mut fc);
     });
 

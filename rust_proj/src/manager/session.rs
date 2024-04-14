@@ -6,7 +6,7 @@ use http::HeaderValue;
 pub mod pages;
 mod templates;
 
-pub fn create_cookie_header<'a>(
+pub fn create_cookie_header(
     user_account: &UserAccountModel,
     profile: &ProfileModel,
 ) -> HeaderValue {

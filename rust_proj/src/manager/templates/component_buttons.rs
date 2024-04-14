@@ -2,6 +2,8 @@ use askama::Template;
 
 use crate::models::data::reference_items::Language;
 
+use super::view_models::AccountLanguageVm;
+
 #[derive(Template, Debug, Clone)]
 #[template(path = "manager/macros/language_selection_dropdown.html")]
 pub struct LanguageSelectionDropdownVm {
@@ -24,6 +26,6 @@ pub struct MenuItemButtonVm {
 pub struct CategoryButtonVm {
     pub id: uuid::Uuid,
     pub title: String,
-    pub user_languages: Vec<Language>,
+    pub user_languages: Vec<AccountLanguageVm>,
     pub published: bool
 }

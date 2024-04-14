@@ -65,7 +65,7 @@ pub async fn create_menu_item(
     Extension(claims): Extension<Claims<ClaimsModel>>,
     State(app_state): State<AppState>,
 ) -> impl IntoResponse {
-    match data_context::manager::menu_item::set(
+    match data_context::manager::menu_item::create(
         &app_state.database_pool,
         &claims.sub,
         MenuItemModel {

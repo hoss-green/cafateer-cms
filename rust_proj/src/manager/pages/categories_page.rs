@@ -1,6 +1,9 @@
 use crate::{
     data_context::{self, context::AppState},
-    manager::templates::{component_buttons::CategoryButtonVm, pages::CategoriesPageVm},
+    manager::templates::{
+        component_buttons::CategoryButtonVm, pages::CategoriesPageVm,
+        view_models::AccountLanguageVm,
+    },
     models::data::{reference_items::Language, ClaimsModel},
     session::claims::Claims,
 };
@@ -15,19 +18,24 @@ pub async fn get(
     State(app_state): State<AppState>,
 ) -> (StatusCode, Html<String>) {
     let database_pool = &app_state.database_pool;
-    let account_languages: Vec<i32> =
-        crate::data_context::manager::profile_languages::get_all(database_pool, &claims.sub)
-            .await
-            .iter()
-            .filter(|&lang| {
-            lang.published
-            })
-            .map(|lang| lang.language)
-            .collect();
-    let languages = Language::vec_from_int_vec(
-        &data_context::references::get_languages(database_pool).await,
-        &account_languages,
-    );
+    let languages = crate::data_context::references::get_languages(database_pool).await;
+    let account_languages =
+        crate::data_context::manager::profile_languages::get_all(database_pool, &claims.sub).await;
+
+    let language_vms: Vec<AccountLanguageVm> = account_languages
+        .iter()
+        .map(|lang| AccountLanguageVm {
+            id: lang.id,
+            title: languages
+                .iter()
+                .find(|acl| acl.id == lang.language)
+                .unwrap()
+                .name
+                .clone(),
+            code: lang.language,
+            published: lang.published,
+        })
+        .collect();
     let category_details =
         data_context::manager::category_details::get_all(&app_state, &claims.sub).await;
     let mut fetched_categories =
@@ -59,7 +67,7 @@ pub async fn get(
             CategoryButtonVm {
                 id: *unique_cat.0,
                 title: button_title,
-                user_languages: languages.clone(),
+                user_languages: language_vms.clone(),
                 published,
             }
         })

@@ -16,3 +16,4 @@ pub struct SelectableLanguageVm {
     pub user_lang_id: Option<uuid::Uuid>,
     pub published: bool
 }
+
