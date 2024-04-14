@@ -90,18 +90,6 @@ pub async fn create_menu_item(
         .into_response(),
         None => StatusCode::INTERNAL_SERVER_ERROR.into_response(),
     }
-    // match
-    //     let menu_item_button = MenuItemEditButton {
-    //         id: mib.id,
-    //         category: None,
-    //         enabled: result.
-    //     };
-    //     // return (StatusCode::OK, Html("Saved!".to_string()));
-    // }
-    //
-    // StatusCode::INTERNAL_SERVER_ERROR.into_response()
-
-    // (StatusCode::OK, Html("Error".to_string()))
 }
 
 pub async fn delete_menu_item(

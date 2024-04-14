@@ -63,7 +63,10 @@ pub async fn create(
     account_id: &uuid::Uuid,
     details_item: MenuItemModel,
 ) -> Option<MenuItemModel> {
-    let mut tx = database_pool.begin().await.expect("Could not create transaction");
+    let mut tx = database_pool
+        .begin()
+        .await
+        .expect("Could not create transaction");
     let _ = sqlx::query!(
         "insert into menu_items(owner_id, id, lang, title, description) VALUES ($1, $2, $3, $4, $5)",
         &account_id,
@@ -98,21 +101,39 @@ pub async fn create(
 }
 
 pub async fn delete(database_pool: &DatabasePool, owner_id: &uuid::Uuid, id: &uuid::Uuid) -> bool {
-    let result = sqlx::query!(
+    let mut tx = database_pool
+        .begin()
+        .await
+        .expect("Could not create transaction");
+    let _ = sqlx::query!(
         "delete from menu_items where id=$1 and owner_id=$2",
         &id,
         &owner_id,
     )
-    .execute(database_pool)
+    .execute(&mut *tx)
+    .await;
+    let _ = sqlx::query!(
+        "delete from menu_item_details where id=$1 and owner_id=$2",
+        &id,
+        &owner_id,
+    )
+    .execute(&mut *tx)
     .await;
 
+        
+    
+
+
+
+
+    let result = tx.commit().await;
     match result {
-        Ok(r) => {
-            if r.rows_affected() > 0 {
-                println!("Deleted menu_item succesfully {:?}", r);
-                return true;
-            }
-            false
+        Ok(_) => {
+            // if r() > 0 {
+            //     println!("Deleted menu_item succesfully {:?}", r);
+            //     return true;
+            // }
+            true
         }
         Err(err) => {
             println!("Cannot delete menu item, fail, error: {}", err);
