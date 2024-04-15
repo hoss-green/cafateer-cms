@@ -61,42 +61,38 @@ pub async fn set(
 pub async fn create(
     database_pool: &DatabasePool,
     account_id: &uuid::Uuid,
-    details_item: MenuItemModel,
-) -> Option<MenuItemModel> {
+    menu_item_model: &MenuItemModel,
+) -> bool {
     let mut tx = database_pool
         .begin()
         .await
         .expect("Could not create transaction");
-    let _ = sqlx::query!(
+    let item_add = sqlx::query!(
         "insert into menu_items(owner_id, id, lang, title, description) VALUES ($1, $2, $3, $4, $5)",
         &account_id,
-        details_item.id,
-        details_item.lang,
-        details_item.title,
-        details_item.description,
+        menu_item_model.id,
+        menu_item_model.lang,
+        menu_item_model.title,
+        menu_item_model.description,
     )
     .execute(&mut *tx)
     .await;
 
-    let _ = sqlx::query!(
+    let detail_add = sqlx::query!(
         "insert into menu_item_details(id, owner_id, published)
             VALUES ($1, $2, false) ",
-        details_item.id,
+        menu_item_model.id,
         account_id,
     )
     .execute(&mut *tx)
     .await;
 
-    let result = tx.commit().await;
-    match result {
-        Ok(_) => {
-            println!("Created menu item succesfully");
-            Some(details_item.clone())
-        }
-        Err(err) => {
-            println!("Cannot create menu item, fail, error: {}", err);
-            None
-        }
+    if item_add.is_err() || detail_add.is_err() {
+        let _ = tx.rollback().await;
+       false 
+    } else {
+        let result = tx.commit().await;
+        result.is_ok()
     }
 }
 
@@ -105,39 +101,34 @@ pub async fn delete(database_pool: &DatabasePool, owner_id: &uuid::Uuid, id: &uu
         .begin()
         .await
         .expect("Could not create transaction");
-    let _ = sqlx::query!(
-        "delete from menu_items where id=$1 and owner_id=$2",
+    let item_delete = sqlx::query!(
+        "delete from menu_items where id=$1 and owner_id=$2 RETURNING *",
         &id,
         &owner_id,
     )
-    .execute(&mut *tx)
+    .fetch_all(&mut *tx)
     .await;
-    let _ = sqlx::query!(
-        "delete from menu_item_details where id=$1 and owner_id=$2",
+    let detail_delete = sqlx::query!(
+        "delete from menu_item_details where id=$1 and owner_id=$2 RETURNING *",
         &id,
         &owner_id,
     )
-    .execute(&mut *tx)
+    .fetch_all(&mut *tx)
     .await;
 
-        
-    
-
-
-
-
-    let result = tx.commit().await;
-    match result {
-        Ok(_) => {
-            // if r() > 0 {
-            //     println!("Deleted menu_item succesfully {:?}", r);
-            //     return true;
-            // }
-            true
-        }
-        Err(err) => {
-            println!("Cannot delete menu item, fail, error: {}", err);
-            false
+    if !matches!(item_delete, Ok(item_delete_count) if !item_delete_count.is_empty())
+        || !matches!(detail_delete, Ok(detail_delete_count) if !detail_delete_count.is_empty())
+    {
+        //this is bad
+        let _ = tx.rollback().await;
+        false
+    } else {
+        match tx.commit().await {
+            Ok(_) => true,
+            Err(err) => {
+                println!("Cannot delete menu item, fail, error: {}", err);
+                false
+            }
         }
     }
 }

@@ -28,14 +28,14 @@ pub async fn get(
 pub async fn set(
     database_pool: &DatabasePool,
     account_id: &uuid::Uuid,
-    details_item: &CategoryModel,
+    category_item: &CategoryModel,
 ) -> bool {
     let result = sqlx::query!(
         "insert into menu_categories(owner_id, id, lang, title) VALUES ($1, $2, $3, $4) ON CONFLICT (id, lang) DO UPDATE SET title=$4 WHERE menu_categories.id=$2 and menu_categories.lang=$3",
         &account_id,
-        details_item.id,
-        details_item.lang,
-        details_item.title,
+        category_item.id,
+        category_item.lang,
+        category_item.title,
     )
     .execute(database_pool)
     .await;
@@ -52,30 +52,82 @@ pub async fn set(
     }
 }
 
+pub async fn create(
+    database_pool: &DatabasePool,
+    account_id: &uuid::Uuid,
+    category_item: &CategoryModel,
+) -> bool {
+    let mut tx = database_pool
+        .begin()
+        .await
+        .expect("Could not create category");
+    let item_create = sqlx::query_as!(
+        CategoryModel,
+        "insert into menu_categories(owner_id, id, lang, title) VALUES ($1, $2, $3, $4)",
+        &account_id,
+        category_item.id,
+        category_item.lang,
+        category_item.title,
+    )
+    .execute(&mut *tx)
+    .await;
+
+    let details_create = sqlx::query_as!(
+        CategoryModel,
+        "insert into menu_category_details(owner_id, id, published) VALUES ($1, $2, $3)",
+        &account_id,
+        category_item.id,
+        false
+    )
+    .execute(&mut *tx)
+    .await;
+
+    if item_create.is_err() || details_create.is_err() {
+        let _ = tx.rollback().await;
+        false
+    } else {
+        let tx_result = tx.commit().await;
+        tx_result.is_ok()
+    }
+}
+
 pub async fn delete(
     database_pool: &DatabasePool,
     account_id: &uuid::Uuid,
     category_id: &uuid::Uuid,
 ) -> bool {
-    let result = sqlx::query!(
-        "delete from menu_categories where owner_id=$1 and id=$2",
+    let mut tx = database_pool
+        .begin()
+        .await
+        .expect("Could not create category");
+    let item_delete = sqlx::query!(
+        "delete from menu_categories where owner_id=$1 and id=$2 RETURNING *",
         &account_id,
         &category_id,
     )
-    .execute(database_pool)
+    .fetch_all(&mut *tx)
     .await;
-
-    match result {
-        Ok(r) => {
-            if r.rows_affected() > 0 {
-                println!("Deleted category succesfully {:?}", r);
-                return true;
+    let detail_delete = sqlx::query!(
+        "delete from menu_categories where owner_id=$1 and id=$2 RETURNING *",
+        &account_id,
+        &category_id,
+    )
+    .fetch_all(&mut *tx)
+    .await;
+    
+    if !matches!(item_delete, Ok(item_delete_count) if !item_delete_count.is_empty())
+        || !matches!(detail_delete, Ok(detail_delete_count) if !detail_delete_count.is_empty())
+    {
+        //this is bad
+        let _ = tx.rollback().await;
+        false
+    } else {
+        match tx.commit().await {
+            Ok(_) => true,
+            Err(err) => {
+                println!("Cannot delete category item, fail, error: {}", err);
+                false
             }
-            false
-        }
-        Err(err) => {
-            println!("Cannot save item, fail, error: {}", err);
-            false
         }
     }
 }

@@ -65,30 +65,31 @@ pub async fn create_menu_item(
     Extension(claims): Extension<Claims<ClaimsModel>>,
     State(app_state): State<AppState>,
 ) -> impl IntoResponse {
-    match data_context::manager::menu_item::create(
-        &app_state.database_pool,
-        &claims.sub,
-        MenuItemModel {
+        let mim = MenuItemModel {
             id: uuid::Uuid::new_v4(),
             lang: claims.body.lang,
             owner_id: claims.sub,
             title: "new menu_item".to_string(),
             description: None,
-        },
+        };
+    match data_context::manager::menu_item::create(
+        &app_state.database_pool,
+        &claims.sub,
+        &mim
     )
     .await
     {
-        Some(menu_item_button) => MenuItemEditButton {
-            id: menu_item_button.id,
+        true => MenuItemEditButton {
+            id: mim.id,
             category: String::new(),
             enabled: false,
-            title: menu_item_button.title,
+            title: mim.title,
             languages: vec![],
         }
         .render()
         .unwrap()
         .into_response(),
-        None => StatusCode::INTERNAL_SERVER_ERROR.into_response(),
+        false => StatusCode::INTERNAL_SERVER_ERROR.into_response(),
     }
 }
 
