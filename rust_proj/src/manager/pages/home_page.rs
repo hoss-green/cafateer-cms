@@ -10,7 +10,7 @@ pub async fn get(
     Extension(claims): Extension<Claims<ClaimsModel>>,
     State(_app_state): State<AppState>,
 ) -> (StatusCode, Html<String>) {
-    println!("{:#?}", claims);
+    // println!("{:#?}", claims);
 
     let editor_home = StartPageVm {
         title: "Editor Home for SC",

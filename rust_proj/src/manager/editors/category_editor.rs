@@ -36,7 +36,7 @@ pub async fn create_category_item(
     State(app_state): State<AppState>,
 ) -> (StatusCode, Html<String>) {
     let database_pool = &app_state.database_pool;
-    let result = data_context::manager::category::set(
+    let result = data_context::manager::category::create(
         database_pool,
         &claims.sub,
         &CategoryModel {
@@ -61,7 +61,7 @@ pub async fn delete_category_item(
 ) -> impl IntoResponse {
     match data_context::manager::category::delete(&app_state.database_pool, &claims.sub, &id).await
     {
-        true => return (StatusCode::OK, Html(String::new())).into_response(),
+        true => (StatusCode::OK, Html(String::new())).into_response(),
         false => (StatusCode::INTERNAL_SERVER_ERROR, Html("Error".to_string())).into_response(),
     }
 }

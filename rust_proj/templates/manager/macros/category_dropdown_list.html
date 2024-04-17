@@ -30,11 +30,17 @@
         hx-target="#sidebar_editor"
         type="button"
       >
-        {% if lang.published %}
-        <span class="font-bold">{{ lang.title }}</span>
-        {% else %}
-        <span class="italic text-gray-500">{{ lang.title }}</span>
-        {% endif %}
+    {% if lang.published %}
+    <span>
+        {{ lang.name }}
+    </span>
+    {% else %}
+    <span class="italic">
+        {{ lang.name }}
+    </span>
+
+    {% endif %}
+
       </button>
       {% endfor %}
     </li>

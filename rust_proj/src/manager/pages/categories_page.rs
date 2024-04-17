@@ -2,9 +2,9 @@ use crate::{
     data_context::{self, context::AppState},
     manager::templates::{
         component_buttons::CategoryButtonVm, pages::CategoriesPageVm,
-        view_models::AccountLanguageVm,
+        view_models::DropDownLanguageVm,
     },
-    models::data::{reference_items::Language, ClaimsModel},
+    models::data::ClaimsModel,
     session::claims::Claims,
 };
 use askama::Template;
@@ -18,22 +18,17 @@ pub async fn get(
     State(app_state): State<AppState>,
 ) -> (StatusCode, Html<String>) {
     let database_pool = &app_state.database_pool;
-    let languages = crate::data_context::references::get_languages(database_pool).await;
     let account_languages =
         crate::data_context::manager::profile_languages::get_all(database_pool, &claims.sub).await;
-
-    let language_vms: Vec<AccountLanguageVm> = account_languages
+    let all_languages = &data_context::references::get_languages(database_pool).await;
+    let languages: Vec<DropDownLanguageVm> = all_languages
         .iter()
-        .map(|lang| AccountLanguageVm {
+        .map(|lang| DropDownLanguageVm {
             id: lang.id,
-            title: languages
+            name: lang.name.clone(),
+            published: account_languages
                 .iter()
-                .find(|acl| acl.id == lang.language)
-                .unwrap()
-                .name
-                .clone(),
-            code: lang.language,
-            published: lang.published,
+                .any(|ac_lang| ac_lang.language == lang.id && ac_lang.published),
         })
         .collect();
     let category_details =
@@ -67,7 +62,7 @@ pub async fn get(
             CategoryButtonVm {
                 id: *unique_cat.0,
                 title: button_title,
-                user_languages: language_vms.clone(),
+                user_languages: languages.clone(),
                 published,
             }
         })

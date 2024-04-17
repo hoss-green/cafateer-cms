@@ -14,6 +14,7 @@ use crate::{
     session::claims::Claims,
 };
 
+
 pub async fn enable_category(
     Extension(claims): Extension<Claims<ClaimsModel>>,
     State(app_state): State<AppState>,

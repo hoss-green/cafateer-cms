@@ -1,6 +1,6 @@
 use askama::Template;
 
-use crate::models::data::reference_items::Language;
+use super::view_models::DropDownLanguageVm;
 
 #[derive(Template, Debug, Clone)]
 #[template(path = "manager/page_buttons/menu_item_edit_button.html")]
@@ -8,6 +8,16 @@ pub struct MenuItemEditButton {
     pub id: uuid::Uuid,
     pub title: String,
     pub category: String,
+    pub languages: Vec<DropDownLanguageVm>,
     pub enabled: bool,
-    pub languages: Vec<Language>
+}
+
+#[derive(Template, Debug, Clone)]
+#[template(path = "manager/page_buttons/menu_item_edit_button.html")]
+pub struct CategoryItemEditButton {
+    pub id: uuid::Uuid,
+    pub title: String,
+    pub category: String,
+    pub languages: Vec<DropDownLanguageVm>,
+    pub enabled: bool,
 }
