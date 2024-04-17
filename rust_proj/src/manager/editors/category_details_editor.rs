@@ -1,3 +1,12 @@
+use crate::{
+    data_context::{self, context::AppState},
+    manager::templates::{
+        components::{CategoryDetailEditorVm, MenuItemDetailsEditorVm},
+        toggle_buttons::{DisableButton, EnableButton},
+    },
+    models::data::ClaimsModel,
+    session::claims::Claims,
+};
 use askama::Template;
 use askama_axum::IntoResponse;
 use axum::{
@@ -7,13 +16,20 @@ use axum::{
 };
 use serde::{Deserialize, Serialize};
 
-use crate::{
-    data_context::context::AppState,
-    manager::templates::toggle_buttons::{DisableButton, EnableButton},
-    models::data::ClaimsModel,
-    session::claims::Claims,
-};
+pub async fn get_category_details(
+    Extension(_claims): Extension<Claims<ClaimsModel>>,
+    State(_app_state): State<AppState>,
+    Path(id): Path<uuid::Uuid>,
+) -> impl IntoResponse {
+    // let database_pool = &app_state.database_pool;
+    // let category_details =
+    //     data_context::manager::category_detail::get(database_pool, &claims.sub, &id).await;
 
+    CategoryDetailEditorVm { id }
+        .render()
+        .unwrap()
+        .into_response()
+}
 
 pub async fn enable_category(
     Extension(claims): Extension<Claims<ClaimsModel>>,
@@ -49,6 +65,7 @@ pub async fn disable_category(
 
     Html(button.render().unwrap()).into_response()
 }
+
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct MenuItemDetailsForm {
     pub id: uuid::Uuid,

@@ -25,6 +25,25 @@ pub async fn get(
     }
 }
 
+pub async fn exists(
+    database_pool: &DatabasePool,
+    id: &uuid::Uuid,
+    owner_id: &uuid::Uuid,
+) -> bool {
+    match sqlx::query_as!(
+        CategoryModel,
+        "select id, lang, owner_id, title, NULL as lang_name from menu_categories where id = $1 and owner_id = $2",
+        id,
+        owner_id,
+    )
+    .fetch_optional(database_pool)
+    .await
+    {
+        Ok(category_item) => category_item.is_some(),
+        Err(_) => false,
+    }
+}
+
 pub async fn set(
     database_pool: &DatabasePool,
     account_id: &uuid::Uuid,
@@ -93,7 +112,7 @@ pub async fn create(
 
 pub async fn delete(
     database_pool: &DatabasePool,
-    account_id: &uuid::Uuid,
+    owner_id: &uuid::Uuid,
     category_id: &uuid::Uuid,
 ) -> bool {
     let mut tx = database_pool
@@ -102,14 +121,14 @@ pub async fn delete(
         .expect("Could not create category");
     let item_delete = sqlx::query!(
         "delete from menu_categories where owner_id=$1 and id=$2 RETURNING *",
-        &account_id,
+        &owner_id,
         &category_id,
     )
     .fetch_all(&mut *tx)
     .await;
     let detail_delete = sqlx::query!(
-        "delete from menu_categories where owner_id=$1 and id=$2 RETURNING *",
-        &account_id,
+        "delete from menu_category_details where owner_id=$1 and id=$2 RETURNING *",
+        &owner_id,
         &category_id,
     )
     .fetch_all(&mut *tx)

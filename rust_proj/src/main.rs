@@ -82,10 +82,10 @@ async fn main() {
             "/manager/menu/categories/:id",
             delete(editors::delete_category_item),
         )
-        // .route(
-        //     "/manager/menu/categories/details/:id",
-        //     get(editors::get_category_details),
-        // )
+        .route(
+            "/manager/menu/category/details/:id",
+            get(editors::get_category_details),
+        )
         // .route(
         //     "/manager/menu/categories/details/",
         //     put(editors::update_category_details),

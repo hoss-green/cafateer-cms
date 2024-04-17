@@ -70,8 +70,11 @@ pub async fn update_category_item(
     Extension(claims): Extension<Claims<ClaimsModel>>,
     State(app_state): State<AppState>,
     Form(details_item): Form<CategoryForm>,
-) -> (StatusCode, Html<String>) {
+) -> impl IntoResponse {
     let database_pool = &app_state.database_pool;
+    if data_context::manager::category::exists(database_pool, &claims.sub, &details_item.id).await {
+        return (StatusCode::OK, Html("Error".to_string())).into_response();
+    }
     let result = data_context::manager::category::set(
         database_pool,
         &claims.sub,
@@ -85,9 +88,9 @@ pub async fn update_category_item(
     )
     .await;
     if result {
-        return (StatusCode::OK, Html("Saved!".to_string()));
+        return (StatusCode::OK, Html("Saved!".to_string())).into_response();
     }
-    (StatusCode::OK, Html("Error".to_string()))
+    (StatusCode::OK, Html("Error".to_string())).into_response()
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]

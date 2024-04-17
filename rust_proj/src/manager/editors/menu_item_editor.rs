@@ -1,6 +1,6 @@
 use crate::{
     data_context::{self, context::AppState},
-    manager::templates::{components::MenuItemEditorVm, page_buttons::MenuItemEditButton},
+    manager::{templates::{components::MenuItemEditorVm, page_buttons::MenuItemEditButton}, viewmodel_helpers::get_dropdown_language_vms},
     models::data::{ClaimsModel, MenuItemModel},
     session::claims::Claims,
 };
@@ -65,26 +65,26 @@ pub async fn create_menu_item(
     Extension(claims): Extension<Claims<ClaimsModel>>,
     State(app_state): State<AppState>,
 ) -> impl IntoResponse {
-        let mim = MenuItemModel {
-            id: uuid::Uuid::new_v4(),
-            lang: claims.body.lang,
-            owner_id: claims.sub,
-            title: "new menu_item".to_string(),
-            description: None,
-        };
-    match data_context::manager::menu_item::create(
-        &app_state.database_pool,
-        &claims.sub,
-        &mim
-    )
-    .await
+    let mim = MenuItemModel {
+        id: uuid::Uuid::new_v4(),
+        lang: claims.body.lang,
+        owner_id: claims.sub,
+        title: "new menu_item x".to_string(),
+        description: None,
+    };
+    let langs = 
+            get_dropdown_language_vms(&app_state.database_pool, &claims.sub).await;
+    println!("{:#?}", langs);
+    println!("{:#?}", mim);
+    match data_context::manager::menu_item::create(&app_state.database_pool, &claims.sub, &mim)
+        .await
     {
         true => MenuItemEditButton {
             id: mim.id,
-            category: String::new(),
+            category: String::from("No Category"),
             enabled: false,
             title: mim.title,
-            languages: vec![],
+            languages: langs
         }
         .render()
         .unwrap()

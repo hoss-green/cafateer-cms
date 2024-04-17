@@ -47,3 +47,9 @@ pub struct MenuItemDetailsEditorVm {
     pub price: f64,
     pub published: bool
 }
+
+#[derive(Template, Debug, Clone)]
+#[template(path = "manager/components/category_detail_editor.html")]
+pub struct CategoryDetailEditorVm {
+    pub id: uuid::Uuid,
+}

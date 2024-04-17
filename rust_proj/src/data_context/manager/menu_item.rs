@@ -29,6 +29,21 @@ pub async fn get(
     MenuItemModel::new(uuid::Uuid::new_v4(), owner_id, lang)
 }
 
+pub async fn exists(database_pool: &DatabasePool, id: &uuid::Uuid, owner_id: &uuid::Uuid) -> bool {
+    match sqlx::query_as!(
+        MenuItemModel,
+        "select id, lang, title, description, owner_id from menu_items where id=$1 and owner_id=$2",
+        owner_id,
+        id,
+    )
+    .fetch_optional(database_pool)
+    .await
+    {
+        Ok(menu_item_model) => menu_item_model.is_some(),
+        Err(_) => false,
+    }
+}
+
 pub async fn set(
     database_pool: &DatabasePool,
     account_id: &uuid::Uuid,
@@ -89,7 +104,7 @@ pub async fn create(
 
     if item_add.is_err() || detail_add.is_err() {
         let _ = tx.rollback().await;
-       false 
+        false
     } else {
         let result = tx.commit().await;
         result.is_ok()

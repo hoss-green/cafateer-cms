@@ -7,7 +7,7 @@ use axum::{extract::State, response::Html, Extension};
 use http::StatusCode;
 
 pub async fn get(
-    Extension(claims): Extension<Claims<ClaimsModel>>,
+    Extension(_claims): Extension<Claims<ClaimsModel>>,
     State(_app_state): State<AppState>,
 ) -> (StatusCode, Html<String>) {
     // println!("{:#?}", claims);

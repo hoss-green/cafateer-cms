@@ -1,7 +1,9 @@
 use crate::{
     data_context::{self, context::AppState, manager::menu_item_details},
-    manager::templates::{component_buttons::MenuItemButtonVm, pages::MenuPageVm, view_models::DropDownLanguageVm},
-    models::data::{reference_items::Language, ClaimsModel, MenuItemDetailsModel},
+    manager::{templates::{
+        component_buttons::MenuItemButtonVm, pages::MenuPageVm, view_models::DropDownLanguageVm,
+    }, viewmodel_helpers::get_dropdown_language_vms},
+    models::data::{ClaimsModel, MenuItemDetailsModel},
     session::claims::Claims,
 };
 use askama::Template;
@@ -15,20 +17,9 @@ pub async fn get(
     State(app_state): State<AppState>,
 ) -> impl IntoResponse {
     let database_pool = &app_state.database_pool;
-    let menu_item_details: Vec<MenuItemDetailsModel> = menu_item_details::get_all(&app_state, &claims.sub).await;
-    let account_languages =
-        crate::data_context::manager::profile_languages::get_all(database_pool, &claims.sub).await;
-    let all_languages = &data_context::references::get_languages(database_pool).await;
-    let languages: Vec<DropDownLanguageVm> = all_languages
-        .iter()
-        .map(|lang| DropDownLanguageVm {
-            id: lang.id,
-            name: lang.name.clone(),
-            published: account_languages
-                .iter()
-                .any(|ac_lang| ac_lang.language == lang.id && ac_lang.published),
-        })
-        .collect();
+    let menu_item_details: Vec<MenuItemDetailsModel> =
+        menu_item_details::get_all(&app_state, &claims.sub).await;
+    let languages = get_dropdown_language_vms(database_pool, &claims.sub).await;
     let mut menu_items =
         data_context::manager::menu_items::get_for_account(database_pool, &claims.sub).await;
     let mut unique_menu_ids: HashMap<uuid::Uuid, bool> = HashMap::new();

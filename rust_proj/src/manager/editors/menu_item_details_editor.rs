@@ -82,6 +82,15 @@ pub async fn update_menu_item_details(
     State(app_state): State<AppState>,
     Form(menu_item_form): Form<MenuItemDetailsForm>,
 ) -> (StatusCode, Html<String>) {
+    let exists = data_context::manager::menu_item::exists(
+        &app_state.database_pool,
+        &claims.sub,
+        &menu_item_form.id,
+    )
+    .await;
+    if !exists {
+        return (StatusCode::OK, Html("Error".to_string()));
+    }
     let result = data_context::manager::menu_item_detail::set(
         &app_state.database_pool,
         &claims.sub,

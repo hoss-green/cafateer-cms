@@ -21,8 +21,7 @@ pub async fn check_auth(headers: HeaderMap, mut request: Request, next: Next) ->
             match validate_jwt_and_get_claims::<ClaimsModel>(jwt) {
                 Ok(cms) => {
                     request.extensions_mut().insert(cms.clone());
-                    return (next.run(request).await).into_response();
-                }
+                    return (next.run(request).await).into_response(); }
                 Err(err) => println!("Could not validate jwt, err: {}", err),
             };
         }

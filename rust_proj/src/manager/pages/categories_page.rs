@@ -1,9 +1,8 @@
 use crate::{
     data_context::{self, context::AppState},
-    manager::templates::{
+    manager::{templates::{
         component_buttons::CategoryButtonVm, pages::CategoriesPageVm,
-        view_models::DropDownLanguageVm,
-    },
+    }, viewmodel_helpers::get_dropdown_language_vms},
     models::data::ClaimsModel,
     session::claims::Claims,
 };
@@ -18,19 +17,7 @@ pub async fn get(
     State(app_state): State<AppState>,
 ) -> (StatusCode, Html<String>) {
     let database_pool = &app_state.database_pool;
-    let account_languages =
-        crate::data_context::manager::profile_languages::get_all(database_pool, &claims.sub).await;
-    let all_languages = &data_context::references::get_languages(database_pool).await;
-    let languages: Vec<DropDownLanguageVm> = all_languages
-        .iter()
-        .map(|lang| DropDownLanguageVm {
-            id: lang.id,
-            name: lang.name.clone(),
-            published: account_languages
-                .iter()
-                .any(|ac_lang| ac_lang.language == lang.id && ac_lang.published),
-        })
-        .collect();
+    let languages = get_dropdown_language_vms(database_pool, &claims.sub).await;
     let category_details =
         data_context::manager::category_details::get_all(&app_state, &claims.sub).await;
     let mut fetched_categories =

@@ -8,7 +8,7 @@ pub use category_editor::create_category_item;
 pub use category_editor::delete_category_item;
 pub use category_editor::get_category_item;
 pub use category_editor::update_category_item;
-// pub use category_details_editor::get_category_details;
+pub use category_details_editor::get_category_details;
 // pub use category_details_editor::update_category_details;
 pub use category_details_editor::enable_category;
 pub use category_details_editor::disable_category;
