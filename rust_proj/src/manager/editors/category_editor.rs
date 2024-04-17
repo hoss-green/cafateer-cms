@@ -1,4 +1,6 @@
 use crate::manager::templates::components::ComponentCategoryEditorVm;
+use crate::manager::templates::page_buttons::CategoryItemEditButton;
+use crate::manager::viewmodel_helpers::get_dropdown_language_vms;
 use crate::{
     data_context::{self, context::AppState},
     models::data::{CategoryModel, ClaimsModel},
@@ -34,24 +36,35 @@ pub async fn get_category_item(
 pub async fn create_category_item(
     Extension(claims): Extension<Claims<ClaimsModel>>,
     State(app_state): State<AppState>,
-) -> (StatusCode, Html<String>) {
+) -> impl IntoResponse {
+    let cm = &CategoryModel {
+        id: uuid::Uuid::new_v4(),
+        lang: claims.body.lang,
+        owner_id: claims.sub,
+        title: Some("new category".to_string()),
+        lang_name: None,
+    };
     let database_pool = &app_state.database_pool;
-    let result = data_context::manager::category::create(
-        database_pool,
-        &claims.sub,
-        &CategoryModel {
-            id: uuid::Uuid::new_v4(),
-            lang: claims.body.lang,
-            owner_id: claims.sub,
-            title: Some("new category".to_string()),
-            lang_name: None,
-        },
-    )
-    .await;
-    if result {
-        return (StatusCode::OK, Html("Saved!".to_string()));
+    // let result = data_context::manager::category::create(database_pool, &claims.sub, cm).await;
+
+    let langs = get_dropdown_language_vms(&app_state.database_pool, &claims.sub).await;
+    match data_context::manager::category::create(database_pool, &claims.sub, cm).await {
+        true => CategoryItemEditButton {
+            id: cm.id,
+            enabled: false,
+            title: cm.title.clone().unwrap_or(String::from("New Category")),
+            languages: langs,
+        }
+        .render()
+        .unwrap()
+        .into_response(),
+        false => StatusCode::INTERNAL_SERVER_ERROR.into_response(),
     }
-    (StatusCode::OK, Html("Error".to_string()))
+
+    // if result {
+    //     return (StatusCode::OK, Html("Saved!".to_string()));
+    // }
+    // (StatusCode::OK, Html("Error".to_string()))
 }
 
 pub async fn delete_category_item(

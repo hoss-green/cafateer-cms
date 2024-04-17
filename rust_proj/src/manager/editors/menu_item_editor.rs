@@ -74,8 +74,6 @@ pub async fn create_menu_item(
     };
     let langs = 
             get_dropdown_language_vms(&app_state.database_pool, &claims.sub).await;
-    println!("{:#?}", langs);
-    println!("{:#?}", mim);
     match data_context::manager::menu_item::create(&app_state.database_pool, &claims.sub, &mim)
         .await
     {
