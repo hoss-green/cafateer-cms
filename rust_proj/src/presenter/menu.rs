@@ -15,7 +15,7 @@ pub async fn get_menu(
     lang: Path<i32>,
 ) -> (StatusCode, Html<String>) {
     // let mut menu_items_lunch: Vec<MenuItemComponent> = vec![];
-    let categories = crate::data_context::presenter::fetcher::get_categories(&app_state, *lang).await;
+     let categories = crate::data_context::presenter::fetcher::get_categories(&app_state, &uuid::Uuid::new_v4(), *lang).await;
     // let menu_items = crate::data::presenter::fetcher::get_menu_items(&app_state, *lang).await;
 
     // let menu_items_breakfast = menu_items

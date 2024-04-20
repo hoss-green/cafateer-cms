@@ -1,14 +1,3 @@
-use askama::Template;
-use askama_axum::IntoResponse;
-use axum::{
-    extract::{Path, State},
-    response::{AppendHeaders, Html},
-};
-use http::{
-    header::{COOKIE, SET_COOKIE},
-    HeaderMap,
-};
-
 use crate::{
     data_context::context::AppState,
     models::{
@@ -18,6 +7,16 @@ use crate::{
             pages::{MenuPage, RestaurantPage},
         },
     },
+};
+use askama::Template;
+use askama_axum::IntoResponse;
+use axum::{
+    extract::{Path, State},
+    response::{AppendHeaders, Html},
+};
+use http::{
+    header::{COOKIE, SET_COOKIE},
+    HeaderMap,
 };
 
 pub async fn get_restaurant(
@@ -39,26 +38,27 @@ pub async fn get_restaurant_with_lang(
     State(app_state): State<AppState>,
     Path(lang_code): Path<String>,
 ) -> impl IntoResponse {
-    let lang =
-        match crate::data_context::references::get_language(&app_state.database_pool, &lang_code)
-            .await
-        {
-            Some(lang) => lang.id,
-            None => 0,
-        };
+    let owner_id = match app_state.single_user_id {
+        Some(id) => id,
+        None => uuid::Uuid::try_parse("deadbeef-0000-dead-beef-010203040506").unwrap(),
+    };
+
+    // fetch all the available system languages
     let available_languages =
         crate::data_context::references::get_languages(&app_state.database_pool).await;
-    
-    let language_codes = crate::data_context::presenter::fetcher::get_all_ids_debug(
-        &app_state.database_pool,
-    )
-    .await;
+    let lang = match available_languages.iter().find(|lang| lang.code == lang_code.to_lowercase()) {
+        Some(found_lang) => found_lang.id, 
+        None => 0
+    };
 
-    let details = crate::data_context::presenter::fetcher::get_details(&app_state, lang).await;
+    //languages available on this account
+    let language_codes = crate::data_context::presenter::fetcher::get_all_available_languages(&app_state.database_pool, &owner_id).await;
+    let details = crate::data_context::presenter::fetcher::get_details(&app_state, &owner_id, lang).await;
     let categories =
-        crate::data_context::presenter::fetcher::get_categories(&app_state, lang).await;
+        crate::data_context::presenter::fetcher::get_categories(&app_state, &owner_id, lang).await;
     let mut menu_items =
-        crate::data_context::presenter::fetcher::get_menu_item_vms(&app_state, lang).await;
+        crate::data_context::presenter::fetcher::get_menu_item_vms(&app_state, &owner_id, lang).await;
+
     let mut menu_tabs: Vec<MenuTabComponent> = vec![];
     menu_items.iter_mut().for_each(|mi| {
         let category_id = match mi.category {
@@ -69,7 +69,7 @@ pub async fn get_restaurant_with_lang(
         match mt {
             Some(mt) => mt.menu_items.push(MenuItemComponent {
                 title: mi.title.clone(),
-                description: mi.description.clone().unwrap_or(String::new()),
+                description: mi.description.clone().unwrap_or_default(),
                 price: mi.price.unwrap_or(0.0),
                 category: mi.category.unwrap_or(uuid::Uuid::nil()),
             }),
@@ -88,7 +88,7 @@ pub async fn get_restaurant_with_lang(
                     },
                     menu_items: vec![MenuItemComponent {
                         title: mi.title.clone(),
-                        description: mi.description.clone().unwrap_or(String::new()),
+                        description: mi.description.clone().unwrap_or_default(),
                         price: mi.price.unwrap_or(0.0),
                         category: mi.category.unwrap_or(uuid::Uuid::nil()),
                     }],
@@ -112,11 +112,9 @@ pub async fn get_restaurant_with_lang(
 
     let restaurant_page: String = restaurant_page.render().unwrap().to_string();
 
-    // let cookie_string = format!("user_language={}; same-site=Lax; path=/;", lang_code);
     let headers: AppendHeaders<[(http::HeaderName, String); 1]> = AppendHeaders([(
         SET_COOKIE,
         format!("user_language={}; same-site=Lax; path=/;", lang),
     )]);
     (headers, Html(restaurant_page)).into_response()
-    // (StatusCode::OK, Html(restaurant_page))
 }

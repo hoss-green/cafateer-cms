@@ -1,66 +1,79 @@
-{% macro show_picker(all_available_languages) %}
-  <button id="dropdownDefault" data-dropdown-toggle="dropdown"
+{% macro render(user_languages) %}
+<div id="language_selection_dropdown_container">
+  <button
+    id="dropdownDefault"
+    data-dropdown-toggle="dropdown"
     class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2.5 text-center inline-flex items-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-    type="button">
+    type="button"
+  >
     Select
-      <i class="ml-2 fa-solid fa-caret-down"></i>
+    <i class="ml-2 fa-solid fa-caret-down"></i>
   </button>
   <!-- Dropdown menu -->
-  <div id="dropdown" class="z-10 hidden p-3 bg-white rounded-lg shadow w-72 dark:bg-gray-700">
-    <ul id="checkbox_container" class="space-y-2 text-sm" aria-labelledby="dropdownDefault">
-      {% for lang in all_available_languages.clone() %}
-      <li>
-        <label
-          class="flex items-center text-sm font-medium text-gray-900 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-md px-1.5 py-1 w-full">
-        <form hx-post="/manager/config/languages">
-          <input  name="{{ lang.id }}" type="checkbox" hx-post="/manager/config/languages" hx-target="#primary_lang_list" hx-swap="outerHTML" 
-            class="w-4 h-4 mr-2 bg-gray-100 border-gray-300 rounded text-primary-600 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500" />
-            {{ lang.name }}
-            <input type="hidden" name="id" value="{{lang.id}}"/>
-        </form>
-        </label>
+  <div
+    id="dropdown"
+    class="z-[999] hidden p-3 bg-white rounded-lg shadow w-72 dark:bg-gray-700"
+  >
+    <ul
+      class="py-2 text-sm text-gray-700 dark:text-gray-200"
+      aria-labelledby="dropdownDefaultButton"
+    >
+      {% for lang in user_languages %}
+      <li id="primary_lang_list">
+        <button
+          class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white w-full text-center"
+          hx-post="/manager/config/primary_language/{{lang.code}}"
+          hx-target="#language_selection_dropdown_container"
+          type="button"
+        >
+          {%if lang.primary %}
+          <span class="font-bold"> {{ lang.title }} </span>
+          {% else %}
+          <span> {{ lang.title }} </span>
+          {% endif %}
+        </button>
       </li>
       {% endfor %}
     </ul>
   </div>
-  <script>
-    let checkboxes = document.getElementById("checkbox_container").getElementsByTagName("input");
-    let checkbox_array = Array.prototype.slice.call(checkboxes);
-   
-    function check_ticked() {
-        let count = checkbox_array.filter((checkbox) => checkbox.checked).length;
-        console.log(count);
-        if (count == 1) {
-          let last_box = checkbox_array.find((checkbox) => checkbox.checked); 
-          disable_checkbox(last_box);
-        } else {
-          checkbox_array.forEach((checkbox) => {
-            enable_checkbox(checkbox);
-          });
-        }
-    }
+  {% endmacro %}
 
-    function notify_if_last(event) {
-        let count = checkbox_array.filter((checkbox) => checkbox.checked).length;
-        console.log(count);
-        if (count === 0) {
-          checkbox_array[0].checked = true;
-        };
-    }
-
-    function disable_checkbox(checkbox) {
-      checkbox.disabled = true;
-      checkbox.style.backgroundColor = "gray";
-    }
-
-    function enable_checkbox(checkbox) {
-      checkbox.disabled = false;
-      checkbox.style.backgroundColor = "";
-    }
-
-    checkbox_array.forEach((checkbox) => {
-      checkbox.addEventListener('change', (event) => notify_if_last(event));
-    });
-
-  </script />
-{% endmacro %}
+  <div id="language_selection_dropdown_container">
+    <button
+      id="dropdownDefault"
+      data-dropdown-toggle="dropdown"
+      class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2.5 text-center inline-flex items-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+      type="button"
+    >
+      Select
+      <i class="ml-2 fa-solid fa-caret-down"></i>
+    </button>
+    <!-- Dropdown menu -->
+    <div
+      id="dropdown"
+      class="z-[999] hidden p-3 bg-white rounded-lg shadow w-72 dark:bg-gray-700"
+    >
+      <ul
+        class="py-2 text-sm text-gray-700 dark:text-gray-200"
+        aria-labelledby="dropdownDefaultButton"
+      >
+        {% for lang in user_languages %}
+        <li id="primary_lang_list">
+          <button
+            class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white w-full text-center"
+            hx-post="/manager/config/primary_language/{{lang.code}}"
+            hx-target="#language_selection_dropdown_container"
+            type="button"
+          >
+            {%if lang.primary %}
+            <span class="font-bold"> {{ lang.title }} </span>
+            {% else %}
+            <span> {{ lang.title }} </span>
+            {% endif %}
+          </button>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>

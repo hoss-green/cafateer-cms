@@ -35,8 +35,8 @@ pub async fn check_auth(headers: HeaderMap, mut request: Request, next: Next) ->
         return Redirect::to("/session/login").into_response();
     }
 
-    let response = "redirect".into_response();
-    let mut red = (StatusCode::OK, response).into_response();
+    // let response = "redirect".into_response();
+    let mut red = (StatusCode::OK, "redirect").into_response();
     let _ = red.headers_mut().append(
         HeaderName::from_str("HX-Redirect").unwrap(),
         HeaderValue::from_str("/session/login").unwrap(),

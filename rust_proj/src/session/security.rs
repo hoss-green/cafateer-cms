@@ -15,7 +15,7 @@ pub fn generate_salt() -> String {
 pub fn calculate_hash(password: &String, salt: &String) -> String {
     let salt_string: SaltString = match SaltString::from_b64(salt.as_str()) {
         Ok(salt) => salt,
-        Err(__) => return "".to_string(),
+        Err(_) => return "".to_string(),
     };
     let hash_method = Argon2::default();
     let combined_string = format!("{}{}", password, salt);

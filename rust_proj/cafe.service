@@ -1,0 +1,14 @@
+[Unit]
+Description=Cafeteer Service
+After=network.target
+
+[Service]
+ExecStart=/etc/cafe/cafeteer
+ExecReload=/etc/cafe/cafeteer
+Type=notify
+Restart=always
+EnvironmentFile=/etc/cafe/cafe.conf
+
+[Install]
+WantedBy=default.target
+RequiredBy=network.target

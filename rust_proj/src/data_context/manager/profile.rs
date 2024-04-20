@@ -18,11 +18,11 @@ pub async fn get(database_pool: &DatabasePool, owner_id: &uuid::Uuid) -> Profile
     }
 }
 
-pub async fn set(database_pool: &DatabasePool, account_model: &ProfileModel) -> bool {
+pub async fn set(database_pool: &DatabasePool, owner_id: &uuid::Uuid, lang: i32) -> bool {
     let result = sqlx::query!(
         "insert into profiles(id, primary_language) VALUES ($1, $2) ON CONFLICT (id) DO UPDATE SET primary_language=$2 WHERE profiles.id=$1", 
-        account_model.id,
-        account_model.primary_language)
+        owner_id,
+        lang)
     .execute(database_pool)
     .await;
 

@@ -1,10 +1,9 @@
-use crate::manager::templates::component_buttons::MenuItemButtonVm;
+use super::view_models::PrimaryLanguageVm;
+use super::view_models::SelectableLanguageVm;
 use crate::manager::templates::component_buttons::CategoryButtonVm;
+use crate::manager::templates::component_buttons::MenuItemButtonVm;
 use crate::models::data::reference_items::Language;
 use askama::Template;
-
-use super::view_models::AccountLanguageVm;
-use super::view_models::SelectableLanguageVm;
 
 #[derive(Template)]
 #[template(path = "manager/start_page.html")]
@@ -17,8 +16,7 @@ pub struct StartPageVm<'a> {
 pub struct ConfigPageVm<'a> {
     pub title: &'a str,
     pub primary_language: Language,
-    pub user_languages: Vec<AccountLanguageVm>,
-
+    pub user_languages: Vec<PrimaryLanguageVm>,
 }
 
 #[derive(Template, Debug, Clone)]
@@ -26,7 +24,7 @@ pub struct ConfigPageVm<'a> {
 pub struct LanguagesPageVm<'a> {
     pub title: &'a str,
     pub primary_language: Language,
-    pub languages: Vec<SelectableLanguageVm>
+    pub languages: Vec<SelectableLanguageVm>,
 }
 
 #[derive(Template)]

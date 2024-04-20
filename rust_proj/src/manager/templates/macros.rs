@@ -1,10 +1,9 @@
 use askama::Template;
-
-use crate::models::data::reference_items::Language;
+use super::view_models::PrimaryLanguageVm;
 
 #[derive(Template, Debug, Clone)]
 #[template(path = "manager/macros/language_selection_dropdown.html")]
 pub struct LanguageSelectionDropdownVm {
-    pub all_available_languages: Vec<Language>,
-    pub user_selected_languages: Vec<Language>,
+     pub user_languages: Vec<PrimaryLanguageVm>,
 }
+

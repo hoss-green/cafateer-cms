@@ -9,6 +9,15 @@ pub struct AccountLanguageVm {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PrimaryLanguageVm {
+    pub id: uuid::Uuid,
+    pub title: String,
+    pub code: i32,
+    pub published: bool,
+    pub primary: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DropDownLanguageVm {
     pub id: i32,
     pub name: String,

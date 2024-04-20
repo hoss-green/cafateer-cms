@@ -108,9 +108,9 @@ pub async fn do_signup(
     match crate::session::data::save_sign_up(
         &app_state.database_pool,
         &UserAccountModel {
-            id: match app_state.single_user_mode {
-                true => app_state.single_user_id, 
-                false => uuid::Uuid::new_v4(),
+            id: match app_state.single_user_id {
+                Some(id) => id,
+                None => uuid::Uuid::new_v4(),
             },
             email: session_form.email.clone(),
             email_normalised: session_form.email.to_uppercase(),

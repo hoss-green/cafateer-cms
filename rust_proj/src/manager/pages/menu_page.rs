@@ -1,7 +1,7 @@
 use crate::{
     data_context::{self, context::AppState, manager::menu_item_details},
     manager::{templates::{
-        component_buttons::MenuItemButtonVm, pages::MenuPageVm, view_models::DropDownLanguageVm,
+        component_buttons::MenuItemButtonVm, pages::MenuPageVm,
     }, viewmodel_helpers::get_dropdown_language_vms},
     models::data::{ClaimsModel, MenuItemDetailsModel},
     session::claims::Claims,

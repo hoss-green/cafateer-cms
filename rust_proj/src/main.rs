@@ -16,10 +16,17 @@ use cafeteer::{
 };
 use cafeteer::{data_context::setup_db, manager::editors::get_details_home};
 use cafeteer::{manager::session, presenter::restaurant::get_restaurant};
-use core::panic;
 use dotenv::dotenv;
 use tower::Layer;
 use tower_http::normalize_path::NormalizePathLayer;
+
+const ERROR_MESSAGE: &str = "The following evironment variables are required to be set: 
+    DATABASE_URL=postgres://dbuser:dbpassword@localhost:5432/cafeteer
+    JWT_SECRET=this_is_my_secret
+    HOST=0.0.0.0/127.0.0.1/localhost/url
+    PORT=4444/5555 etc.
+    SINGLE_USER_MODE=true/false
+";
 
 #[tokio::main]
 async fn main() {
@@ -27,7 +34,7 @@ async fn main() {
     //deadbeef-0000-dead-beef-010203040506
     let single_user_id = uuid::Uuid::try_parse("deadbeef-0000-dead-beef-010203040506").unwrap();
     dotenv().ok();
-    let pg = std::env::var("DATABASE_URL").unwrap();
+    let pg = std::env::var("DATABASE_URL").expect(ERROR_MESSAGE);
     let single_user_mode: bool = match std::env::var("SINGLE_USER_MODE") {
         Ok(value) => match value.to_lowercase().as_str() {
             "true" => true,
@@ -48,8 +55,11 @@ async fn main() {
                 panic!("Could not create database and connect to pool");
             }
         },
-        single_user_id,
-        single_user_mode,
+        single_user_id: match single_user_mode {
+            true => Some(single_user_id),
+            false => None,
+        },
+        // single_user_mode,
     };
     setup_db(&state).await;
 
@@ -149,8 +159,10 @@ async fn main() {
         .route_layer(middleware::from_fn(auth_middleware::check_auth))
         .with_state(state);
 
-    let host = std::env::var("HOST").unwrap();
-    let post = std::env::var("PORT").unwrap();
+    let host = std::env::var("HOST")
+        .unwrap_or_else(|_| panic!("{}\n{}", "PORT not set in environment", ERROR_MESSAGE));
+    let post = std::env::var("PORT")
+        .unwrap_or_else(|_| panic!("{}\n{}", "PORT not set in environment", ERROR_MESSAGE));
 
     let advertise_url = format!("{}:{}", host, post);
     println!("Server is running on: {}", advertise_url);

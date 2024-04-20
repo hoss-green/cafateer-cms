@@ -1,18 +1,16 @@
-{%- import "manager/page_buttons/language_edit_button.html" as language_edit_button  -%}
 {%- import "manager/page_buttons/language_selection_button.html" as language_selection_button  -%}
 {%- import "manager/macros/primary_language_selector.html" as primary_language_selector  -%}
+{%- import "manager/macros/language_selection_dropdown.html" as language_selection_dropdown  -%}
 {% extends "manager/manager_base.html" %}
 {% block title %}{{ title }}{% endblock %}
 {% block content %}
 <div class="pb-2 flex flex-col items-start">
-<h5 class="text-2xl">Language Editor</h5>
+<h5 class="text-2xl">Web Configuration</h5>
   <div class="flex flex-col w-full justify-start gap-2">
   <div id="menu_item_container">
-    <p class="pl-1 font-bold">Enabled Languages</p>
+    <p class="pl-1 font-bold">Primary Language</p>
       <div class="flex flex-col gap-2">
-        {% for user_language in user_languages %}
-          {% call language_edit_button::render(user_language.id, user_language.title, user_language.published) %}
-        {% endfor %}
+        {% call language_selection_dropdown::render(user_languages) %}
       </div>
     </div>
   </div>

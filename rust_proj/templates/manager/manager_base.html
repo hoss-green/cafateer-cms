@@ -16,7 +16,7 @@
       htmx.onLoad(function (content) {
         //console.log({ content });
         let content_id = content.id.toString();
-        if (content_id.startsWith("menu_button") || content_id.startsWith("category_button")) {
+        if (content_id.startsWith("menu_button") || content_id.startsWith("category_button") || content_id.startsWith("language_selection_dropdown_container")) {
           console.log("hoorah");
           initDropdowns();
           initDismisses();

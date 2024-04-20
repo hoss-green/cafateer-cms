@@ -1,7 +1,7 @@
 use crate::{
-    data_context::{self, context::AppState},
+    data_context::context::AppState,
     manager::templates::{
-        components::{CategoryDetailEditorVm, MenuItemDetailsEditorVm},
+        components::CategoryDetailEditorVm,
         toggle_buttons::{DisableButton, EnableButton},
     },
     models::data::ClaimsModel,

@@ -3,7 +3,9 @@
 <div class="p-2 bg-base-100">
   <span class="font-bold block text-lg">{{ title }}</span>
   <p class="text-md font-light">{{ description }}</p>
-  <span class="font-bold">{{ price }}</span>
+  {% let price_str = price.clone() %}
+  {% let price_str = format!("{:.2}", price_str) %}
+  <span class=""><span class="font-bold">€</span>{{ price_str }}</span>
 </div>
 <!-- item end -->
 {% endmacro %}
