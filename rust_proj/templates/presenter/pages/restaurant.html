@@ -1,4 +1,5 @@
-{%- import "presenter/components/menu_tab.html" as scope -%} {% extends "presenter/presenter_base.html" %} {%
+{%- import "presenter/components/menu_tabs.html" as menu_tabs -%}
+{% extends "presenter/presenter_base.html" %} {%
 block title %}{{ title }}{% endblock %} {% block content %}
 <!-- Header -->
 <div
@@ -20,7 +21,6 @@ block title %}{{ title }}{% endblock %} {% block content %}
     <a href="#find_us">Find Us</a>
     <p>●</p>
     <button class="" onclick="my_modal_1.showModal()">Language</button>
-    <!-- <a href="#language"></a> -->
   </div>
 </div>
 <!-- Hero -->
@@ -28,14 +28,8 @@ block title %}{{ title }}{% endblock %} {% block content %}
   <h1 class="text-center text-[8rem] font-logo font-thin text-secondary">
     Sunny Cafe
   </h1>
-  <!--<p class="text-center font-label uppercase font-bold text-lg opacity-80">Fine Food, Fine Drinks &amp; Fine Service</p>-->
 </div>
 <div class="flex flex-col justify-center items-center">
-  <!-- <div class="flex gap-1 p-4 md:px-16 max-w-4xl"> -->
-  <!--   <a href="#menu">Menu</a> -->
-  <!--   <p>|</p> -->
-  <!--   <a href="#find_us">Find Us</a> -->
-  <!-- </div> -->
   <div class="flex gap-4 p-4 md:px-16 max-w-4xl">
     <div>
       <img class="rounded-sm" src="assets/images/sunny-3.jpeg" />
@@ -66,17 +60,7 @@ block title %}{{ title }}{% endblock %} {% block content %}
       Menu
     </h5>
   </div>
-  <div class="flex w-full justify-center">
-    <div class="px-4 flex justify-center items-center w-full max-w-4xl">
-      <div role="tablist" class="tabs w-full">
-        <div style="grid-column-start: 1;grid-column-end: span 9999;"></div>
-        {% let first_run = true %}
-        {% for tab in menu_page.menu_tabs %} 
-          {% call scope::tab(tab.name, tab.menu_items.clone(), first_run) %} 
-        {% endfor %}
-      </div>
-    </div>
-  </div>
+  {% call menu_tabs::render(menu_page.menu_tabs) %}
 </div>
 <!-- Find us -->
 <div id="find_us" class="w-full flex justify-center font-light">

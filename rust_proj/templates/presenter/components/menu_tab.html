@@ -1,7 +1,11 @@
 {%- import "presenter/components/menu_item.html" as scope -%}
-{% macro tab(name, menu_items, first_run) %}
+{% macro tab(id, name, menu_items, first_run) %}
 <!-- tab -->
-<input type="radio" name="my_tabs_1" role="tab" class="tab" aria-label="{{ name }}" />
+{% if first_run %}
+  <input id="{{ id }}" type="radio" name="my_tabs_1" role="tab" class="tab !w-max h-8 !hidden" style="display: none" aria-label="{{ name }}" checked />
+{% else %}
+  <input id="{{ id }}" type="radio" name="my_tabs_1" role="tab" class="tab !w-max h-8 !hidden" style="display: none" aria-label="{{ name }}" />
+{% endif %}
 <div role="tabpanel" class="tab-content w-full max-w-5xl">
   <div class="w-full">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-3 w-full">

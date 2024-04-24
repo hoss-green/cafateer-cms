@@ -1,0 +1,29 @@
+{%- import "presenter/components/menu_tab.html" as scope -%}
+{% macro render(menu_tabs) %}
+<div class="flex flex-col w-full justify-center items-center">
+      <div class="!pb-4">
+        <select id="menu_selector" class="select w-full rounded-none pb-2" onChange="choose_tab(this.options[this.selectedIndex].value)"  >
+          {% for tab in menu_tabs.clone() %} 
+          <option value="{{ tab.category }}">{{ tab.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+  <div class="px-4 flex justify-center items-center w-full max-w-4xl">
+    <div role="tablist" class="tabs w-full">
+      <div style="grid-column-start: 1;grid-column-end: span 9999;"></div>
+      {% for tab in menu_tabs %} 
+        <!-- makes sure the first item is selected -->
+        {% let first_run = loop.index0 == 0 %}
+        {% call scope::tab(tab.category, tab.name, tab.menu_items.clone(), first_run) %}
+      {% endfor %}
+    </div>
+  </div>
+</div>
+<script>
+  function choose_tab(chosen) {
+    console.log(chosen);
+    let checkbox = document.getElementById(chosen);
+    checkbox.checked = true;
+  }
+</script>
+{% endmacro %}
