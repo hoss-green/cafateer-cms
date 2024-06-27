@@ -2,7 +2,7 @@
 {% macro render(menu_tabs) %}
 <div class="flex flex-col w-full justify-center items-center">
       <div class="!pb-4">
-        <select id="menu_selector" class="select w-full rounded-none pb-2" onChange="choose_tab(this.options[this.selectedIndex].value)"  >
+        <select id="menu_selector" class="select w-full rounded-none" onChange="choose_tab(this.options[this.selectedIndex].value)"  >
           {% for tab in menu_tabs.clone() %} 
           <option value="{{ tab.category }}">{{ tab.name }}</option>
           {% endfor %}

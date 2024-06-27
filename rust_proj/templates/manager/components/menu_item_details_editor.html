@@ -7,8 +7,8 @@
         <option disabled>Choose a Category</option>
         {% for available_category in categories %}
           {% if available_category.id == category %}
-        <option selected value="{{ available_category.id }}">{{ available_category.title.clone().unwrap_or(String::new()) }}</option>
-        {% endif %}
+            <option selected value="{{ available_category.id }}">{{ available_category.title.clone().unwrap_or(String::new()) }}</option>
+          {% endif %}
         <option value="{{ available_category.id }}">{{ available_category.title.clone().unwrap_or(String::new()) }}</option>
         {% endfor %}
       </select>
