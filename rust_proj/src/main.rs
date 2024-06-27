@@ -96,10 +96,6 @@ async fn main() {
             "/manager/menu/category/details/:id",
             get(editors::get_category_details),
         )
-        // .route(
-        //     "/manager/menu/categories/details/",
-        //     put(editors::update_category_details),
-        // )
         .route(
             "/manager/menu/categories/enable/:id",
             put(editors::enable_category),

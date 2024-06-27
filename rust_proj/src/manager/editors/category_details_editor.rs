@@ -21,10 +21,6 @@ pub async fn get_category_details(
     State(_app_state): State<AppState>,
     Path(id): Path<uuid::Uuid>,
 ) -> impl IntoResponse {
-    // let database_pool = &app_state.database_pool;
-    // let category_details =
-    //     data_context::manager::category_detail::get(database_pool, &claims.sub, &id).await;
-
     CategoryDetailEditorVm { id }
         .render()
         .unwrap()

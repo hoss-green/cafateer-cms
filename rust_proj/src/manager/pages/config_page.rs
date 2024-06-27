@@ -37,7 +37,6 @@ pub async fn get(
             .collect::<Vec<PrimaryLanguageVm>>(),
         title: "Config",
     }
-    // let editor_home: String = editor_home
     .render()
     .unwrap()
     .to_string();

@@ -8,7 +8,4 @@ pub struct Claims<T> {
     pub exp: i64,
     pub roles: Vec<String>,
     pub body: T
-    // pub sub_expiry: NaiveDateTime,
-    // pub product_id: String,
-    // pub sub_status: String,
 }

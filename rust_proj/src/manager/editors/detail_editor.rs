@@ -16,7 +16,6 @@ pub async fn get_details_data(
     let database_pool = &app_state.database_pool;
     let account_languages = data_context::manager::profile_languages::get_all_ids(database_pool, &claims.sub).await;
     if !account_languages
-        // .iter().map(|al| al.language).collect::<Vec<i32>>()
         .iter()
         .any(|&lang_id| lang_id == id)
     {
@@ -52,7 +51,6 @@ pub async fn get_details_home(
     let account_languages = data_context::manager::profile_languages::get_all_ids(database_pool, &claims.sub).await;
     let all_langs = data_context::references::get_languages(database_pool).await;
     let language_list = Language::vec_from_int_vec(&all_langs, &account_languages);
-        // .iter().map(|ml| ml.language).collect::<Vec<i32>>());
 
     let editor_home = DetailsPageVm {
         title: "Editor Home for SC",

@@ -10,6 +10,7 @@ use crate::{
     models::views::{components::MenuTabComponent, pages::MenuPage},
 };
 
+//this needs to be modularised
 pub async fn get_menu(
     State(app_state): State<AppState>,
     lang: Path<i32>,

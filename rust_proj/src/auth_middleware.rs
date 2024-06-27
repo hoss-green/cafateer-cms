@@ -17,7 +17,6 @@ pub async fn check_auth(headers: HeaderMap, mut request: Request, next: Next) ->
     let jwt = get_jwt_from_header(&headers);
     match jwt {
         Ok(jwt) => {
-            // println!("Middleware hit {}", jwt);
             match validate_jwt_and_get_claims::<ClaimsModel>(jwt) {
                 Ok(cms) => {
                     request.extensions_mut().insert(cms.clone());
@@ -30,12 +29,10 @@ pub async fn check_auth(headers: HeaderMap, mut request: Request, next: Next) ->
         }
     };
 
-
     if !is_hx_request(&headers) {
         return Redirect::to("/session/login").into_response();
     }
 
-    // let response = "redirect".into_response();
     let mut red = (StatusCode::OK, "redirect").into_response();
     let _ = red.headers_mut().append(
         HeaderName::from_str("HX-Redirect").unwrap(),

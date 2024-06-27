@@ -73,7 +73,6 @@ pub async fn get_menu_item_details(
         published: menu_item_details.published,
     };
     let menu_editor: String = menu_item_editor.render().unwrap().to_string();
-    // (StatusCode::OK, Html(menu_editor))
     menu_editor.into_response()
 }
 

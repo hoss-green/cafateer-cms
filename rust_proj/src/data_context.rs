@@ -57,7 +57,6 @@ pub async fn setup_db(app_state: &AppState) {
         Err(_) => panic!("Could not remove languages from database to rebuild"),
     };
 
-    // "insert into details(id, lang, blurb) VALUES ($1, $2, $3) ON CONFLICT (id, lang) DO UPDATE SET blurb=$3 WHERE details.id=$1 and details.lang=$2",
     for lang in setup_langs {
         let res = sqlx::query!(
             "insert into ref_languages (id, code, name) VALUES ($1, $2, $3)",

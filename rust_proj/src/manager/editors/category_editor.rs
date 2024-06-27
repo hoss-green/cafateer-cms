@@ -45,7 +45,6 @@ pub async fn create_category_item(
         lang_name: None,
     };
     let database_pool = &app_state.database_pool;
-    // let result = data_context::manager::category::create(database_pool, &claims.sub, cm).await;
 
     let langs = get_dropdown_language_vms(&app_state.database_pool, &claims.sub).await;
     match data_context::manager::category::create(database_pool, &claims.sub, cm).await {
@@ -60,11 +59,6 @@ pub async fn create_category_item(
         .into_response(),
         false => StatusCode::INTERNAL_SERVER_ERROR.into_response(),
     }
-
-    // if result {
-    //     return (StatusCode::OK, Html("Saved!".to_string()));
-    // }
-    // (StatusCode::OK, Html("Error".to_string()))
 }
 
 pub async fn delete_category_item(
